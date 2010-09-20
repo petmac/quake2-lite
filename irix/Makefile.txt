@@ -1,76 +1,144 @@
+#!gmake -j3
+# 
+# MAKE="gmake -j8"
 #
-# Quake2 Makefile for Solaris
-#
-# Nov '97 by Zoid <zoid@idsoftware.com>
+# Quake2 Makefile for Irix
 #
 # ELF only
 #
 
-ARCH=axp
+MOUNT_DIR=..
 
-MOUNT_DIR=/chest/Quake2/code
+# SUB_MAKE_FLAGS=-j 3
 
-BUILD_DEBUG_DIR=debug$(ARCH)
-BUILD_RELEASE_DIR=release$(ARCH)
+BUILD_DEBUG_DIR=debug
+BUILD_RELEASE_DIR=release
+BUILD_DEBUG_STATIC_DIR=debug_static
+BUILD_RELEASE_STATIC_DIR=release_static
 CLIENT_DIR=$(MOUNT_DIR)/client
 SERVER_DIR=$(MOUNT_DIR)/server
+REF_SOFT_DIR=$(MOUNT_DIR)/ref_soft
+REF_GL_DIR=$(MOUNT_DIR)/ref_gl
 COMMON_DIR=$(MOUNT_DIR)/qcommon
+IRIX_DIR=$(MOUNT_DIR)/irix
 LINUX_DIR=$(MOUNT_DIR)/linux
 GAME_DIR=$(MOUNT_DIR)/game
 CTF_DIR=$(MOUNT_DIR)/ctf
 XATRIX_DIR=$(MOUNT_DIR)/xatrix
-NULL_DIR=$(MOUNT_DIR)/null
 
-CC=gcc
-BASE_CFLAGS=-Dstricmp=strcasecmp -DC_ONLY -DDEDICATED_ONLY
-RELEASE_CFLAGS=$(BASE_CFLAGS) -ffast-math -funroll-loops \
-	-fomit-frame-pointer -fexpensive-optimizations
+ARCH=mips
+
+#CC=gcc
+# warning(1185): enumerated type mixed with another type
+BASE_CFLAGS=-Dstricmp=strcasecmp -Xcpluscomm -woff 1185 -mips3 \
+	-nostdinc -I. -I$(ROOT)/usr/include
+RELEASE_CFLAGS=$(BASE_CFLAGS) -O3
 DEBUG_CFLAGS=$(BASE_CFLAGS) -g
-LDFLAGS=-ldl -lm
+BASE_STATIC_CFLAGS=-DGAME_HARD_LINKED -DREF_HARD_LINKED
+RELEASE_STATIC_CFLAGS=$(BASE_STATIC_CFLAGS) $(RELEASE_CFLAGS)
+DEBUG_STATIC_CFLAGS=$(BASE_STATIC_CFLAGS) $(DEBUG_CFLAGS)
+# ld warning(15) multiply defined...
+LDFLAGS=-nostdlib -L. -L$(ROOT)/usr/lib32 \
+	-ldl -lm -laudio -ldmedia -Wl,-woff,15
+XLDFLAGS=-lX11 -lXext
 XCFLAGS=
+
+GLLDFLAGS=-lGL -lX11 -lXext
+GLCFLAGS=
 
 SHLIBEXT=so
 
-SHLIBCFLAGS=-fPIC
+#SHLIBCFLAGS=-fPIC
+SHLIBCFLAGS=
 SHLIBLDFLAGS=-shared
 
 DO_CC=$(CC) $(CFLAGS) -o $@ -c $<
 DO_SHLIB_CC=$(CC) $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
+DO_GL_SHLIB_CC=$(CC) $(CFLAGS) $(SHLIBCFLAGS) $(GLCFLAGS) -o $@ -c $<
+DO_AS=$(CC) $(CFLAGS) -DELF -x assembler-with-cpp -o $@ -c $<
+DO_SHLIB_AS=$(CC) $(CFLAGS) $(SHLIBCFLAGS) -DELF -x assembler-with-cpp -o $@ -c $<
 
 #############################################################################
 # SETUP AND BUILD
 #############################################################################
 
-TARGETS=$(BUILDDIR)/q2ded \
-	$(BUILDDIR)/game$(ARCH).$(SHLIBEXT) \
+TARGETS=$(BUILDDIR)/quake2 $(BUILDDIR)/game$(ARCH).$(SHLIBEXT) \
+	$(BUILDDIR)/ref_soft.$(SHLIBEXT) \
+	$(BUILDDIR)/ref_gl.$(SHLIBEXT) \
 	$(BUILDDIR)/ctf/game$(ARCH).$(SHLIBEXT) \
 	$(BUILDDIR)/xatrix/game$(ARCH).$(SHLIBEXT)
 
+STATIC_TARGETS= \
+	$(BUILDDIR)/quake2.gl \
+	$(BUILDDIR)/quake2.sw
+
 build_debug:
-	@-mkdir $(BUILD_DEBUG_DIR) \
-		$(BUILD_DEBUG_DIR)/client \
-		$(BUILD_DEBUG_DIR)/game \
-		$(BUILD_DEBUG_DIR)/ctf \
-		$(BUILD_DEBUG_DIR)/xatrix
-	$(MAKE) targets BUILDDIR=$(BUILD_DEBUG_DIR) CFLAGS="$(DEBUG_CFLAGS)"
+	@ if test ! -d $(BUILD_DEBUG_DIR) ; then mkdir $(BUILD_DEBUG_DIR) ; fi
+	@ if test ! -d $(BUILD_DEBUG_DIR)/client ; then mkdir $(BUILD_DEBUG_DIR)/client ; fi
+	@ if test ! -d $(BUILD_DEBUG_DIR)/ref_soft ; then mkdir $(BUILD_DEBUG_DIR)/ref_soft ; fi
+	@ if test ! -d $(BUILD_DEBUG_DIR)/ref_gl ; then mkdir $(BUILD_DEBUG_DIR)/ref_gl ; fi
+	@ if test ! -d $(BUILD_DEBUG_DIR)/game ; then mkdir $(BUILD_DEBUG_DIR)/game ; fi
+	@ if test ! -d $(BUILD_DEBUG_DIR)/ctf ; then mkdir $(BUILD_DEBUG_DIR)/ctf ; fi
+	@ if test ! -d $(BUILD_DEBUG_DIR)/xatrix ; then mkdir $(BUILD_DEBUG_DIR)/xatrix ; fi
+	$(MAKE) $(SUB_MAKE_FLAGS) targets BUILDDIR=$(BUILD_DEBUG_DIR) CFLAGS="$(DEBUG_CFLAGS)"
 
 build_release:
-	@-mkdir $(BUILD_RELEASE_DIR) \
-		$(BUILD_RELEASE_DIR)/client \
-		$(BUILD_RELEASE_DIR)/game \
-		$(BUILD_RELEASE_DIR)/ctf \
-		$(BUILD_RELEASE_DIR)/xatrix
-	$(MAKE) targets BUILDDIR=$(BUILD_RELEASE_DIR) CFLAGS="$(RELEASE_CFLAGS)"
+	@ if test ! -d $(BUILD_RELEASE_DIR) ; then mkdir $(BUILD_RELEASE_DIR) ; fi
+	@ if test ! -d $(BUILD_RELEASE_DIR)/client ; then mkdir $(BUILD_RELEASE_DIR)/client ; fi
+	@ if test ! -d $(BUILD_RELEASE_DIR)/ref_soft ; then mkdir $(BUILD_RELEASE_DIR)/ref_soft ; fi
+	@ if test ! -d $(BUILD_RELEASE_DIR)/ref_gl ; then mkdir $(BUILD_RELEASE_DIR)/ref_gl ; fi
+	@ if test ! -d $(BUILD_RELEASE_DIR)/game ; then mkdir $(BUILD_RELEASE_DIR)/game ; fi
+	@ if test ! -d $(BUILD_RELEASE_DIR)/ctf ; then mkdir $(BUILD_RELEASE_DIR)/ctf ; fi
+	@ if test ! -d $(BUILD_RELEASE_DIR)/xatrix ; then mkdir $(BUILD_RELEASE_DIR)/xatrix ; fi
+	$(MAKE) $(SUB_MAKE_FLAGS) targets BUILDDIR=$(BUILD_RELEASE_DIR) CFLAGS="$(RELEASE_CFLAGS)"
 
-all: build_debug build_release
+build_debug_static:
+	@ if test ! -d $(BUILD_DEBUG_STATIC_DIR) ; then mkdir $(BUILD_DEBUG_STATIC_DIR) ; fi
+	@ if test ! -d $(BUILD_DEBUG_STATIC_DIR)/client ; then mkdir $(BUILD_DEBUG_STATIC_DIR)/client ; fi
+	@ if test ! -d $(BUILD_DEBUG_STATIC_DIR)/ref_soft ; then mkdir $(BUILD_DEBUG_STATIC_DIR)/ref_soft ; fi
+	@ if test ! -d $(BUILD_DEBUG_STATIC_DIR)/ref_gl ; then mkdir $(BUILD_DEBUG_STATIC_DIR)/ref_gl ; fi
+	@ if test ! -d $(BUILD_DEBUG_STATIC_DIR)/game ; then mkdir $(BUILD_DEBUG_STATIC_DIR)/game ; fi
+	$(MAKE) $(SUB_MAKE_FLAGS) static_targets BUILDDIR=$(BUILD_DEBUG_STATIC_DIR) CFLAGS="$(DEBUG_STATIC_CFLAGS)"
+
+build_release_static:
+	@ if test ! -d $(BUILD_RELEASE_STATIC_DIR) ; then mkdir $(BUILD_RELEASE_STATIC_DIR) ; fi
+	@ if test ! -d $(BUILD_RELEASE_STATIC_DIR)/client ; then mkdir $(BUILD_RELEASE_STATIC_DIR)/client ; fi
+	@ if test ! -d $(BUILD_RELEASE_STATIC_DIR)/ref_soft ; then mkdir $(BUILD_RELEASE_STATIC_DIR)/ref_soft ; fi
+	@ if test ! -d $(BUILD_RELEASE_STATIC_DIR)/ref_gl ; then mkdir $(BUILD_RELEASE_STATIC_DIR)/ref_gl ; fi
+	@ if test ! -d $(BUILD_RELEASE_STATIC_DIR)/game ; then mkdir $(BUILD_RELEASE_STATIC_DIR)/game ; fi
+	$(MAKE) $(SUB_MAKE_FLAGS) static_targets BUILDDIR=$(BUILD_RELEASE_STATIC_DIR) CFLAGS="$(RELEASE_STATIC_CFLAGS)"
+
+all: build_debug build_release build_debug_static build_release_static
 
 targets: $(TARGETS)
+
+static_targets: $(STATIC_TARGETS)
 
 #############################################################################
 # CLIENT/SERVER
 #############################################################################
 
 QUAKE2_OBJS = \
+	$(BUILDDIR)/client/cl_cin.o \
+	$(BUILDDIR)/client/cl_ents.o \
+	$(BUILDDIR)/client/cl_fx.o \
+	$(BUILDDIR)/client/cl_input.o \
+	$(BUILDDIR)/client/cl_inv.o \
+	$(BUILDDIR)/client/cl_main.o \
+	$(BUILDDIR)/client/cl_newfx.o \
+	$(BUILDDIR)/client/cl_parse.o \
+	$(BUILDDIR)/client/cl_pred.o \
+	$(BUILDDIR)/client/cl_tent.o \
+	$(BUILDDIR)/client/cl_scrn.o \
+	$(BUILDDIR)/client/cl_view.o \
+	$(BUILDDIR)/client/console.o \
+	$(BUILDDIR)/client/keys.o \
+	$(BUILDDIR)/client/menu.o \
+	$(BUILDDIR)/client/snd_dma.o \
+	$(BUILDDIR)/client/snd_mem.o \
+	$(BUILDDIR)/client/snd_mix.o \
+	$(BUILDDIR)/client/qmenu.o \
+	$(BUILDDIR)/client/m_flash.o \
 	\
 	$(BUILDDIR)/client/cmd.o \
 	$(BUILDDIR)/client/cmodel.o \
@@ -90,19 +158,80 @@ QUAKE2_OBJS = \
 	$(BUILDDIR)/client/sv_user.o \
 	$(BUILDDIR)/client/sv_world.o \
 	\
-	$(BUILDDIR)/client/q_shlinux.o \
-	$(BUILDDIR)/client/sys_linux.o \
+	$(BUILDDIR)/client/cd_irix.o \
+	$(BUILDDIR)/client/q_shirix.o \
+	$(BUILDDIR)/client/vid_menu.o \
+	$(BUILDDIR)/client/vid_so.o \
+	$(BUILDDIR)/client/snd_irix.o \
+	$(BUILDDIR)/client/sys_irix.o \
 	$(BUILDDIR)/client/glob.o \
 	$(BUILDDIR)/client/net_udp.o \
 	\
 	$(BUILDDIR)/client/q_shared.o \
-	$(BUILDDIR)/client/pmove.o \
-	\
-	$(BUILDDIR)/client/cl_null.o \
-	$(BUILDDIR)/client/cd_null.o
+	$(BUILDDIR)/client/pmove.o
 
-$(BUILDDIR)/q2ded : $(QUAKE2_OBJS)
+$(BUILDDIR)/quake2 : $(QUAKE2_OBJS)
 	$(CC) $(CFLAGS) -o $@ $(QUAKE2_OBJS) $(LDFLAGS)
+
+$(BUILDDIR)/client/cl_cin.o :     $(CLIENT_DIR)/cl_cin.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/cl_ents.o :    $(CLIENT_DIR)/cl_ents.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/cl_fx.o :      $(CLIENT_DIR)/cl_fx.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/cl_input.o :   $(CLIENT_DIR)/cl_input.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/cl_inv.o :     $(CLIENT_DIR)/cl_inv.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/cl_main.o :    $(CLIENT_DIR)/cl_main.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/cl_newfx.o :    $(CLIENT_DIR)/cl_newfx.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/cl_parse.o :   $(CLIENT_DIR)/cl_parse.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/cl_pred.o :    $(CLIENT_DIR)/cl_pred.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/cl_tent.o :    $(CLIENT_DIR)/cl_tent.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/cl_scrn.o :    $(CLIENT_DIR)/cl_scrn.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/cl_view.o :    $(CLIENT_DIR)/cl_view.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/console.o :    $(CLIENT_DIR)/console.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/keys.o :       $(CLIENT_DIR)/keys.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/menu.o :       $(CLIENT_DIR)/menu.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/snd_dma.o :    $(CLIENT_DIR)/snd_dma.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/snd_mem.o :    $(CLIENT_DIR)/snd_mem.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/snd_mix.o :    $(CLIENT_DIR)/snd_mix.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/qmenu.o :      $(CLIENT_DIR)/qmenu.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/m_flash.o :    $(GAME_DIR)/m_flash.c
+	$(DO_CC)
 
 $(BUILDDIR)/client/cmd.o :        $(COMMON_DIR)/cmd.c
 	$(DO_CC)
@@ -158,22 +287,28 @@ $(BUILDDIR)/client/sv_user.o :    $(SERVER_DIR)/sv_user.c
 $(BUILDDIR)/client/sv_world.o :   $(SERVER_DIR)/sv_world.c
 	$(DO_CC)
 
-$(BUILDDIR)/client/q_shlinux.o :  $(LINUX_DIR)/q_shlinux.c
+$(BUILDDIR)/client/cd_irix.o :   $(IRIX_DIR)/cd_irix.c
 	$(DO_CC)
 
-$(BUILDDIR)/client/sys_linux.o :  $(LINUX_DIR)/sys_linux.c
+$(BUILDDIR)/client/q_shirix.o :  $(IRIX_DIR)/q_shirix.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/vid_menu.o :   $(IRIX_DIR)/vid_menu.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/vid_so.o :     $(IRIX_DIR)/vid_so.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/snd_irix.o :  $(IRIX_DIR)/snd_irix.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/sys_irix.o :  $(IRIX_DIR)/sys_irix.c
 	$(DO_CC)
 
 $(BUILDDIR)/client/glob.o :       $(LINUX_DIR)/glob.c
 	$(DO_CC)
 
 $(BUILDDIR)/client/net_udp.o :    $(LINUX_DIR)/net_udp.c
-	$(DO_CC)
-
-$(BUILDDIR)/client/cd_null.o     : $(NULL_DIR)/cd_null.c    
-	$(DO_CC)
-
-$(BUILDDIR)/client/cl_null.o     : $(NULL_DIR)/cl_null.c    
 	$(DO_CC)
 
 #############################################################################
@@ -184,6 +319,7 @@ GAME_OBJS = \
 	$(BUILDDIR)/game/g_ai.o \
 	$(BUILDDIR)/game/p_client.o \
 	$(BUILDDIR)/game/g_cmds.o \
+	$(BUILDDIR)/game/g_chase.o \
 	$(BUILDDIR)/game/g_svcmds.o \
 	$(BUILDDIR)/game/g_combat.o \
 	$(BUILDDIR)/game/g_func.o \
@@ -239,6 +375,9 @@ $(BUILDDIR)/game/p_client.o :    $(GAME_DIR)/p_client.c
 	$(DO_SHLIB_CC)
 
 $(BUILDDIR)/game/g_cmds.o :      $(GAME_DIR)/g_cmds.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/game/g_chase.o :      $(GAME_DIR)/g_chase.c
 	$(DO_SHLIB_CC)
 
 $(BUILDDIR)/game/g_svcmds.o :    $(GAME_DIR)/g_svcmds.c
@@ -492,6 +631,7 @@ $(BUILDDIR)/ctf/q_shared.o :   $(CTF_DIR)/q_shared.c
 
 XATRIX_OBJS = \
 	$(BUILDDIR)/xatrix/g_ai.o \
+	$(BUILDDIR)/xatrix/g_chase.o \
 	$(BUILDDIR)/xatrix/g_cmds.o \
 	$(BUILDDIR)/xatrix/g_combat.o \
 	$(BUILDDIR)/xatrix/g_func.o \
@@ -547,6 +687,9 @@ $(BUILDDIR)/xatrix/game$(ARCH).$(SHLIBEXT) : $(XATRIX_OBJS)
 	$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(XATRIX_OBJS)
 
 $(BUILDDIR)/xatrix/g_ai.o :        $(XATRIX_DIR)/g_ai.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/xatrix/g_chase.o :      $(XATRIX_DIR)/g_chase.c
 	$(DO_SHLIB_CC)
 
 $(BUILDDIR)/xatrix/g_cmds.o :      $(XATRIX_DIR)/g_cmds.c
@@ -699,11 +842,186 @@ $(BUILDDIR)/xatrix/p_weapon.o :    $(XATRIX_DIR)/p_weapon.c
 $(BUILDDIR)/xatrix/q_shared.o :    $(XATRIX_DIR)/q_shared.c
 	$(DO_SHLIB_CC)
 
+
+#############################################################################
+# REF_SOFT
+#############################################################################
+
+REF_SOFT_OBJS = \
+	$(BUILDDIR)/ref_soft/r_aclip.o \
+	$(BUILDDIR)/ref_soft/r_alias.o \
+	$(BUILDDIR)/ref_soft/r_bsp.o \
+	$(BUILDDIR)/ref_soft/r_draw.o \
+	$(BUILDDIR)/ref_soft/r_edge.o \
+	$(BUILDDIR)/ref_soft/r_image.o \
+	$(BUILDDIR)/ref_soft/r_light.o \
+	$(BUILDDIR)/ref_soft/r_main.o \
+	$(BUILDDIR)/ref_soft/r_misc.o \
+	$(BUILDDIR)/ref_soft/r_model.o \
+	$(BUILDDIR)/ref_soft/r_part.o \
+	$(BUILDDIR)/ref_soft/r_poly.o \
+	$(BUILDDIR)/ref_soft/r_polyse.o \
+	$(BUILDDIR)/ref_soft/r_rast.o \
+	$(BUILDDIR)/ref_soft/r_scan.o \
+	$(BUILDDIR)/ref_soft/r_sprite.o \
+	$(BUILDDIR)/ref_soft/r_surf.o \
+	\
+	$(BUILDDIR)/ref_soft/q_shared.o \
+	$(BUILDDIR)/ref_soft/q_shirix.o \
+	$(BUILDDIR)/ref_soft/glob.o
+
+REF_SOFT_X11_OBJS = \
+	$(BUILDDIR)/ref_soft/rw_x11.o
+
+$(BUILDDIR)/ref_soft.$(SHLIBEXT) : $(REF_SOFT_OBJS) $(REF_SOFT_X11_OBJS)
+	$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(REF_SOFT_OBJS) \
+		$(REF_SOFT_X11_OBJS) $(XLDFLAGS)
+
+$(BUILDDIR)/ref_soft/r_aclip.o :      $(REF_SOFT_DIR)/r_aclip.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/ref_soft/r_alias.o :      $(REF_SOFT_DIR)/r_alias.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/ref_soft/r_bsp.o :        $(REF_SOFT_DIR)/r_bsp.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/ref_soft/r_draw.o :       $(REF_SOFT_DIR)/r_draw.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/ref_soft/r_edge.o :       $(REF_SOFT_DIR)/r_edge.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/ref_soft/r_image.o :      $(REF_SOFT_DIR)/r_image.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/ref_soft/r_light.o :      $(REF_SOFT_DIR)/r_light.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/ref_soft/r_main.o :       $(REF_SOFT_DIR)/r_main.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/ref_soft/r_misc.o :       $(REF_SOFT_DIR)/r_misc.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/ref_soft/r_model.o :      $(REF_SOFT_DIR)/r_model.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/ref_soft/r_part.o :       $(REF_SOFT_DIR)/r_part.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/ref_soft/r_poly.o :       $(REF_SOFT_DIR)/r_poly.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/ref_soft/r_polyse.o :     $(REF_SOFT_DIR)/r_polyse.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/ref_soft/r_rast.o :       $(REF_SOFT_DIR)/r_rast.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/ref_soft/r_scan.o :       $(REF_SOFT_DIR)/r_scan.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/ref_soft/r_sprite.o :     $(REF_SOFT_DIR)/r_sprite.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/ref_soft/r_surf.o :       $(REF_SOFT_DIR)/r_surf.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/ref_soft/q_shared.o :     $(GAME_DIR)/q_shared.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/ref_soft/q_shirix.o :    $(IRIX_DIR)/q_shirix.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/ref_soft/glob.o :         $(LINUX_DIR)/glob.c
+	$(DO_SHLIB_CC)
+
+$(BUILDDIR)/ref_soft/rw_x11.o :       $(IRIX_DIR)/rw_x11.c
+	$(DO_SHLIB_CC)
+
+#############################################################################
+# REF_GL
+#############################################################################
+
+REF_GL_OBJS = \
+	$(BUILDDIR)/ref_gl/gl_draw.o \
+	$(BUILDDIR)/ref_gl/gl_image.o \
+	$(BUILDDIR)/ref_gl/gl_light.o \
+	$(BUILDDIR)/ref_gl/gl_mesh.o \
+	$(BUILDDIR)/ref_gl/gl_model.o \
+	$(BUILDDIR)/ref_gl/gl_rmain.o \
+	$(BUILDDIR)/ref_gl/gl_rmisc.o \
+	$(BUILDDIR)/ref_gl/gl_rsurf.o \
+	$(BUILDDIR)/ref_gl/gl_warp.o \
+	\
+	$(BUILDDIR)/ref_gl/qgl_irix.o \
+	$(BUILDDIR)/ref_gl/glw_imp.o \
+	$(BUILDDIR)/ref_gl/q_shared.o \
+	$(BUILDDIR)/ref_gl/q_shirix.o \
+	$(BUILDDIR)/ref_gl/glob.o
+
+$(BUILDDIR)/ref_gl.$(SHLIBEXT) : $(REF_GL_OBJS)
+	$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(REF_GL_OBJS) $(GLLDFLAGS)
+
+$(BUILDDIR)/ref_gl/gl_draw.o :        $(REF_GL_DIR)/gl_draw.c
+	$(DO_GL_SHLIB_CC)
+
+$(BUILDDIR)/ref_gl/gl_image.o :       $(REF_GL_DIR)/gl_image.c
+	$(DO_GL_SHLIB_CC)
+
+$(BUILDDIR)/ref_gl/gl_light.o :       $(REF_GL_DIR)/gl_light.c
+	$(DO_GL_SHLIB_CC)
+
+$(BUILDDIR)/ref_gl/gl_mesh.o :        $(REF_GL_DIR)/gl_mesh.c
+	$(DO_GL_SHLIB_CC)
+
+$(BUILDDIR)/ref_gl/gl_model.o :       $(REF_GL_DIR)/gl_model.c
+	$(DO_GL_SHLIB_CC)
+
+$(BUILDDIR)/ref_gl/gl_rmain.o :       $(REF_GL_DIR)/gl_rmain.c
+	$(DO_GL_SHLIB_CC)
+
+$(BUILDDIR)/ref_gl/gl_rmisc.o :       $(REF_GL_DIR)/gl_rmisc.c
+	$(DO_GL_SHLIB_CC)
+
+$(BUILDDIR)/ref_gl/gl_rsurf.o :       $(REF_GL_DIR)/gl_rsurf.c
+	$(DO_GL_SHLIB_CC)
+
+$(BUILDDIR)/ref_gl/gl_warp.o :        $(REF_GL_DIR)/gl_warp.c
+	$(DO_GL_SHLIB_CC)
+
+$(BUILDDIR)/ref_gl/qgl_irix.o :      $(IRIX_DIR)/qgl_irix.c
+	$(DO_GL_SHLIB_CC)
+
+$(BUILDDIR)/ref_gl/glw_imp.o :      $(IRIX_DIR)/glw_imp.c
+	$(DO_GL_SHLIB_CC)
+
+$(BUILDDIR)/ref_gl/q_shared.o :       $(GAME_DIR)/q_shared.c
+	$(DO_GL_SHLIB_CC)
+
+$(BUILDDIR)/ref_gl/q_shirix.o :      $(IRIX_DIR)/q_shirix.c
+	$(DO_GL_SHLIB_CC)
+
+$(BUILDDIR)/ref_gl/glob.o :           $(LINUX_DIR)/glob.c
+	$(DO_GL_SHLIB_CC)
+
 #############################################################################
 # MISC
 #############################################################################
 
-clean: clean-debug clean-release
+$(BUILDDIR)/quake2.sw : $(QUAKE2_OBJS) $(GAME_OBJS) \
+		$(REF_SOFT_OBJS) $(REF_SOFT_X11_OBJS)
+	$(CC) $(CFLAGS) -o $@ $(QUAKE2_OBJS) $(GAME_OBJS) \
+		$(REF_SOFT_OBJS) $(REF_SOFT_X11_OBJS) $(LDFLAGS) $(XLDFLAGS)
+
+$(BUILDDIR)/quake2.gl : $(QUAKE2_OBJS) $(GAME_OBJS) $(REF_GL_OBJS)
+	$(CC) $(CFLAGS) -o $@ $(QUAKE2_OBJS) $(GAME_OBJS) \
+		$(REF_GL_OBJS) $(LDFLAGS) $(GLLDFLAGS)
+
+#############################################################################
+
+clean: clean-debug clean-release clean-debug-static clean-release-static
 
 clean-debug:
 	$(MAKE) clean2 BUILDDIR=$(BUILD_DEBUG_DIR) CFLAGS="$(DEBUG_CFLAGS)"
@@ -711,6 +1029,26 @@ clean-debug:
 clean-release:
 	$(MAKE) clean2 BUILDDIR=$(BUILD_RELEASE_DIR) CFLAGS="$(DEBUG_CFLAGS)"
 
+clean-debug-static:
+	$(MAKE) clean2 BUILDDIR=$(BUILD_DEBUG_STATIC_DIR) CFLAGS="$(DEBUG_CFLAGS)"
+
+clean-release-static:
+	$(MAKE) clean2 BUILDDIR=$(BUILD_RELEASE_STATIC_DIR) CFLAGS="$(DEBUG_CFLAGS)"
+
 clean2:
-	-rm -f $(QUAKE2_OBJS) $(GAME_OBJS) $(CTF_OBJS) $(XATRIX_OBJS)
+	-rm -f $(QUAKE2_OBJS) \
+		$(GAME_OBJS) \
+		$(REF_SOFT_OBJS) \
+		$(REF_SOFT_X11_OBJS) \
+		$(REF_GL_OBJS)
+	-rm -f \
+	$(QUAKE2_OBJS) \
+	$(QUAKE2_AS_OBJS) \
+	$(GAME_OBJS) \
+	$(CTF_OBJS) \
+	$(XATRIX_OBJS) \
+	$(REF_SOFT_OBJS) \
+	$(REF_SOFT_SVGA_OBJS) \
+	$(REF_SOFT_X11_OBJS) \
+	$(REF_GL_OBJS)
 
