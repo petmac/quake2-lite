@@ -164,9 +164,6 @@
     <ClInclude Include="client\anorms.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="qcommon\bspfile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="client\cdaudio.h">
       <Filter>Header Files</Filter>
     </ClInclude>

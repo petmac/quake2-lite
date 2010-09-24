@@ -326,7 +326,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="client\anorms.h" />
-    <ClInclude Include="qcommon\bspfile.h" />
     <ClInclude Include="client\cdaudio.h" />
     <ClInclude Include="client\client.h" />
     <ClInclude Include="win32\conproc.h" />
@@ -356,20 +355,6 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="ctf\ctf.vcxproj">
-      <Project>{17c26f53-e702-46e5-b94b-db37fcff3c91}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="game\game.vcxproj">
-      <Project>{7b6f79df-2909-44fe-bacb-d54bc7538fa0}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="ref_gl\ref_gl.vcxproj">
-      <Project>{c29ab5ed-934b-4455-9162-7bb926e07ca8}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
