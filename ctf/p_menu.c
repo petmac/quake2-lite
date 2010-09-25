@@ -45,7 +45,7 @@ pmenuhnd_t *PMenu_Open(edict_t *ent, pmenu_t *entries, int cur, int num, void *a
 	// duplicate the strings since they may be from static memory
 	for (i = 0; i < num; i++)
 		if (entries[i].text)
-			hnd->entries[i].text = strdup(entries[i].text);
+			hnd->entries[i].text = _strdup(entries[i].text);
 
 	hnd->num = num;
 
@@ -96,7 +96,7 @@ void PMenu_UpdateEntry(pmenu_t *entry, const char *text, int align, SelectFunc_t
 {
 	if (entry->text)
 		free(entry->text);
-	entry->text = strdup(text);
+	entry->text = _strdup(text);
 	entry->align = align;
 	entry->SelectFunc = SelectFunc;
 }

@@ -2536,7 +2536,7 @@ void StartServer_MenuInit( void )
 	else
 	{
 #ifdef _WIN32
-		length = filelength( fileno( fp  ) );
+		length = _filelength( _fileno( fp  ) );
 #else
 		fseek(fp, 0, SEEK_END);
 		length = ftell(fp);
@@ -3542,7 +3542,7 @@ static qboolean PlayerConfig_ScanDirectories( void )
 					if ( strrchr( scratch, '.' ) )
 						*strrchr( scratch, '.' ) = 0;
 
-					skinnames[s] = strdup( scratch );
+					skinnames[s] = _strdup( scratch );
 					s++;
 				}
 			}

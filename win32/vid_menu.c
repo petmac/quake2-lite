@@ -102,7 +102,7 @@ static void BrightnessCallback( void *s )
 	else
 		s_brightness_slider[0].curvalue = s_brightness_slider[1].curvalue;
 
-	if ( stricmp( vid_ref->string, "soft" ) == 0 )
+	if ( _stricmp( vid_ref->string, "soft" ) == 0 )
 	{
 		float gamma = ( 0.8 - ( slider->curvalue/10.0 - 0.5 ) ) + 0.5;
 
@@ -167,12 +167,12 @@ static void ApplyChanges( void *unused )
 	** update appropriate stuff if we're running OpenGL and gamma
 	** has been modified
 	*/
-	if ( stricmp( vid_ref->string, "gl" ) == 0 )
+	if ( _stricmp( vid_ref->string, "gl" ) == 0 )
 	{
 		if ( vid_gamma->modified )
 		{
 			vid_ref->modified = true;
-			if ( stricmp( gl_driver->string, "3dfxgl" ) == 0 )
+			if ( _stricmp( gl_driver->string, "3dfxgl" ) == 0 )
 			{
 				char envbuffer[1024];
 				float g;
@@ -181,9 +181,9 @@ static void ApplyChanges( void *unused )
 
 				g = 2.00 * ( 0.8 - ( vid_gamma->value - 0.5 ) ) + 1.0F;
 				Com_sprintf( envbuffer, sizeof(envbuffer), "SSTV2_GAMMA=%f", g );
-				putenv( envbuffer );
+				_putenv( envbuffer );
 				Com_sprintf( envbuffer, sizeof(envbuffer), "SST_GAMMA=%f", g );
-				putenv( envbuffer );
+				_putenv( envbuffer );
 
 				vid_gamma->modified = false;
 			}

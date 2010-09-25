@@ -237,7 +237,7 @@ void EndDMLevel (void)
 
 	// see if it's in the map list
 	if (*sv_maplist->string) {
-		s = strdup(sv_maplist->string);
+		s = _strdup(sv_maplist->string);
 		f = NULL;
 		t = strtok(s, seps);
 		while (t != NULL) {

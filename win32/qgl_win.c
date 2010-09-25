@@ -3038,9 +3038,9 @@ qboolean QGL_Init( const char *dllname )
 
 		g = 2.00 * ( 0.8 - ( vid_gamma->value - 0.5 ) ) + 1.0F;
 		Com_sprintf( envbuffer, sizeof(envbuffer), "SSTV2_GAMMA=%f", g );
-		putenv( envbuffer );
+		_putenv( envbuffer );
 		Com_sprintf( envbuffer, sizeof(envbuffer), "SST_GAMMA=%f", g );
-		putenv( envbuffer );
+		_putenv( envbuffer );
 	}
 
 	if ( ( glw_state.hinstOpenGL = LoadLibrary( dllname ) ) == 0 )

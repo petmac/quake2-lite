@@ -319,7 +319,7 @@ void CL_Setenv_f( void )
 			strcat( buffer, " " );
 		}
 
-		putenv( buffer );
+		_putenv( buffer );
 	}
 	else if ( argc == 2 )
 	{
