@@ -3432,7 +3432,7 @@ static qboolean IconOfSkinExists( char *skin, char **pcxfiles, int npcxfiles )
 	return false;
 }
 
-static qboolean PlayerConfig_ScanDirectories( void )
+static void PlayerConfig_ScanDirectories( void )
 {
 	char findname[1024];
 	char scratch[1024];
@@ -3458,7 +3458,7 @@ static qboolean PlayerConfig_ScanDirectories( void )
 	} while ( path );
 
 	if ( !dirnames )
-		return false;
+		return;
 
 	/*
 	** go through the subdirectories
