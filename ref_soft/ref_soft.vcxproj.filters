@@ -2,25 +2,92 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{5815f66e-e300-4e5f-922f-8b9fc4b2752c}</UniqueIdentifier>
-      <Extensions>cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90</Extensions>
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{6439b3e7-d5ed-406e-92b2-55bf02cf877b}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;fi;fd</Extensions>
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
     <Filter Include="Resource Files">
-      <UniqueIdentifier>{0655db5f-da94-4a80-8892-8141ecf0a389}</UniqueIdentifier>
-      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\game\q_shared.c">
+    <ClInclude Include="adivtab.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="anorms.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="asm_draw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d_ifacea.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rand1k.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="r_local.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="r_model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\win32\rw_win.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\q_shared.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="block16.inc">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="block8.inc">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="d_if.inc">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="qasm.inc">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="ref_soft.def">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\win32\q_shwin.c">
+    </None>
+    <None Include="r_aclipa.asm">
       <Filter>Source Files</Filter>
-    </ClCompile>
+    </None>
+    <None Include="r_draw16.asm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="r_drawa.asm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="r_edgea.asm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="r_polysa.asm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="r_scana.asm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="r_spr8.asm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="r_surf8.asm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="r_varsa.asm">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="r_aclip.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -81,45 +148,11 @@
     <ClCompile Include="..\win32\rw_imp.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ref_soft.def">
-      <Filter>Resource Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="adivtab.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="anorms.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\game\q_shared.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\qcommon\qcommon.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\qcommon\qfiles.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="r_local.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="r_model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="rand1k.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\client\ref.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\win32\rw_win.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\win32\winquake.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClCompile Include="..\game\q_shared.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\win32\q_shwin.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
