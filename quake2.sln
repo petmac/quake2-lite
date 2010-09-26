@@ -3,14 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual C++ Express 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "quake2", "quake2.vcxproj", "{B9F2B9F5-9CED-4877-A8CF-6787656B3697}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ref_soft", "ref_soft\ref_soft.vcxproj", "{2ACD602D-CA72-452F-93C4-9CD852C201D1}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "game", "game\game.vcxproj", "{4A4FD513-F960-4FC5-ABEB-BD85758EF200}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ctf", "ctf\ctf.vcxproj", "{47E17F81-9024-45A5-82CE-F83D2ABDBB4A}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ref_gl", "ref_gl\ref_gl.vcxproj", "{6DC07343-D5E6-44C0-806B-1026A85FDAF0}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -21,22 +13,6 @@ Global
 		{B9F2B9F5-9CED-4877-A8CF-6787656B3697}.Debug|Win32.Build.0 = Debug|Win32
 		{B9F2B9F5-9CED-4877-A8CF-6787656B3697}.Release|Win32.ActiveCfg = Release|Win32
 		{B9F2B9F5-9CED-4877-A8CF-6787656B3697}.Release|Win32.Build.0 = Release|Win32
-		{2ACD602D-CA72-452F-93C4-9CD852C201D1}.Debug|Win32.ActiveCfg = Debug|Win32
-		{2ACD602D-CA72-452F-93C4-9CD852C201D1}.Debug|Win32.Build.0 = Debug|Win32
-		{2ACD602D-CA72-452F-93C4-9CD852C201D1}.Release|Win32.ActiveCfg = Release|Win32
-		{2ACD602D-CA72-452F-93C4-9CD852C201D1}.Release|Win32.Build.0 = Release|Win32
-		{4A4FD513-F960-4FC5-ABEB-BD85758EF200}.Debug|Win32.ActiveCfg = Debug|Win32
-		{4A4FD513-F960-4FC5-ABEB-BD85758EF200}.Debug|Win32.Build.0 = Debug|Win32
-		{4A4FD513-F960-4FC5-ABEB-BD85758EF200}.Release|Win32.ActiveCfg = Release|Win32
-		{4A4FD513-F960-4FC5-ABEB-BD85758EF200}.Release|Win32.Build.0 = Release|Win32
-		{47E17F81-9024-45A5-82CE-F83D2ABDBB4A}.Debug|Win32.ActiveCfg = Debug|Win32
-		{47E17F81-9024-45A5-82CE-F83D2ABDBB4A}.Debug|Win32.Build.0 = Debug|Win32
-		{47E17F81-9024-45A5-82CE-F83D2ABDBB4A}.Release|Win32.ActiveCfg = Release|Win32
-		{47E17F81-9024-45A5-82CE-F83D2ABDBB4A}.Release|Win32.Build.0 = Release|Win32
-		{6DC07343-D5E6-44C0-806B-1026A85FDAF0}.Debug|Win32.ActiveCfg = Debug|Win32
-		{6DC07343-D5E6-44C0-806B-1026A85FDAF0}.Debug|Win32.Build.0 = Debug|Win32
-		{6DC07343-D5E6-44C0-806B-1026A85FDAF0}.Release|Win32.ActiveCfg = Release|Win32
-		{6DC07343-D5E6-44C0-806B-1026A85FDAF0}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

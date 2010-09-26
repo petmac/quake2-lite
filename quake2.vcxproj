@@ -10,6 +10,165 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="client\adivtab.h" />
+    <ClInclude Include="client\anorms.h" />
+    <ClInclude Include="client\asm_i386.h" />
+    <ClInclude Include="client\block16.h" />
+    <ClInclude Include="client\block8.h" />
+    <ClInclude Include="client\cdaudio.h" />
+    <ClInclude Include="client\client.h" />
+    <ClInclude Include="client\console.h" />
+    <ClInclude Include="client\input.h" />
+    <ClInclude Include="client\keys.h" />
+    <ClInclude Include="client\qmenu.h" />
+    <ClInclude Include="client\ref.h" />
+    <ClInclude Include="client\screen.h" />
+    <ClInclude Include="client\snd_loc.h" />
+    <ClInclude Include="client\sound.h" />
+    <ClInclude Include="client\vid.h" />
+    <ClInclude Include="game\game.h" />
+    <ClInclude Include="game\g_local.h" />
+    <ClInclude Include="game\m_actor.h" />
+    <ClInclude Include="game\m_berserk.h" />
+    <ClInclude Include="game\m_boss2.h" />
+    <ClInclude Include="game\m_boss31.h" />
+    <ClInclude Include="game\m_boss32.h" />
+    <ClInclude Include="game\m_brain.h" />
+    <ClInclude Include="game\m_chick.h" />
+    <ClInclude Include="game\m_flipper.h" />
+    <ClInclude Include="game\m_float.h" />
+    <ClInclude Include="game\m_flyer.h" />
+    <ClInclude Include="game\m_gladiator.h" />
+    <ClInclude Include="game\m_gunner.h" />
+    <ClInclude Include="game\m_hover.h" />
+    <ClInclude Include="game\m_infantry.h" />
+    <ClInclude Include="game\m_insane.h" />
+    <ClInclude Include="game\m_medic.h" />
+    <ClInclude Include="game\m_mutant.h" />
+    <ClInclude Include="game\m_parasite.h" />
+    <ClInclude Include="game\m_player.h" />
+    <ClInclude Include="game\m_rider.h" />
+    <ClInclude Include="game\m_soldier.h" />
+    <ClInclude Include="game\m_supertank.h" />
+    <ClInclude Include="game\m_tank.h" />
+    <ClInclude Include="game\q_shared.h" />
+    <ClInclude Include="qcommon\crc.h" />
+    <ClInclude Include="qcommon\qcommon.h" />
+    <ClInclude Include="qcommon\qfiles.h" />
+    <ClInclude Include="ref_gl\anorms.h" />
+    <ClInclude Include="ref_gl\anormtab.h" />
+    <ClInclude Include="ref_gl\gl_local.h" />
+    <ClInclude Include="ref_gl\gl_model.h" />
+    <ClInclude Include="ref_gl\qgl.h" />
+    <ClInclude Include="ref_gl\warpsin.h" />
+    <ClInclude Include="server\server.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="client\cl_cin.c" />
+    <ClCompile Include="client\cl_ents.c" />
+    <ClCompile Include="client\cl_fx.c" />
+    <ClCompile Include="client\cl_input.c" />
+    <ClCompile Include="client\cl_inv.c" />
+    <ClCompile Include="client\cl_main.c" />
+    <ClCompile Include="client\cl_newfx.c" />
+    <ClCompile Include="client\cl_parse.c" />
+    <ClCompile Include="client\cl_pred.c" />
+    <ClCompile Include="client\cl_scrn.c" />
+    <ClCompile Include="client\cl_tent.c" />
+    <ClCompile Include="client\cl_view.c" />
+    <ClCompile Include="client\console.c" />
+    <ClCompile Include="client\keys.c" />
+    <ClCompile Include="client\menu.c" />
+    <ClCompile Include="client\qmenu.c" />
+    <ClCompile Include="client\snd_dma.c" />
+    <ClCompile Include="client\snd_mem.c" />
+    <ClCompile Include="client\snd_mix.c" />
+    <ClCompile Include="client\x86.c" />
+    <ClCompile Include="game\g_ai.c" />
+    <ClCompile Include="game\g_chase.c" />
+    <ClCompile Include="game\g_cmds.c" />
+    <ClCompile Include="game\g_combat.c" />
+    <ClCompile Include="game\g_func.c" />
+    <ClCompile Include="game\g_items.c" />
+    <ClCompile Include="game\g_main.c" />
+    <ClCompile Include="game\g_misc.c" />
+    <ClCompile Include="game\g_monster.c" />
+    <ClCompile Include="game\g_phys.c" />
+    <ClCompile Include="game\g_save.c" />
+    <ClCompile Include="game\g_spawn.c" />
+    <ClCompile Include="game\g_svcmds.c" />
+    <ClCompile Include="game\g_target.c" />
+    <ClCompile Include="game\g_trigger.c" />
+    <ClCompile Include="game\g_turret.c" />
+    <ClCompile Include="game\g_utils.c" />
+    <ClCompile Include="game\g_weapon.c" />
+    <ClCompile Include="game\m_actor.c" />
+    <ClCompile Include="game\m_berserk.c" />
+    <ClCompile Include="game\m_boss2.c" />
+    <ClCompile Include="game\m_boss3.c" />
+    <ClCompile Include="game\m_boss31.c" />
+    <ClCompile Include="game\m_boss32.c" />
+    <ClCompile Include="game\m_brain.c" />
+    <ClCompile Include="game\m_chick.c" />
+    <ClCompile Include="game\m_flash.c" />
+    <ClCompile Include="game\m_flipper.c" />
+    <ClCompile Include="game\m_float.c" />
+    <ClCompile Include="game\m_flyer.c" />
+    <ClCompile Include="game\m_gladiator.c" />
+    <ClCompile Include="game\m_gunner.c" />
+    <ClCompile Include="game\m_hover.c" />
+    <ClCompile Include="game\m_infantry.c" />
+    <ClCompile Include="game\m_insane.c" />
+    <ClCompile Include="game\m_medic.c" />
+    <ClCompile Include="game\m_move.c" />
+    <ClCompile Include="game\m_mutant.c" />
+    <ClCompile Include="game\m_parasite.c" />
+    <ClCompile Include="game\m_soldier.c" />
+    <ClCompile Include="game\m_supertank.c" />
+    <ClCompile Include="game\m_tank.c" />
+    <ClCompile Include="game\p_client.c" />
+    <ClCompile Include="game\p_hud.c" />
+    <ClCompile Include="game\p_trail.c" />
+    <ClCompile Include="game\p_view.c" />
+    <ClCompile Include="game\p_weapon.c" />
+    <ClCompile Include="game\q_shared.c" />
+    <ClCompile Include="null\cd_null.c" />
+    <ClCompile Include="null\in_null.c" />
+    <ClCompile Include="null\snddma_null.c" />
+    <ClCompile Include="null\vid_null.c" />
+    <ClCompile Include="qcommon\cmd.c" />
+    <ClCompile Include="qcommon\cmodel.c" />
+    <ClCompile Include="qcommon\common.c" />
+    <ClCompile Include="qcommon\crc.c" />
+    <ClCompile Include="qcommon\cvar.c" />
+    <ClCompile Include="qcommon\files.c" />
+    <ClCompile Include="qcommon\md4.c" />
+    <ClCompile Include="qcommon\net_chan.c" />
+    <ClCompile Include="qcommon\pmove.c" />
+    <ClCompile Include="ref_gl\gl_draw.c" />
+    <ClCompile Include="ref_gl\gl_image.c" />
+    <ClCompile Include="ref_gl\gl_light.c" />
+    <ClCompile Include="ref_gl\gl_mesh.c" />
+    <ClCompile Include="ref_gl\gl_model.c" />
+    <ClCompile Include="ref_gl\gl_rmain.c" />
+    <ClCompile Include="ref_gl\gl_rmisc.c" />
+    <ClCompile Include="ref_gl\gl_rsurf.c" />
+    <ClCompile Include="ref_gl\gl_warp.c" />
+    <ClCompile Include="sdl\glimp_sdl.c" />
+    <ClCompile Include="sdl\qgl_sdl.c" />
+    <ClCompile Include="sdl\SDL_win32_main.c" />
+    <ClCompile Include="sdl\sys_sdl.c" />
+    <ClCompile Include="server\sv_ccmds.c" />
+    <ClCompile Include="server\sv_ents.c" />
+    <ClCompile Include="server\sv_game.c" />
+    <ClCompile Include="server\sv_init.c" />
+    <ClCompile Include="server\sv_main.c" />
+    <ClCompile Include="server\sv_send.c" />
+    <ClCompile Include="server\sv_user.c" />
+    <ClCompile Include="server\sv_world.c" />
+    <ClCompile Include="win32\net_wins.c" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B9F2B9F5-9CED-4877-A8CF-6787656B3697}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -39,9 +198,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Documents and Settings\Pete\My Documents\My Dropbox\Programming\Libraries\C\SDL\SDL-1.2.13\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Documents and Settings\Pete\My Documents\My Dropbox\Programming\Libraries\C\SDL\SDL-1.2.13\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Documents and Settings\Pete\My Documents\My Dropbox\Programming\Libraries\C\SDL\SDL-1.2.13\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Documents and Settings\Pete\My Documents\My Dropbox\Programming\Libraries\C\SDL\SDL-1.2.13\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -49,13 +212,13 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;REF_HARD_LINKED;GAME_HARD_LINKED;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;wsock32.lib;SDL.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -66,7 +229,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;REF_HARD_LINKED;GAME_HARD_LINKED;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -74,90 +237,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;wsock32.lib;SDL.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="client\cl_cin.c" />
-    <ClCompile Include="client\cl_ents.c" />
-    <ClCompile Include="client\cl_fx.c" />
-    <ClCompile Include="client\cl_input.c" />
-    <ClCompile Include="client\cl_inv.c" />
-    <ClCompile Include="client\cl_main.c" />
-    <ClCompile Include="client\cl_newfx.c" />
-    <ClCompile Include="client\cl_parse.c" />
-    <ClCompile Include="client\cl_pred.c" />
-    <ClCompile Include="client\cl_scrn.c" />
-    <ClCompile Include="client\cl_tent.c" />
-    <ClCompile Include="client\cl_view.c" />
-    <ClCompile Include="client\console.c" />
-    <ClCompile Include="client\keys.c" />
-    <ClCompile Include="client\menu.c" />
-    <ClCompile Include="client\qmenu.c" />
-    <ClCompile Include="client\snd_dma.c" />
-    <ClCompile Include="client\snd_mem.c" />
-    <ClCompile Include="client\snd_mix.c" />
-    <ClCompile Include="client\x86.c" />
-    <ClCompile Include="game\m_flash.c" />
-    <ClCompile Include="game\q_shared.c" />
-    <ClCompile Include="qcommon\cmd.c" />
-    <ClCompile Include="qcommon\cmodel.c" />
-    <ClCompile Include="qcommon\common.c" />
-    <ClCompile Include="qcommon\crc.c" />
-    <ClCompile Include="qcommon\cvar.c" />
-    <ClCompile Include="qcommon\files.c" />
-    <ClCompile Include="qcommon\md4.c" />
-    <ClCompile Include="qcommon\net_chan.c" />
-    <ClCompile Include="qcommon\pmove.c" />
-    <ClCompile Include="server\sv_ccmds.c" />
-    <ClCompile Include="server\sv_ents.c" />
-    <ClCompile Include="server\sv_game.c" />
-    <ClCompile Include="server\sv_init.c" />
-    <ClCompile Include="server\sv_main.c" />
-    <ClCompile Include="server\sv_send.c" />
-    <ClCompile Include="server\sv_user.c" />
-    <ClCompile Include="server\sv_world.c" />
-    <ClCompile Include="win32\cd_win.c" />
-    <ClCompile Include="win32\conproc.c" />
-    <ClCompile Include="win32\in_win.c" />
-    <ClCompile Include="win32\net_wins.c" />
-    <ClCompile Include="win32\q_shwin.c" />
-    <ClCompile Include="win32\snd_win.c" />
-    <ClCompile Include="win32\sys_win.c" />
-    <ClCompile Include="win32\vid_dll.c" />
-    <ClCompile Include="win32\vid_menu.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="client\adivtab.h" />
-    <ClInclude Include="client\anorms.h" />
-    <ClInclude Include="client\asm_i386.h" />
-    <ClInclude Include="client\block16.h" />
-    <ClInclude Include="client\block8.h" />
-    <ClInclude Include="client\cdaudio.h" />
-    <ClInclude Include="client\client.h" />
-    <ClInclude Include="client\console.h" />
-    <ClInclude Include="client\input.h" />
-    <ClInclude Include="client\keys.h" />
-    <ClInclude Include="client\qmenu.h" />
-    <ClInclude Include="client\ref.h" />
-    <ClInclude Include="client\screen.h" />
-    <ClInclude Include="client\snd_loc.h" />
-    <ClInclude Include="client\sound.h" />
-    <ClInclude Include="client\vid.h" />
-    <ClInclude Include="game\q_shared.h" />
-    <ClInclude Include="qcommon\crc.h" />
-    <ClInclude Include="qcommon\qcommon.h" />
-    <ClInclude Include="qcommon\qfiles.h" />
-    <ClInclude Include="server\server.h" />
-    <ClInclude Include="win32\conproc.h" />
-    <ClInclude Include="win32\glw_win.h" />
-    <ClInclude Include="win32\resource.h" />
-    <ClInclude Include="win32\rw_win.h" />
-    <ClInclude Include="win32\winquake.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="win32\q2.rc" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
