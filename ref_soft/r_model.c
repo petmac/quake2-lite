@@ -153,17 +153,17 @@ model_t *Mod_ForName (char *name, qboolean crash)
 	switch (LittleLong(*(unsigned *)buf))
 	{
 	case IDALIASHEADER:
-		loadmodel->extradata = Hunk_Begin (0x200000);
+		loadmodel->extradata = Hunk_Alloc(0);
 		Mod_LoadAliasModel (mod, buf);
 		break;
 		
 	case IDSPRITEHEADER:
-		loadmodel->extradata = Hunk_Begin (0x10000);
+		loadmodel->extradata = Hunk_Alloc(0);
 		Mod_LoadSpriteModel (mod, buf);
 		break;
 	
 	case IDBSPHEADER:
-		loadmodel->extradata = Hunk_Begin (0x1000000);
+		loadmodel->extradata = Hunk_Alloc(0);
 		Mod_LoadBrushModel (mod, buf);
 		break;
 
@@ -172,7 +172,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 		break;
 	}
 
-	loadmodel->extradatasize = Hunk_End ();
+	loadmodel->extradatasize = (byte *)Hunk_Alloc(0) - (byte *)loadmodel->extradata;
 
 	ri.FS_FreeFile (buf);
 
@@ -1118,21 +1118,27 @@ R_BeginRegistration
 Specifies the model that will be used as the world
 @@@@@@@@@@@@@@@@@@@@@
 */
+static byte *mods;
+
 void R_BeginRegistration (char *model)
 {
 	char	fullname[MAX_QPATH];
-	cvar_t	*flushmap;
 
 	registration_sequence++;
 	r_oldviewcluster = -1;		// force markleafs
 	Com_sprintf (fullname, sizeof(fullname), "maps/%s.bsp", model);
 
 	D_FlushCaches ();
-	// explicitly free the old map if different
-	// this guarantees that mod_known[0] is the world map
-	flushmap = ri.Cvar_Get ("flushmap", "0", 0);
-	if ( strcmp(mod_known[0].name, fullname) || flushmap->value)
-		Mod_Free (&mod_known[0]);
+
+	if (mods != NULL)
+	{
+		Mod_FreeAll();
+		Hunk_Free(mods);
+		mods = NULL;
+	}
+
+	mods = Hunk_Begin(32 * 1024 * 1024);
+
 	r_worldmodel = R_RegisterModel (fullname);
 	R_NewMap ();
 }
@@ -1196,18 +1202,14 @@ void R_EndRegistration (void)
 	{
 		if (!mod->name[0])
 			continue;
-		if (mod->registration_sequence != registration_sequence)
-		{	// don't need this model
-			Hunk_Free (mod->extradata);
-			memset (mod, 0, sizeof(*mod));
-		}
-		else
-		{	// make sure it is paged in
-			Com_PageInMemory (mod->extradata, mod->extradatasize);
-		}
+
+		// make sure it is paged in
+		Com_PageInMemory (mod->extradata, mod->extradatasize);
 	}
 
 	R_FreeUnusedImages ();
+
+	Hunk_End();
 }
 
 
@@ -1220,7 +1222,6 @@ Mod_Free
 */
 void Mod_Free (model_t *mod)
 {
-	Hunk_Free (mod->extradata);
 	memset (mod, 0, sizeof(*mod));
 }
 
