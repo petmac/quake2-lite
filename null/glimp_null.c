@@ -27,8 +27,9 @@ void		GLimp_EndFrame( void )
 {
 }
 
-int 		GLimp_Init( void *hinstance, void *hWnd )
+qboolean	GLimp_Init( void *hinstance, void *hWnd )
 {
+	return true;
 }
 
 void		GLimp_Shutdown( void )
@@ -37,17 +38,9 @@ void		GLimp_Shutdown( void )
 
 int     	GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
 {
+	return rserr_ok;
 }
 
 void		GLimp_AppActivate( qboolean active )
 {
 }
-
-void		GLimp_EnableLogging( qboolean enable )
-{
-}
-
-void		GLimp_LogNewFrame( void )
-{
-}
-
