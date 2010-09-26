@@ -1112,10 +1112,11 @@ void R_BeginRegistration (char *model)
 	r_oldviewcluster = -1;		// force markleafs
 
 	Com_sprintf (fullname, sizeof(fullname), "maps/%s.bsp", model);
+	
+	Mod_FreeAll ();
 
 	if (mods != NULL)
 	{
-		Mod_FreeAll ();
 		Hunk_Free(mods);
 		mods = NULL;
 	}
@@ -1144,8 +1145,6 @@ struct model_s *R_RegisterModel (char *name)
 	mod = Mod_ForName (name, false);
 	if (mod)
 	{
-		mod->registration_sequence = registration_sequence;
-
 		// register any images used by the models
 		if (mod->type == mod_sprite)
 		{
@@ -1180,19 +1179,7 @@ R_EndRegistration
 */
 void R_EndRegistration (void)
 {
-	int		i;
-	model_t	*mod;
-
-	for (i=0, mod=mod_known ; i<mod_numknown ; i++, mod++)
-	{
-		if (!mod->name[0])
-			continue;
-		if (mod->registration_sequence != registration_sequence)
-		{	// don't need this model
-			Mod_Free (mod);
-		}
-	}
-
+	Hunk_End();
 	GL_FreeUnusedImages ();
 }
 
