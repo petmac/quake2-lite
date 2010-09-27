@@ -160,19 +160,18 @@ void	Sys_Init (void)
 int main (int argc, char **argv)
 {
 	qboolean go = true;
+	int oldtime;
 	SDL_Event e;
-	Uint32 t1;
-	Uint32 t2;
 
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) >= 0)
 	{
 		Qcommon_Init (argc, argv);
 
-		t1 = SDL_GetTicks();
+		oldtime = SDL_GetTicks();
 
 		while (go)
 		{
-			t2 = SDL_GetTicks();
+			curtime = SDL_GetTicks();
 
 			while (SDL_PollEvent(&e))
 			{
@@ -184,9 +183,9 @@ int main (int argc, char **argv)
 				}
 			}
 
-			Qcommon_Frame ((t2 - t1) * 0.001f);
+			Qcommon_Frame (curtime - oldtime);
 
-			t1 = t2;
+			oldtime = curtime;
 		}
 
 		SDL_Quit();
