@@ -1443,10 +1443,6 @@ Handles offseting and rotation of the end points for moving and
 rotating entities
 ==================
 */
-#ifdef _WIN32
-#pragma optimize( "", off )
-#endif
-
 
 trace_t		CM_TransformedBoxTrace (vec3_t start, vec3_t end,
 						  vec3_t mins, vec3_t maxs,
@@ -1507,12 +1503,6 @@ trace_t		CM_TransformedBoxTrace (vec3_t start, vec3_t end,
 
 	return trace;
 }
-
-#ifdef _WIN32
-#pragma optimize( "", on )
-#endif
-
-
 
 /*
 ===============================================================================
