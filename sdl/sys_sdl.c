@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../qcommon/qcommon.h"
 #include <SDL.h>
+#include <Windows.h>
 
 void *GetGameAPI (void *import);
 
@@ -68,6 +69,8 @@ char *Sys_ConsoleInput (void)
 
 void	Sys_ConsoleOutput (char *string)
 {
+	puts(string);
+	OutputDebugStringA(string);
 }
 
 void Sys_SendKeyEvents (void)
@@ -158,13 +161,19 @@ int main (int argc, char **argv)
 {
 	qboolean go = true;
 	SDL_Event e;
+	Uint32 t1;
+	Uint32 t2;
 
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) >= 0)
 	{
 		Qcommon_Init (argc, argv);
 
+		t1 = SDL_GetTicks();
+
 		while (go)
 		{
+			t2 = SDL_GetTicks();
+
 			while (SDL_PollEvent(&e))
 			{
 				switch (e.type)
@@ -175,7 +184,9 @@ int main (int argc, char **argv)
 				}
 			}
 
-			Qcommon_Frame (0.1);
+			Qcommon_Frame ((t2 - t1) * 0.001f);
+
+			t1 = t2;
 		}
 
 		SDL_Quit();
