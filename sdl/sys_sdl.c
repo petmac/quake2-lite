@@ -159,12 +159,15 @@ void	Sys_Init (void)
 
 int main (int argc, char **argv)
 {
+	const char *const caption = "Quake 2 Lite";
 	qboolean go = true;
 	int oldtime;
 	SDL_Event e;
 
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) >= 0)
 	{
+		SDL_WM_SetCaption(caption, caption);
+
 		Qcommon_Init (argc, argv);
 
 		oldtime = SDL_GetTicks();
