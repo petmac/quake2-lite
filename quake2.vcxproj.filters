@@ -108,9 +108,6 @@
     <ClInclude Include="client\anorms.h">
       <Filter>client</Filter>
     </ClInclude>
-    <ClInclude Include="client\asm_i386.h">
-      <Filter>client</Filter>
-    </ClInclude>
     <ClInclude Include="client\block8.h">
       <Filter>client</Filter>
     </ClInclude>
@@ -384,9 +381,6 @@
       <Filter>client</Filter>
     </ClCompile>
     <ClCompile Include="client\snd_mix.c">
-      <Filter>client</Filter>
-    </ClCompile>
-    <ClCompile Include="client\x86.c">
       <Filter>client</Filter>
     </ClCompile>
     <ClCompile Include="qcommon\cmodel.c">

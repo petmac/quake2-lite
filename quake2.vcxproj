@@ -13,7 +13,6 @@
   <ItemGroup>
     <ClInclude Include="client\adivtab.h" />
     <ClInclude Include="client\anorms.h" />
-    <ClInclude Include="client\asm_i386.h" />
     <ClInclude Include="client\block16.h" />
     <ClInclude Include="client\block8.h" />
     <ClInclude Include="client\cdaudio.h" />
@@ -84,7 +83,6 @@
     <ClCompile Include="client\snd_dma.c" />
     <ClCompile Include="client\snd_mem.c" />
     <ClCompile Include="client\snd_mix.c" />
-    <ClCompile Include="client\x86.c" />
     <ClCompile Include="game\g_ai.c" />
     <ClCompile Include="game\g_chase.c" />
     <ClCompile Include="game\g_cmds.c" />
