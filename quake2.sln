@@ -1,7 +1,12 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C++ Express 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "quake2", "quake2.vcxproj", "{B9F2B9F5-9CED-4877-A8CF-6787656B3697}"
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "game", "game\game.vcproj", "{416DFE63-9667-4757-95BA-020BA6229DF0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{57956E02-9FC2-4EEA-9678-FB56BEE211F0} = {57956E02-9FC2-4EEA-9678-FB56BEE211F0}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "quake2", "quake2.vcproj", "{57956E02-9FC2-4EEA-9678-FB56BEE211F0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,10 +14,14 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B9F2B9F5-9CED-4877-A8CF-6787656B3697}.Debug|Win32.ActiveCfg = Debug|Win32
-		{B9F2B9F5-9CED-4877-A8CF-6787656B3697}.Debug|Win32.Build.0 = Debug|Win32
-		{B9F2B9F5-9CED-4877-A8CF-6787656B3697}.Release|Win32.ActiveCfg = Release|Win32
-		{B9F2B9F5-9CED-4877-A8CF-6787656B3697}.Release|Win32.Build.0 = Release|Win32
+		{416DFE63-9667-4757-95BA-020BA6229DF0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{416DFE63-9667-4757-95BA-020BA6229DF0}.Debug|Win32.Build.0 = Debug|Win32
+		{416DFE63-9667-4757-95BA-020BA6229DF0}.Release|Win32.ActiveCfg = Release|Win32
+		{416DFE63-9667-4757-95BA-020BA6229DF0}.Release|Win32.Build.0 = Release|Win32
+		{57956E02-9FC2-4EEA-9678-FB56BEE211F0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{57956E02-9FC2-4EEA-9678-FB56BEE211F0}.Debug|Win32.Build.0 = Debug|Win32
+		{57956E02-9FC2-4EEA-9678-FB56BEE211F0}.Release|Win32.ActiveCfg = Release|Win32
+		{57956E02-9FC2-4EEA-9678-FB56BEE211F0}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
