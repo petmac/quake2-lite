@@ -2542,7 +2542,7 @@ void StartServer_MenuInit( void )
 		length = ftell(fp);
 		fseek(fp, 0, SEEK_SET);
 #endif
-		buffer = malloc( length );
+		buffer = Z_Malloc( length );
 		fread( buffer, length, 1, fp );
 	}
 
@@ -2559,7 +2559,7 @@ void StartServer_MenuInit( void )
 	if ( nummaps == 0 )
 		Com_Error( ERR_DROP, "no maps in maps.lst\n" );
 
-	mapnames = malloc( sizeof( char * ) * ( nummaps + 1 ) );
+	mapnames = Z_Malloc( sizeof( char * ) * ( nummaps + 1 ) );
 	memset( mapnames, 0, sizeof( char * ) * ( nummaps + 1 ) );
 
 	s = buffer;
@@ -2578,7 +2578,7 @@ void StartServer_MenuInit( void )
 		strcpy( longname, COM_Parse( &s ) );
 		Com_sprintf( scratch, sizeof( scratch ), "%s\n%s", longname, shortname );
 
-		mapnames[i] = malloc( strlen( scratch ) + 1 );
+		mapnames[i] = Z_Malloc( strlen( scratch ) + 1 );
 		strcpy( mapnames[i], scratch );
 	}
 	mapnames[nummaps] = 0;
@@ -2586,7 +2586,7 @@ void StartServer_MenuInit( void )
 	if ( fp != 0 )
 	{
 		fp = 0;
-		free( buffer );
+		Z_Free( buffer );
 	}
 	else
 	{
@@ -2716,8 +2716,8 @@ const char *StartServer_MenuKey( int key )
 			int i;
 
 			for ( i = 0; i < nummaps; i++ )
-				free( mapnames[i] );
-			free( mapnames );
+				Z_Free( mapnames[i] );
+			Z_Free( mapnames );
 		}
 		mapnames = 0;
 		nummaps = 0;
@@ -3407,11 +3407,11 @@ static void FreeFileList( char **list, int n )
 	{
 		if ( list[i] )
 		{
-			free( list[i] );
+			Z_Free( list[i] );
 			list[i] = 0;
 		}
 	}
-	free( list );
+	Z_Free( list );
 }
 
 static qboolean IconOfSkinExists( char *skin, char **pcxfiles, int npcxfiles )
@@ -3484,7 +3484,7 @@ static void PlayerConfig_ScanDirectories( void )
 		strcat( scratch, "/tris.md2" );
 		if ( !Sys_FindFirst( scratch, 0, SFF_SUBDIR | SFF_HIDDEN | SFF_SYSTEM ) )
 		{
-			free( dirnames[i] );
+			Z_Free( dirnames[i] );
 			dirnames[i] = 0;
 			Sys_FindClose();
 			continue;
@@ -3498,7 +3498,7 @@ static void PlayerConfig_ScanDirectories( void )
 
 		if ( !pcxnames )
 		{
-			free( dirnames[i] );
+			Z_Free( dirnames[i] );
 			dirnames[i] = 0;
 			continue;
 		}
@@ -3517,7 +3517,7 @@ static void PlayerConfig_ScanDirectories( void )
 		if ( !nskins )
 			continue;
 
-		skinnames = malloc( sizeof( char * ) * ( nskins + 1 ) );
+		skinnames = Z_Malloc( sizeof( char * ) * ( nskins + 1 ) );
 		memset( skinnames, 0, sizeof( char * ) * ( nskins + 1 ) );
 
 		// copy the valid skins
@@ -3542,7 +3542,7 @@ static void PlayerConfig_ScanDirectories( void )
 					if ( strrchr( scratch, '.' ) )
 						*strrchr( scratch, '.' ) = 0;
 
-					skinnames[s] = _strdup( scratch );
+					skinnames[s] = CopyString( scratch );
 					s++;
 				}
 			}
@@ -3840,10 +3840,10 @@ const char *PlayerConfig_MenuKey (int key)
 			for ( j = 0; j < s_pmi[i].nskins; j++ )
 			{
 				if ( s_pmi[i].skindisplaynames[j] )
-					free( s_pmi[i].skindisplaynames[j] );
+					Z_Free( s_pmi[i].skindisplaynames[j] );
 				s_pmi[i].skindisplaynames[j] = 0;
 			}
-			free( s_pmi[i].skindisplaynames );
+			Z_Free( s_pmi[i].skindisplaynames );
 			s_pmi[i].skindisplaynames = 0;
 			s_pmi[i].nskins = 0;
 		}

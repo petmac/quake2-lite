@@ -708,7 +708,7 @@ char **FS_ListFiles( char *findname, int *numfiles, unsigned musthave, unsigned 
 	nfiles++; // add space for a guard
 	*numfiles = nfiles;
 
-	list = malloc( sizeof( char * ) * nfiles );
+	list = Z_Malloc( sizeof( char * ) * nfiles );
 	memset( list, 0, sizeof( char * ) * nfiles );
 
 	s = Sys_FindFirst( findname, musthave, canthave );
@@ -717,7 +717,7 @@ char **FS_ListFiles( char *findname, int *numfiles, unsigned musthave, unsigned 
 	{
 		if ( s[strlen(s)-1] != '.' )
 		{
-			list[nfiles] = _strdup( s );
+			list[nfiles] = CopyString( s );
 #ifdef _WIN32
 			_strlwr( list[nfiles] );
 #endif
@@ -772,9 +772,9 @@ void FS_Dir_f( void )
 				else
 					Com_Printf( "%s\n", dirnames[i] );
 
-				free( dirnames[i] );
+				Z_Free( dirnames[i] );
 			}
-			free( dirnames );
+			Z_Free( dirnames );
 		}
 		Com_Printf( "\n" );
 	};

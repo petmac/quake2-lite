@@ -199,7 +199,7 @@ void	*Hunk_Begin (int maxsize)
 	cursize = 0;
 	hunkmaxsize = maxsize;
 
-	membase = malloc (maxsize);
+	membase = Z_Malloc (maxsize);
 	memset (membase, 0, maxsize);
 
 	if (!membase)
@@ -222,7 +222,7 @@ void	*Hunk_Alloc (int size)
 
 void	Hunk_Free (void *buf)
 {
-	free (buf);
+	Z_Free (buf);
 }
 
 int		Hunk_End (void)

@@ -478,7 +478,7 @@ void LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *heigh
 		return;
 	}
 
-	out = malloc ( (pcx->ymax+1) * (pcx->xmax+1) );
+	out = Z_Malloc ( (pcx->ymax+1) * (pcx->xmax+1) );
 
 	*pic = out;
 
@@ -486,7 +486,7 @@ void LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *heigh
 
 	if (palette)
 	{
-		*palette = malloc(768);
+		*palette = Z_Malloc(768);
 		memcpy (*palette, (byte *)pcx + len - 768, 768);
 	}
 
@@ -518,7 +518,7 @@ void LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *heigh
 	if ( raw - (byte *)pcx > len)
 	{
 		ri.Con_Printf (PRINT_DEVELOPER, "PCX file %s was malformed", filename);
-		free (*pic);
+		Z_Free (*pic);
 		*pic = NULL;
 	}
 
@@ -614,7 +614,7 @@ void LoadTGA (char *name, byte **pic, int *width, int *height)
 	if (height)
 		*height = rows;
 
-	targa_rgba = malloc (numPixels*4);
+	targa_rgba = Z_Malloc (numPixels*4);
 	*pic = targa_rgba;
 
 	if (targa_header.id_length != 0)
@@ -1410,9 +1410,9 @@ image_t	*GL_FindImage (char *name, imagetype_t type)
 
 
 	if (pic)
-		free(pic);
+		Z_Free(pic);
 	if (palette)
-		free(palette);
+		Z_Free(palette);
 
 	return image;
 }
@@ -1493,8 +1493,8 @@ int Draw_GetPalette (void)
 
 	d_8to24table[255] &= LittleLong(0xffffff);	// 255 is transparent
 
-	free (pic);
-	free (pal);
+	Z_Free (pic);
+	Z_Free (pal);
 
 	return 0;
 }
