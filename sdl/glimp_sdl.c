@@ -32,6 +32,8 @@ void		GLimp_EndFrame( void )
 
 qboolean	GLimp_Init( void *hinstance, void *hWnd )
 {
+	vidref_val = VIDREF_GL;
+
 	return true;
 }
 
