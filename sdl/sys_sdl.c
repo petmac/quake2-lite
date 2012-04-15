@@ -210,8 +210,8 @@ void	*Hunk_Begin (int maxsize)
 
 void	*Hunk_Alloc (int size)
 {
-	// round to cacheline
-	size = (size+31)&~31;
+	// round to size of double
+	size = (size+7)&~7;
 
 	cursize += size;
 	if (cursize > hunkmaxsize)
