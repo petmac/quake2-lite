@@ -764,7 +764,8 @@ extern	int		time_before_ref;
 extern	int		time_after_ref;
 
 void Z_Free (void *ptr);
-void *Z_Malloc (int size);			// returns 0 filled memory
+#define Z_Malloc(size) Z_MallocEx(size, __FILE__, __LINE__, __FUNCTION__)
+void *Z_MallocEx (int size, const char *file, int line, const char *function);			// returns 0 filled memory
 void *Z_TagMalloc (int size, int tag);
 void Z_FreeTags (int tag);
 

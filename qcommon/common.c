@@ -1191,8 +1191,10 @@ void *Z_TagMalloc (int size, int tag)
 Z_Malloc
 ========================
 */
-void *Z_Malloc (int size)
+void *Z_MallocEx (int size, const char *file, int line, const char *function)
 {
+	Com_Printf("ALLOC size = %08d, count = %08d, %s\n", size, z_count, function);
+
 	return Z_TagMalloc (size, 0);
 }
 
