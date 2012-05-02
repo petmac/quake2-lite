@@ -643,6 +643,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\qcommon\mem.c"
+				>
+			</File>
+			<File
 				RelativePath=".\qcommon\net_chan.c"
 				>
 			</File>

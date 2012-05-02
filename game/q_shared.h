@@ -249,12 +249,6 @@ extern	int	curtime;		// time returned by last Sys_Milliseconds
 int		Sys_Milliseconds (void);
 void	Sys_Mkdir (char *path);
 
-// large block stack allocation routines
-void	*Hunk_Begin (int maxsize);
-void	*Hunk_Alloc (int size);
-void	Hunk_Free (void *buf);
-int		Hunk_End (void);
-
 // directory searching
 #define SFF_ARCH    0x01
 #define SFF_HIDDEN  0x02

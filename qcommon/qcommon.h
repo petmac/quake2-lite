@@ -824,4 +824,19 @@ void SV_Shutdown (char *finalmsg, qboolean reconnect);
 void SV_Frame (int msec);
 
 
+/*
+==============================================================
 
+MEMORY HANDLING
+
+==============================================================
+*/
+
+typedef struct hunk_s hunk_t;
+
+extern hunk_t hunk_ref;
+
+void Mem_Init (void);
+void *Hunk_Alloc (hunk_t *hunk, int size);
+void Hunk_Begin (hunk_t *hunk);
+void Hunk_End (hunk_t *hunk);

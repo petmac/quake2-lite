@@ -29,9 +29,6 @@ void *GetGameAPI (void *import);
 int	curtime;
 unsigned	sys_frame_time;
 
-static byte	*membase;
-static int	hunkmaxsize;
-static int	cursize;
 static qboolean go = true;
 
 void Sys_Error (char *error, ...)
@@ -191,43 +188,6 @@ void Sys_CopyProtect (void)
 char *Sys_GetClipboardData( void )
 {
 	return NULL;
-}
-
-void	*Hunk_Begin (int maxsize)
-{
-	// reserve a huge chunk of memory, but don't commit any yet
-	cursize = 0;
-	hunkmaxsize = maxsize;
-
-	membase = Z_Malloc (maxsize);
-	memset (membase, 0, maxsize);
-
-	if (!membase)
-		Sys_Error ("Hunk_Begin reserve failed");
-
-	return (void *)membase;
-}
-
-void	*Hunk_Alloc (int size)
-{
-	// round to size of double
-	size = (size+7)&~7;
-
-	cursize += size;
-	if (cursize > hunkmaxsize)
-		Sys_Error ("Hunk_Alloc overflow");
-
-	return (void *)(membase+cursize-size);
-}
-
-void	Hunk_Free (void *buf)
-{
-	Z_Free (buf);
-}
-
-int		Hunk_End (void)
-{
-	return cursize;
 }
 
 int		Sys_Milliseconds (void)

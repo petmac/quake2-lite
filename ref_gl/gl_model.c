@@ -245,17 +245,17 @@ model_t *Mod_ForName (char *name, qboolean crash)
 	switch (LittleLong(*(unsigned *)buf))
 	{
 	case IDALIASHEADER:
-		loadmodel->extradata = Hunk_Alloc (0);
+		loadmodel->extradata = Hunk_Alloc (&hunk_ref, 0);
 		Mod_LoadAliasModel (mod, buf);
 		break;
 		
 	case IDSPRITEHEADER:
-		loadmodel->extradata = Hunk_Alloc (0);
+		loadmodel->extradata = Hunk_Alloc (&hunk_ref, 0);
 		Mod_LoadSpriteModel (mod, buf);
 		break;
 	
 	case IDBSPHEADER:
-		loadmodel->extradata = Hunk_Alloc (0);
+		loadmodel->extradata = Hunk_Alloc (&hunk_ref, 0);
 		Mod_LoadBrushModel (mod, buf);
 		break;
 
@@ -264,7 +264,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 		break;
 	}
 
-	loadmodel->extradatasize = (byte *)Hunk_Alloc(0) - (byte *)loadmodel->extradata;
+	loadmodel->extradatasize = (byte *)Hunk_Alloc (&hunk_ref, 0) - (byte *)loadmodel->extradata;
 
 	ri.FS_FreeFile (buf);
 
@@ -294,7 +294,7 @@ void Mod_LoadLighting (lump_t *l)
 		loadmodel->lightdata = NULL;
 		return;
 	}
-	loadmodel->lightdata = Hunk_Alloc ( l->filelen);	
+	loadmodel->lightdata = Hunk_Alloc (&hunk_ref, l->filelen);	
 	memcpy (loadmodel->lightdata, mod_base + l->fileofs, l->filelen);
 }
 
@@ -313,7 +313,7 @@ void Mod_LoadVisibility (lump_t *l)
 		loadmodel->vis = NULL;
 		return;
 	}
-	loadmodel->vis = Hunk_Alloc ( l->filelen);	
+	loadmodel->vis = Hunk_Alloc (&hunk_ref, l->filelen);	
 	memcpy (loadmodel->vis, mod_base + l->fileofs, l->filelen);
 
 	loadmodel->vis->numclusters = LittleLong (loadmodel->vis->numclusters);
@@ -340,7 +340,7 @@ void Mod_LoadVertexes (lump_t *l)
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
-	out = Hunk_Alloc ( count*sizeof(*out));	
+	out = Hunk_Alloc (&hunk_ref, count*sizeof(*out));	
 
 	loadmodel->vertexes = out;
 	loadmodel->numvertexes = count;
@@ -387,7 +387,7 @@ void Mod_LoadSubmodels (lump_t *l)
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
-	out = Hunk_Alloc ( count*sizeof(*out));	
+	out = Hunk_Alloc (&hunk_ref, count*sizeof(*out));	
 
 	loadmodel->submodels = out;
 	loadmodel->numsubmodels = count;
@@ -422,7 +422,7 @@ void Mod_LoadEdges (lump_t *l)
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
-	out = Hunk_Alloc ( (count + 1) * sizeof(*out));	
+	out = Hunk_Alloc (&hunk_ref, (count + 1) * sizeof(*out));	
 
 	loadmodel->edges = out;
 	loadmodel->numedges = count;
@@ -451,7 +451,7 @@ void Mod_LoadTexinfo (lump_t *l)
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
-	out = Hunk_Alloc ( count*sizeof(*out));	
+	out = Hunk_Alloc (&hunk_ref, count*sizeof(*out));	
 
 	loadmodel->texinfo = out;
 	loadmodel->numtexinfo = count;
@@ -564,7 +564,7 @@ void Mod_LoadFaces (lump_t *l)
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
-	out = Hunk_Alloc ( count*sizeof(*out));	
+	out = Hunk_Alloc (&hunk_ref, count*sizeof(*out));	
 
 	loadmodel->surfaces = out;
 	loadmodel->numsurfaces = count;
@@ -659,7 +659,7 @@ void Mod_LoadNodes (lump_t *l)
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
-	out = Hunk_Alloc ( count*sizeof(*out));	
+	out = Hunk_Alloc (&hunk_ref, count*sizeof(*out));	
 
 	loadmodel->nodes = out;
 	loadmodel->numnodes = count;
@@ -708,7 +708,7 @@ void Mod_LoadLeafs (lump_t *l)
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
-	out = Hunk_Alloc ( count*sizeof(*out));	
+	out = Hunk_Alloc (&hunk_ref, count*sizeof(*out));	
 
 	loadmodel->leafs = out;
 	loadmodel->numleafs = count;
@@ -761,7 +761,7 @@ void Mod_LoadMarksurfaces (lump_t *l)
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
-	out = Hunk_Alloc ( count*sizeof(*out));	
+	out = Hunk_Alloc (&hunk_ref, count*sizeof(*out));	
 
 	loadmodel->marksurfaces = out;
 	loadmodel->nummarksurfaces = count;
@@ -793,7 +793,7 @@ void Mod_LoadSurfedges (lump_t *l)
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: bad surfedges count in %s: %i",
 		loadmodel->name, count);
 
-	out = Hunk_Alloc ( count*sizeof(*out));	
+	out = Hunk_Alloc (&hunk_ref, count*sizeof(*out));	
 
 	loadmodel->surfedges = out;
 	loadmodel->numsurfedges = count;
@@ -820,7 +820,7 @@ void Mod_LoadPlanes (lump_t *l)
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
-	out = Hunk_Alloc ( count*2*sizeof(*out));	
+	out = Hunk_Alloc (&hunk_ref, count*2*sizeof(*out));	
 	
 	loadmodel->planes = out;
 	loadmodel->numplanes = count;
@@ -943,7 +943,7 @@ void Mod_LoadAliasModel (model_t *mod, void *buffer)
 		ri.Sys_Error (ERR_DROP, "%s has wrong version number (%i should be %i)",
 				 mod->name, version, ALIAS_VERSION);
 
-	pheader = Hunk_Alloc (LittleLong(pinmodel->ofs_end));
+	pheader = Hunk_Alloc (&hunk_ref, LittleLong(pinmodel->ofs_end));
 	
 	// byte swap the header fields and sanity check
 	for (i=0 ; i<sizeof(dmdl_t)/4 ; i++)
@@ -1064,7 +1064,7 @@ void Mod_LoadSpriteModel (model_t *mod, void *buffer)
 	int			i;
 
 	sprin = (dsprite_t *)buffer;
-	sprout = Hunk_Alloc (modfilelen);
+	sprout = Hunk_Alloc (&hunk_ref, modfilelen);
 
 	sprout->ident = LittleLong (sprin->ident);
 	sprout->version = LittleLong (sprin->version);
@@ -1102,7 +1102,6 @@ R_BeginRegistration
 Specifies the model that will be used as the world
 @@@@@@@@@@@@@@@@@@@@@
 */
-static byte *mods;
 
 void R_BeginRegistration (char *model)
 {
@@ -1115,14 +1114,8 @@ void R_BeginRegistration (char *model)
 	
 	Mod_FreeAll ();
 
-	if (mods != NULL)
-	{
-		Hunk_Free(mods);
-		mods = NULL;
-	}
+	Hunk_Begin (&hunk_ref);
 	
-	mods = Hunk_Begin(32 * 1024 * 1024);
-
 	r_worldmodel = Mod_ForName(fullname, true);
 
 	r_viewcluster = -1;
@@ -1179,7 +1172,7 @@ R_EndRegistration
 */
 void R_EndRegistration (void)
 {
-	Hunk_End();
+	Hunk_End (&hunk_ref);
 	GL_FreeUnusedImages ();
 }
 
