@@ -28,16 +28,30 @@ struct hunk_s
 	char *membase;
 };
 
-#define REF_HEAP_CAPACITY (16 * 1024 * 1024)
+#define GAME_HUNK_CAPACITY (16 * 1024 * 1024)
+#define LEVEL_HUNK_CAPACITY (16 * 1024 * 1024)
+#define REF_HUNK_CAPACITY (16 * 1024 * 1024)
 
-static char ref_mem[REF_HEAP_CAPACITY];
+static char game_mem[GAME_HUNK_CAPACITY];
+static char level_mem[LEVEL_HUNK_CAPACITY];
+static char ref_mem[REF_HUNK_CAPACITY];
 
+hunk_t hunk_game;
+hunk_t hunk_level;
 hunk_t hunk_ref;
 
 void Mem_Init (void)
 {
+	hunk_game.cursize = 0;
+	hunk_game.capacity = GAME_HUNK_CAPACITY;
+	hunk_game.membase = game_mem;
+
+	hunk_level.cursize = 0;
+	hunk_level.capacity = LEVEL_HUNK_CAPACITY;
+	hunk_level.membase = level_mem;
+
 	hunk_ref.cursize = 0;
-	hunk_ref.capacity = REF_HEAP_CAPACITY;
+	hunk_ref.capacity = REF_HUNK_CAPACITY;
 	hunk_ref.membase = ref_mem;
 }
 

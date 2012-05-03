@@ -834,6 +834,8 @@ MEMORY HANDLING
 
 typedef struct hunk_s hunk_t;
 
+extern hunk_t hunk_game;
+extern hunk_t hunk_level;
 extern hunk_t hunk_ref;
 
 void Mem_Init (void);

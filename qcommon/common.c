@@ -1122,6 +1122,11 @@ void Z_Free (void *ptr)
 	if (z->magic != Z_MAGIC)
 		Com_Error (ERR_FATAL, "Z_Free: bad magic");
 
+	if (z->tag != 0)
+	{
+		Com_Error (ERR_FATAL, "Z_Free: bad tag");
+	}
+
 	z->prev->next = z->next;
 	z->next->prev = z->prev;
 
@@ -1150,6 +1155,17 @@ void Z_FreeTags (int tag)
 {
 	zhead_t	*z, *next;
 
+	if (tag == 765)
+	{
+		Hunk_Begin (&hunk_game);
+		return;
+	}
+	else if (tag == 766)
+	{
+		Hunk_Begin (&hunk_level);
+		return;
+	}
+
 	for (z=z_chain.next ; z != &z_chain ; z=next)
 	{
 		next = z->next;
@@ -1167,6 +1183,15 @@ void *Z_TagMalloc (int size, int tag)
 {
 	zhead_t	*z;
 	
+	if (tag == 765)
+	{
+		return Hunk_Alloc (&hunk_game, size);
+	}
+	else if (tag == 766)
+	{
+		return Hunk_Alloc (&hunk_level, size);
+	}
+
 	size = size + sizeof(zhead_t);
 	z = malloc(size);
 	if (!z)
