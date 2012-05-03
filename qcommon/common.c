@@ -1149,12 +1149,12 @@ void *Z_MallocEx (int size, const char *file, int line, const char *function)
 {
 	zhead_t	*z;
 	
-	Com_Printf("Z_MallocEx: ALLOC size = %08d, count = %08d, total = %08d, %s\n", size, z_count, z_bytes, function);
+	// Com_Printf("Z_MallocEx: ALLOC size = %8d, count = %8d, total = %8d, called from %s\n", size, z_count, z_bytes, function);
 
 	size = size + sizeof(zhead_t);
 	z = malloc(size);
 	if (!z)
-		Com_Error (ERR_FATAL, "Z_TagMalloc: failed on allocation of %i bytes",size);
+		Com_Error (ERR_FATAL, "Z_MallocEx: failed on allocation of %i bytes",size);
 	memset (z, 0, size);
 	z_count++;
 	z_bytes += size;
