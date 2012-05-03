@@ -35,14 +35,17 @@ struct hunk_s
 #define GAME_HUNK_CAPACITY (1 * 1024 * 1024)
 #define LEVEL_HUNK_CAPACITY (32 * 1024)
 #define REF_HUNK_CAPACITY (7 * 1024 * 1024)
+#define SND_HUNK_CAPACITY (9 * 1024 * 1024)
 
 static char game_mem[GAME_HUNK_CAPACITY];
 static char level_mem[LEVEL_HUNK_CAPACITY];
 static char ref_mem[REF_HUNK_CAPACITY];
+static char snd_mem[SND_HUNK_CAPACITY];
 
 hunk_t hunk_game;
 hunk_t hunk_level;
 hunk_t hunk_ref;
+hunk_t hunk_snd;
 
 static void Hunk_Init (hunk_t *hunk, const char *name, int capacity, void *membase)
 {
@@ -65,6 +68,7 @@ void Mem_Init (void)
 	Hunk_Init (&hunk_game, "Game", GAME_HUNK_CAPACITY, game_mem);
 	Hunk_Init (&hunk_level, "Level", LEVEL_HUNK_CAPACITY, level_mem);
 	Hunk_Init (&hunk_ref, "Refresh", REF_HUNK_CAPACITY, ref_mem);
+	Hunk_Init (&hunk_snd, "Sound", SND_HUNK_CAPACITY, snd_mem);
 }
 
 void *Hunk_Alloc (hunk_t *hunk, int size)

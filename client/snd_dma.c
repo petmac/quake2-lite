@@ -37,8 +37,6 @@ void S_StopAllSounds(void);
 
 #define		SOUND_LOOPATTENUATE	0.003
 
-int			s_registration_sequence;
-
 channel_t   channels[MAX_CHANNELS];
 
 qboolean	snd_initialized = false;
@@ -183,8 +181,6 @@ void S_Shutdown(void)
 	{
 		if (!sfx->name[0])
 			continue;
-		if (sfx->cache)
-			Z_Free (sfx->cache);
 		memset (sfx, 0, sizeof(*sfx));
 	}
 
@@ -228,7 +224,6 @@ sfx_t *S_FindName (char *name, qboolean create)
 	// find a free sfx
 	for (i=0 ; i < num_sfx ; i++)
 		if (!known_sfx[i].name[0])
-//			registration_sequence < s_registration_sequence)
 			break;
 
 	if (i == num_sfx)
@@ -241,7 +236,6 @@ sfx_t *S_FindName (char *name, qboolean create)
 	sfx = &known_sfx[i];
 	memset (sfx, 0, sizeof(*sfx));
 	strcpy (sfx->name, name);
-	sfx->registration_sequence = s_registration_sequence;
 	
 	return sfx;
 }
@@ -259,7 +253,7 @@ sfx_t *S_AliasName (char *aliasname, char *truename)
 	char	*s;
 	int		i;
 
-	s = Z_Malloc (MAX_QPATH);
+	s = Hunk_Alloc (&hunk_snd, MAX_QPATH);
 	strcpy (s, truename);
 
 	// find a free sfx
@@ -277,7 +271,6 @@ sfx_t *S_AliasName (char *aliasname, char *truename)
 	sfx = &known_sfx[i];
 	memset (sfx, 0, sizeof(*sfx));
 	strcpy (sfx->name, aliasname);
-	sfx->registration_sequence = s_registration_sequence;
 	sfx->truename = s;
 
 	return sfx;
@@ -292,7 +285,21 @@ S_BeginRegistration
 */
 void S_BeginRegistration (void)
 {
-	s_registration_sequence++;
+	int		i;
+	sfx_t	*sfx;
+
+	// free all sounds
+	for (i=0, sfx=known_sfx ; i < num_sfx ; i++,sfx++)
+	{
+		if (!sfx->name[0])
+			continue;
+		memset (sfx, 0, sizeof(*sfx));
+	}
+
+	num_sfx = 0;
+
+	Hunk_Free(&hunk_snd);
+
 	s_registering = true;
 }
 
@@ -310,7 +317,6 @@ sfx_t *S_RegisterSound (char *name)
 		return NULL;
 
 	sfx = S_FindName (name, true);
-	sfx->registration_sequence = s_registration_sequence;
 
 	if (!s_registering)
 		S_LoadSound (sfx);
@@ -329,29 +335,6 @@ void S_EndRegistration (void)
 {
 	int		i;
 	sfx_t	*sfx;
-	int		size;
-
-	// free any sounds not from this registration sequence
-	for (i=0, sfx=known_sfx ; i < num_sfx ; i++,sfx++)
-	{
-		if (!sfx->name[0])
-			continue;
-		if (sfx->registration_sequence != s_registration_sequence)
-		{	// don't need this sound
-			if (sfx->cache)	// it is possible to have a leftover
-				Z_Free (sfx->cache);	// from a server that didn't finish loading
-			memset (sfx, 0, sizeof(*sfx));
-		}
-		else
-		{	// make sure it is paged in
-			if (sfx->cache)
-			{
-				size = sfx->cache->length*sfx->cache->width;
-				Com_PageInMemory ((byte *)sfx->cache, size);
-			}
-		}
-
-	}
 
 	// load everything in
 	for (i=0, sfx=known_sfx ; i < num_sfx ; i++,sfx++)
@@ -1188,7 +1171,7 @@ void S_SoundList(void)
 	total = 0;
 	for (sfx=known_sfx, i=0 ; i<num_sfx ; i++, sfx++)
 	{
-		if (!sfx->registration_sequence)
+		if (!sfx->name[0])
 			continue;
 		sc = sfx->cache;
 		if (sc)

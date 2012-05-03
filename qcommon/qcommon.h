@@ -835,6 +835,7 @@ typedef struct hunk_s hunk_t;
 extern hunk_t hunk_game;
 extern hunk_t hunk_level;
 extern hunk_t hunk_ref;
+extern hunk_t hunk_snd;
 
 void Mem_Init (void);
 void *Hunk_Alloc (hunk_t *hunk, int size);

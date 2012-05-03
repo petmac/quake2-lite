@@ -39,7 +39,6 @@ typedef struct
 typedef struct sfx_s
 {
 	char 		name[MAX_QPATH];
-	int			registration_sequence;
 	sfxcache_t	*cache;
 	char 		*truename;
 } sfx_t;
