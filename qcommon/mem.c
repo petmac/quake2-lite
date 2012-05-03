@@ -67,7 +67,7 @@ void *Hunk_Alloc (hunk_t *hunk, int size)
 	return (hunk->membase+hunk->cursize-size);
 }
 
-void Hunk_Begin (hunk_t *hunk)
+void Hunk_Free (hunk_t *hunk)
 {
 	if (hunk->cursize > 0)
 	{
@@ -75,8 +75,4 @@ void Hunk_Begin (hunk_t *hunk)
 
 		hunk->cursize = 0;
 	}
-}
-
-void Hunk_End (hunk_t *hunk)
-{
 }

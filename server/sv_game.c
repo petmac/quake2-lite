@@ -293,6 +293,43 @@ void PF_StartSound (edict_t *entity, int channel, int sound_num, float volume,
 	SV_StartSound (NULL, entity, channel, sound_num, volume, attenuation, timeofs);
 }
 
+void *PF_TagMalloc (int size, int tag)
+{
+	switch (tag)
+	{
+	case TAG_GAME:
+		return Hunk_Alloc(&hunk_game, size);
+
+	case TAG_LEVEL:
+		return Hunk_Alloc(&hunk_level, size);
+
+	case 0:
+		return Z_Malloc(size);
+
+	default:
+		Com_Error (ERR_FATAL, "PF_TagMalloc: Called with unhandled tag %d", tag);
+		return NULL;
+	}
+}
+
+void PF_FreeTags (int tag)
+{
+	switch (tag)
+	{
+	case TAG_GAME:
+		Hunk_Free(&hunk_game);
+		break;
+
+	case TAG_LEVEL:
+		Hunk_Free(&hunk_level);
+		break;
+
+	default:
+		Com_Error (ERR_FATAL, "PF_FreeTags: Called with unhandled tag %d", tag);
+		break;
+	}
+}
+
 //==============================================
 
 /*
@@ -367,9 +404,9 @@ void SV_InitGameProgs (void)
 	import.WriteDir = PF_WriteDir;
 	import.WriteAngle = PF_WriteAngle;
 
-	import.TagMalloc = Z_TagMalloc;
+	import.TagMalloc = PF_TagMalloc;
 	import.TagFree = Z_Free;
-	import.FreeTags = Z_FreeTags;
+	import.FreeTags = PF_FreeTags;
 
 	import.cvar = Cvar_Get;
 	import.cvar_set = Cvar_Set;

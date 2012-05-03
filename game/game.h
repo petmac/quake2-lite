@@ -22,6 +22,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define	GAME_API_VERSION	3
 
+// memory tags to allow dynamic memory to be cleaned up
+#define	TAG_GAME	765		// clear when unloading the dll
+#define	TAG_LEVEL	766		// clear when loading a new level
+
 // edict->svflags
 
 #define	SVF_NOCLIENT			0x00000001	// don't send entity to clients, even if it has effects

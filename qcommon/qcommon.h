@@ -766,8 +766,6 @@ extern	int		time_after_ref;
 void Z_Free (void *ptr);
 #define Z_Malloc(size) Z_MallocEx(size, __FILE__, __LINE__, __FUNCTION__)
 void *Z_MallocEx (int size, const char *file, int line, const char *function);			// returns 0 filled memory
-void *Z_TagMalloc (int size, int tag);
-void Z_FreeTags (int tag);
 
 void Qcommon_Init (int argc, char **argv);
 void Qcommon_Frame (int msec);
@@ -840,5 +838,4 @@ extern hunk_t hunk_ref;
 
 void Mem_Init (void);
 void *Hunk_Alloc (hunk_t *hunk, int size);
-void Hunk_Begin (hunk_t *hunk);
-void Hunk_End (hunk_t *hunk);
+void Hunk_Free (hunk_t *hunk);

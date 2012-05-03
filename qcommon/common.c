@@ -1101,7 +1101,6 @@ typedef struct zhead_s
 {
 	struct zhead_s	*prev, *next;
 	short	magic;
-	short	tag;			// for group free
 	int		size;
 } zhead_t;
 
@@ -1121,11 +1120,6 @@ void Z_Free (void *ptr)
 
 	if (z->magic != Z_MAGIC)
 		Com_Error (ERR_FATAL, "Z_Free: bad magic");
-
-	if (z->tag != 0)
-	{
-		Com_Error (ERR_FATAL, "Z_Free: bad tag");
-	}
 
 	z->prev->next = z->next;
 	z->next->prev = z->prev;
@@ -1148,59 +1142,23 @@ void Z_Stats_f (void)
 
 /*
 ========================
-Z_FreeTags
+Z_Malloc
 ========================
 */
-void Z_FreeTags (int tag)
-{
-	zhead_t	*z, *next;
-
-	if (tag == 765)
-	{
-		Hunk_Begin (&hunk_game);
-		return;
-	}
-	else if (tag == 766)
-	{
-		Hunk_Begin (&hunk_level);
-		return;
-	}
-
-	for (z=z_chain.next ; z != &z_chain ; z=next)
-	{
-		next = z->next;
-		if (z->tag == tag)
-			Z_Free ((void *)(z+1));
-	}
-}
-
-/*
-========================
-Z_TagMalloc
-========================
-*/
-void *Z_TagMalloc (int size, int tag)
+void *Z_MallocEx (int size, const char *file, int line, const char *function)
 {
 	zhead_t	*z;
 	
-	if (tag == 765)
-	{
-		return Hunk_Alloc (&hunk_game, size);
-	}
-	else if (tag == 766)
-	{
-		return Hunk_Alloc (&hunk_level, size);
-	}
+	Com_Printf("Z_MallocEx: ALLOC size = %08d, count = %08d, total = %08d, %s\n", size, z_count, z_bytes, function);
 
 	size = size + sizeof(zhead_t);
 	z = malloc(size);
 	if (!z)
-		Com_Error (ERR_FATAL, "Z_Malloc: failed on allocation of %i bytes",size);
+		Com_Error (ERR_FATAL, "Z_TagMalloc: failed on allocation of %i bytes",size);
 	memset (z, 0, size);
 	z_count++;
 	z_bytes += size;
 	z->magic = Z_MAGIC;
-	z->tag = tag;
 	z->size = size;
 
 	z->next = z_chain.next;
@@ -1209,18 +1167,6 @@ void *Z_TagMalloc (int size, int tag)
 	z_chain.next = z;
 
 	return (void *)(z+1);
-}
-
-/*
-========================
-Z_Malloc
-========================
-*/
-void *Z_MallocEx (int size, const char *file, int line, const char *function)
-{
-	Com_Printf("ALLOC size = %08d, count = %08d, %s\n", size, z_count, function);
-
-	return Z_TagMalloc (size, 0);
 }
 
 
