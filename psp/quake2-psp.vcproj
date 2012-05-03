@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="9.00"
+	Name="quake2-psp"
+	ProjectGUID="{1F0F9675-48A5-4127-94C5-69BF508486E0}"
+	Keyword="MakeFileProj"
+	TargetFrameworkVersion="196613"
+	>
+	<Platforms>
+		<Platform
+			Name="Win32"
+		/>
+	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
+	<Configurations>
+		<Configuration
+			Name="Debug|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="0"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="vsmake.bat deploy"
+				ReBuildCommandLine="vsmake.bat clean deploy"
+				CleanCommandLine="vsmake.bat clean"
+				Output="quake2-psp.exe"
+				PreprocessorDefinitions="WIN32;_DEBUG"
+				IncludeSearchPath="C:\pspsdk\psp\include;C:\pspsdk\psp\sdk\include"
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="0"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="vsmake.bat deploy"
+				ReBuildCommandLine="vsmake.bat clean deploy"
+				CleanCommandLine="vsmake.bat clean"
+				Output="quake2-psp.exe"
+				PreprocessorDefinitions="WIN32;NDEBUG"
+				IncludeSearchPath="C:\pspsdk\psp\include;C:\pspsdk\psp\sdk\include"
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
+		</Configuration>
+	</Configurations>
+	<References>
+	</References>
+	<Files>
+		<Filter
+			Name="psp"
+			>
+			<File
+				RelativePath=".\Makefile"
+				>
+			</File>
+			<File
+				RelativePath=".\sys_psp.c"
+				>
+			</File>
+		</Filter>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>
