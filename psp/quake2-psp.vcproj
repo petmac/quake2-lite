@@ -27,7 +27,7 @@
 				ReBuildCommandLine="make clean deploy"
 				CleanCommandLine="make clean"
 				Output="quake2-psp.exe"
-				PreprocessorDefinitions="WIN32;_DEBUG"
+				PreprocessorDefinitions="PSP"
 				IncludeSearchPath="C:\pspsdk\psp\include;C:\pspsdk\psp\sdk\include"
 				ForcedIncludes=""
 				AssemblySearchPath=""
@@ -47,7 +47,7 @@
 				ReBuildCommandLine="make clean deploy"
 				CleanCommandLine="make clean"
 				Output="quake2-psp.exe"
-				PreprocessorDefinitions="WIN32;NDEBUG"
+				PreprocessorDefinitions="PSP"
 				IncludeSearchPath="C:\pspsdk\psp\include;C:\pspsdk\psp\sdk\include"
 				ForcedIncludes=""
 				AssemblySearchPath=""
@@ -567,54 +567,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\ref_gl\gl_draw.c"
-				>
-			</File>
-			<File
-				RelativePath="..\ref_gl\gl_image.c"
-				>
-			</File>
-			<File
-				RelativePath="..\ref_gl\gl_light.c"
-				>
-			</File>
-			<File
-				RelativePath="..\ref_gl\gl_local.h"
-				>
-			</File>
-			<File
-				RelativePath="..\ref_gl\gl_mesh.c"
-				>
-			</File>
-			<File
-				RelativePath="..\ref_gl\gl_model.c"
-				>
-			</File>
-			<File
-				RelativePath="..\ref_gl\gl_model.h"
-				>
-			</File>
-			<File
-				RelativePath="..\ref_gl\gl_rmain.c"
-				>
-			</File>
-			<File
-				RelativePath="..\ref_gl\gl_rmisc.c"
-				>
-			</File>
-			<File
-				RelativePath="..\ref_gl\gl_rsurf.c"
-				>
-			</File>
-			<File
-				RelativePath="..\ref_gl\gl_warp.c"
-				>
-			</File>
-			<File
-				RelativePath="..\ref_gl\qgl.h"
-				>
-			</File>
-			<File
 				RelativePath="..\ref_gl\warpsin.h"
 				>
 			</File>
@@ -622,6 +574,50 @@
 		<Filter
 			Name="psp"
 			>
+			<File
+				RelativePath=".\gu_draw.c"
+				>
+			</File>
+			<File
+				RelativePath=".\gu_image.c"
+				>
+			</File>
+			<File
+				RelativePath=".\gu_light.c"
+				>
+			</File>
+			<File
+				RelativePath=".\gu_local.h"
+				>
+			</File>
+			<File
+				RelativePath=".\gu_mesh.c"
+				>
+			</File>
+			<File
+				RelativePath=".\gu_model.c"
+				>
+			</File>
+			<File
+				RelativePath=".\gu_model.h"
+				>
+			</File>
+			<File
+				RelativePath=".\gu_rmain.c"
+				>
+			</File>
+			<File
+				RelativePath=".\gu_rmisc.c"
+				>
+			</File>
+			<File
+				RelativePath=".\gu_rsurf.c"
+				>
+			</File>
+			<File
+				RelativePath=".\gu_warp.c"
+				>
+			</File>
 			<File
 				RelativePath=".\Makefile"
 				>

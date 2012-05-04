@@ -1,6 +1,16 @@
 TARGET = Quake2
 
 OBJS = \
+	gu_draw.o \
+	gu_image.o \
+	gu_light.o \
+	gu_mesh.o \
+	gu_model.o \
+	gu_rmain.o \
+	gu_rmisc.o \
+	gu_rsurf.o \
+	gu_warp.o \
+	\
 	net_psp.o \
 	sys_psp.o \
 	vid_menu_psp.o \
