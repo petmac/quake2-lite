@@ -22,6 +22,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../client/client.h"
 
+#include "SDL_video.h"
+
+extern cvar_t *vid_ref;
+extern cvar_t *vid_fullscreen;
+
 void M_PopMenu (void);
 
 viddef_t	viddef;				// global video state
@@ -79,30 +84,32 @@ void VID_NewWindow (int width, int height)
 */
 typedef struct vidmode_s
 {
-    const char *description;
-    int         width, height;
-    int         mode;
+    int width, height;
 } vidmode_t;
 
-vidmode_t vid_modes[] =
+#define VID_MAX_MODES 256
+
+static vidmode_t vid_modes[VID_MAX_MODES];
+static int vid_num_modes;
+
+static int CompareModes(const void *a, const void *b)
 {
-    { "Mode 0: 320x240",   320, 240,   0 },
-    { "Mode 1: 400x300",   400, 300,   1 },
-    { "Mode 2: 512x384",   512, 384,   2 },
-    { "Mode 3: 640x480",   640, 480,   3 },
-    { "Mode 4: 800x600",   800, 600,   4 },
-    { "Mode 5: 960x720",   960, 720,   5 },
-    { "Mode 6: 1024x768",  1024, 768,  6 },
-    { "Mode 7: 1152x864",  1152, 864,  7 },
-    { "Mode 8: 1280x960",  1280, 960, 8 },
-    { "Mode 9: 1600x1200", 1600, 1200, 9 },
-	{ "Mode 10: 2048x1536", 2048, 1536, 10 }
-};
-#define VID_NUM_MODES ( sizeof( vid_modes ) / sizeof( vid_modes[0] ) )
+	const vidmode_t *const ma = (const vidmode_t *)a;
+	const vidmode_t *const mb = (const vidmode_t *)b;
+
+	if (ma->width != mb->width)
+	{
+		return ma->width - mb->width;
+	}
+	else
+	{
+		return mb->height - mb->height;
+	}
+}
 
 qboolean VID_GetModeInfo( int *width, int *height, int mode )
 {
-    if ( mode < 0 || mode >= VID_NUM_MODES )
+    if ( mode < 0 || mode >= vid_num_modes )
         return false;
 
     *width  = vid_modes[mode].width;
@@ -114,10 +121,38 @@ qboolean VID_GetModeInfo( int *width, int *height, int mode )
 
 void	VID_Init (void)
 {
+	SDL_Rect **modes;
     refimport_t	ri;
 
-    viddef.width = 320;
-    viddef.height = 240;
+	vid_ref = Cvar_Get ("vid_ref", "soft", CVAR_ARCHIVE);
+
+	// Enumerate modes.
+	modes = SDL_ListModes(NULL, SDL_OPENGL | SDL_FULLSCREEN);
+	if (modes == NULL)
+	{
+        Com_Error (ERR_FATAL, "SDL_ListModes returned no modes.");
+		return;
+	}
+	else if (modes == (SDL_Rect **)-1)
+	{
+		vid_modes[0].width = 480;
+		vid_modes[0].height = 272;
+		vid_num_modes = 1;
+	}
+	else
+	{
+		while ((vid_num_modes < VID_MAX_MODES) && (modes[vid_num_modes] != NULL))
+		{
+			vid_modes[vid_num_modes].width = modes[vid_num_modes]->w;
+			vid_modes[vid_num_modes].height = modes[vid_num_modes]->h;
+			++vid_num_modes;
+		}
+	}
+
+	qsort(&vid_modes[0], vid_num_modes, sizeof(vidmode_t), &CompareModes);
+
+    viddef.width = vid_modes[0].width;
+	viddef.height = vid_modes[0].height;
 
     ri.Cmd_AddCommand = Cmd_AddCommand;
     ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
@@ -154,4 +189,45 @@ void	VID_Shutdown (void)
 
 void	VID_CheckChanges (void)
 {
+	if ( vid_ref->modified )
+	{
+		S_StopAllSounds();
+	}
+
+	while (vid_ref->modified)
+	{
+		/*
+		** refresh has changed
+		*/
+		vid_ref->modified = false;
+		vid_fullscreen->modified = true;
+		cl.refresh_prepped = false;
+		cls.disable_screen = true;
+
+		if ( !VID_LoadRefresh( "opengl32" ) )
+		{
+		        if ( strcmp (vid_ref->string, "soft") == 0 ) {
+			        Com_Printf("Refresh failed\n");
+				sw_mode = Cvar_Get( "sw_mode", "0", 0 );
+				if (sw_mode->value != 0) {
+				        Com_Printf("Trying mode 0\n");
+					Cvar_SetValue("sw_mode", 0);
+					if ( !VID_LoadRefresh( name ) )
+						Com_Error (ERR_FATAL, "Couldn't fall back to software refresh!");
+				} else
+					Com_Error (ERR_FATAL, "Couldn't fall back to software refresh!");
+			}
+
+			Cvar_Set( "vid_ref", "soft" );
+
+			/*
+			** drop the console if we fail to load a refresh
+			*/
+			if ( cls.key_dest != key_console )
+			{
+				Con_ToggleConsole_f();
+			}
+		}
+		cls.disable_screen = false;
+	}
 }

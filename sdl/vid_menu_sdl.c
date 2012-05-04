@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define REF_SOFT	0
 #define REF_OPENGL	1
 
+extern cvar_t *vid_ref;
 extern cvar_t *vid_fullscreen;
 extern cvar_t *vid_gamma;
 extern cvar_t *scr_viewsize;
@@ -38,6 +39,7 @@ static cvar_t *sw_stipplealpha;
 static cvar_t *_windowed_mouse;
 
 extern void M_ForceMenuOff( void );
+extern qboolean VID_GetModeInfo( int *width, int *height, int mode );
 
 /*
 ====================================================================
@@ -101,27 +103,36 @@ static void ApplyChanges( void *unused )
 */
 void VID_MenuInit( void )
 {
-	static const char *resolutions[] = 
-	{
-		"[320 240  ]",
-		"[400 300  ]",
-		"[512 384  ]",
-		"[640 480  ]",
-		"[800 600  ]",
-		"[960 720  ]",
-		"[1024 768 ]",
-		"[1152 864 ]",
-		"[1280 1024]",
-		"[1600 1200]",
-		"[2048 1536]",
-		0
-	};
+#define MAX_RESOLUTIONS 32
+
+	static char res_names[MAX_RESOLUTIONS][16];
+	static const char *resolutions[MAX_RESOLUTIONS + 1];
 	static const char *yesno_names[] =
 	{
 		"no",
 		"yes",
 		0
 	};
+
+	int res_count = 0;
+
+	while (res_count < MAX_RESOLUTIONS)
+	{
+		char *const name = res_names[res_count];
+		int w;
+		int h;
+
+		if (!VID_GetModeInfo(&w, &h, res_count))
+		{
+			break;
+		}
+
+		sprintf(name, "[%4d %4d]", w, h);
+		resolutions[res_count] = name;
+
+		++res_count;
+	}
+	resolutions[res_count] = 0;
 
 	if ( !gl_driver )
 		gl_driver = Cvar_Get( "gl_driver", "opengl32", 0 );
