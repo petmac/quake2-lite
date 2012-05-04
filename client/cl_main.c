@@ -319,7 +319,11 @@ void CL_Setenv_f( void )
 			strcat( buffer, " " );
 		}
 
+#ifdef _MSC_VER
 		_putenv( buffer );
+#else
+		putenv( buffer );
+#endif
 	}
 	else if ( argc == 2 )
 	{
