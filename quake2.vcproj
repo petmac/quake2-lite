@@ -750,6 +750,14 @@
 				RelativePath=".\sdl\sys_sdl.c"
 				>
 			</File>
+			<File
+				RelativePath=".\sdl\vid_menu_sdl.c"
+				>
+			</File>
+			<File
+				RelativePath=".\sdl\vid_sdl.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="server"
@@ -800,10 +808,6 @@
 			</File>
 			<File
 				RelativePath=".\null\in_null.c"
-				>
-			</File>
-			<File
-				RelativePath=".\null\vid_null.c"
 				>
 			</File>
 		</Filter>
