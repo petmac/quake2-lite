@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../client/client.h"
 
+void M_PopMenu (void);
+
 viddef_t	viddef;				// global video state
 
 refexport_t	re;
@@ -164,5 +166,7 @@ void	VID_MenuDraw (void)
 
 const char *VID_MenuKey( int k)
 {
+	M_PopMenu();
+
 	return NULL;
 }
