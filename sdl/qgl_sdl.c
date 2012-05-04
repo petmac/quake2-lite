@@ -798,6 +798,8 @@ void QGL_Shutdown( void )
 */
 qboolean QGL_Init( const char *dllname )
 {
+	static qboolean loaded = false;
+
 	// update 3Dfx gamma irrespective of underlying DLL
 	{
 		char envbuffer[1024];
@@ -810,9 +812,14 @@ qboolean QGL_Init( const char *dllname )
 		_putenv( envbuffer );
 	}
 
-	if (SDL_GL_LoadLibrary(dllname) < 0)
+	if (!loaded)
 	{
-		return false;
+		if (SDL_GL_LoadLibrary(dllname) < 0)
+		{
+			return false;
+		}
+
+		loaded = true;
 	}
 
 	gl_config.allow_cds = true;

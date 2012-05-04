@@ -32,8 +32,6 @@ void		GLimp_EndFrame( void )
 
 qboolean	GLimp_Init( void *hinstance, void *hWnd )
 {
-	vidref_val = VIDREF_GL;
-
 	return true;
 }
 
@@ -53,7 +51,14 @@ int     	GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 		return rserr_invalid_mode;
 	}
 
-	screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL);
+	if (fullscreen)
+	{
+		screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_FULLSCREEN);
+	}
+	else
+	{
+		screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL);
+	}
 	if (screen == NULL)
 	{
 		return rserr_invalid_mode;

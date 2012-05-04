@@ -24,8 +24,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "SDL_video.h"
 
+// Console variables that we need to access from this module
 extern cvar_t *vid_ref;
-extern cvar_t *vid_fullscreen;
+cvar_t		*vid_gamma;
+cvar_t		*vid_fullscreen;
 
 void M_PopMenu (void);
 
@@ -34,6 +36,8 @@ viddef_t	viddef;				// global video state
 refexport_t	re;
 
 refexport_t GetRefAPI (refimport_t rimp);
+
+static qboolean	reflib_active;
 
 /*
 ==========================================================================
@@ -118,13 +122,78 @@ qboolean VID_GetModeInfo( int *width, int *height, int mode )
     return true;
 }
 
+/*
+============
+VID_Restart_f
+
+Console command to re-start the video mode and refresh DLL. We do this
+simply by setting the modified flag for the vid_ref variable, which will
+cause the entire video mode and refresh DLL to be reset on the next frame.
+============
+*/
+void VID_Restart_f (void)
+{
+	vid_ref->modified = true;
+}
+
+/*
+==============
+VID_LoadRefresh
+==============
+*/
+qboolean VID_LoadRefresh()
+{
+	refimport_t	ri;
+	
+	if ( reflib_active )
+	{
+		re.Shutdown();
+	}
+
+	ri.Cmd_AddCommand = Cmd_AddCommand;
+	ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
+	ri.Cmd_Argc = Cmd_Argc;
+	ri.Cmd_Argv = Cmd_Argv;
+	ri.Cmd_ExecuteText = Cbuf_ExecuteText;
+	ri.Con_Printf = VID_Printf;
+	ri.Sys_Error = VID_Error;
+	ri.FS_LoadFile = FS_LoadFile;
+	ri.FS_FreeFile = FS_FreeFile;
+	ri.FS_Gamedir = FS_Gamedir;
+	ri.Cvar_Get = Cvar_Get;
+	ri.Cvar_Set = Cvar_Set;
+	ri.Cvar_SetValue = Cvar_SetValue;
+	ri.Vid_GetModeInfo = VID_GetModeInfo;
+	ri.Vid_MenuInit = VID_MenuInit;
+	ri.Vid_NewWindow = VID_NewWindow;
+
+	re = GetRefAPI( ri );
+
+	if (re.api_version != API_VERSION)
+	{
+		Com_Error (ERR_FATAL, "Refresh has incompatible api_version");
+	}
+
+	if ( re.Init( NULL, NULL ) == -1 )
+	{
+		re.Shutdown();
+		return false;
+	}
+
+	reflib_active = true;
+
+//======
+//PGM
+	vidref_val = VIDREF_GL;
+//PGM
+//======
+
+	return true;
+}
 
 void	VID_Init (void)
 {
 	SDL_Rect **modes;
-    refimport_t	ri;
-
-	vid_ref = Cvar_Get ("vid_ref", "soft", CVAR_ARCHIVE);
 
 	// Enumerate modes.
 	modes = SDL_ListModes(NULL, SDL_OPENGL | SDL_FULLSCREEN);
@@ -151,34 +220,16 @@ void	VID_Init (void)
 
 	qsort(&vid_modes[0], vid_num_modes, sizeof(vidmode_t), &CompareModes);
 
-    viddef.width = vid_modes[0].width;
-	viddef.height = vid_modes[0].height;
+	/* Create the video variables so we know how to start the graphics drivers */
+	vid_ref = Cvar_Get ("vid_ref", "gl", CVAR_ARCHIVE);
+	vid_fullscreen = Cvar_Get ("vid_fullscreen", "0", CVAR_ARCHIVE);
+	vid_gamma = Cvar_Get( "vid_gamma", "1", CVAR_ARCHIVE );
 
-    ri.Cmd_AddCommand = Cmd_AddCommand;
-    ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
-    ri.Cmd_Argc = Cmd_Argc;
-    ri.Cmd_Argv = Cmd_Argv;
-    ri.Cmd_ExecuteText = Cbuf_ExecuteText;
-    ri.Con_Printf = VID_Printf;
-    ri.Sys_Error = VID_Error;
-    ri.FS_LoadFile = FS_LoadFile;
-    ri.FS_FreeFile = FS_FreeFile;
-    ri.FS_Gamedir = FS_Gamedir;
-	ri.Vid_NewWindow = VID_NewWindow;
-	ri.Vid_MenuInit = VID_MenuInit;
-    ri.Cvar_Get = Cvar_Get;
-    ri.Cvar_Set = Cvar_Set;
-    ri.Cvar_SetValue = Cvar_SetValue;
-    ri.Vid_GetModeInfo = VID_GetModeInfo;
-
-    re = GetRefAPI(ri);
-
-    if (re.api_version != API_VERSION)
-        Com_Error (ERR_FATAL, "Re has incompatible api_version");
-    
-        // call the init function
-    if (re.Init (NULL, NULL) == -1)
-		Com_Error (ERR_FATAL, "Couldn't start refresh");
+	/* Add some console commands that we want to handle */
+	Cmd_AddCommand ("vid_restart", VID_Restart_f);
+		
+	/* Start the graphics mode and load refresh DLL */
+	VID_CheckChanges();
 }
 
 void	VID_Shutdown (void)
@@ -204,29 +255,9 @@ void	VID_CheckChanges (void)
 		cl.refresh_prepped = false;
 		cls.disable_screen = true;
 
-		if ( !VID_LoadRefresh( "opengl32" ) )
+		if ( !VID_LoadRefresh() )
 		{
-		        if ( strcmp (vid_ref->string, "soft") == 0 ) {
-			        Com_Printf("Refresh failed\n");
-				sw_mode = Cvar_Get( "sw_mode", "0", 0 );
-				if (sw_mode->value != 0) {
-				        Com_Printf("Trying mode 0\n");
-					Cvar_SetValue("sw_mode", 0);
-					if ( !VID_LoadRefresh( name ) )
-						Com_Error (ERR_FATAL, "Couldn't fall back to software refresh!");
-				} else
-					Com_Error (ERR_FATAL, "Couldn't fall back to software refresh!");
-			}
-
-			Cvar_Set( "vid_ref", "soft" );
-
-			/*
-			** drop the console if we fail to load a refresh
-			*/
-			if ( cls.key_dest != key_console )
-			{
-				Con_ToggleConsole_f();
-			}
+			Com_Error (ERR_FATAL, "Failed to load refresh.");
 		}
 		cls.disable_screen = false;
 	}
