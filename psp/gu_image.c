@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#include "gl_local.h"
+#include "gu_local.h"
 
 image_t		gltextures[MAX_GLTEXTURES];
 int			numgltextures;
@@ -88,7 +88,7 @@ void GL_EnableMultitexture( qboolean enable )
 	GL_TexEnv( GL_REPLACE );
 }
 
-void GL_SelectTexture( GLenum texture )
+void GL_SelectTexture( int texture )
 {
 	int tmu;
 
@@ -122,7 +122,7 @@ void GL_SelectTexture( GLenum texture )
 	}
 }
 
-void GL_TexEnv( GLenum mode )
+void GL_TexEnv( int mode )
 {
 	static int lastmodes[2] = { -1, -1 };
 
@@ -145,7 +145,7 @@ void GL_Bind (int texnum)
 	qglBindTexture (GL_TEXTURE_2D, texnum);
 }
 
-void GL_MBind( GLenum target, int texnum )
+void GL_MBind( int target, int texnum )
 {
 	GL_SelectTexture( target );
 	if ( target == GL_TEXTURE0 )

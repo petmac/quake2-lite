@@ -18,27 +18,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#ifdef _WIN32
-#  include <windows.h>
-#endif
-
 #include <stdio.h>
-
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include <math.h>
-
-#ifndef __linux__
-#ifndef GL_COLOR_INDEX8_EXT
-#define GL_COLOR_INDEX8_EXT GL_COLOR_INDEX
-#endif
-#endif
 
 #include "../client/ref.h"
 
-#include "qgl.h"
+#include <pspgu.h>
 
-#define	REF_VERSION	"GL 0.01"
+extern int GL_TEXTURE0, GL_TEXTURE1;
+
+#define	REF_VERSION	"GU 0.01"
 
 // up / down
 #define	PITCH	0
@@ -117,7 +106,7 @@ typedef enum
 	rserr_unknown
 } rserr_t;
 
-#include "gl_model.h"
+#include "gu_model.h"
 
 void GL_BeginRendering (int *x, int *y, int *width, int *height);
 void GL_EndRendering (void);
@@ -251,10 +240,10 @@ extern	float	r_world_matrix[16];
 
 void R_TranslatePlayerSkin (int playernum);
 void GL_Bind (int texnum);
-void GL_MBind( GLenum target, int texnum );
-void GL_TexEnv( GLenum value );
+void GL_MBind( int target, int texnum );
+void GL_TexEnv( int value );
 void GL_EnableMultitexture( qboolean enable );
-void GL_SelectTexture( GLenum );
+void GL_SelectTexture( int texture );
 
 void R_LightPoint (vec3_t p, vec3_t color);
 void R_PushDlights (void);

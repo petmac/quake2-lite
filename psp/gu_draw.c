@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // draw.c
 
-#include "gl_local.h"
+#include "gu_local.h"
 
 image_t		*draw_chars;
 
@@ -38,8 +38,10 @@ void Draw_InitLocal (void)
 	// load console characters (don't bilerp characters)
 	draw_chars = GL_FindImage ("pics/conchars.pcx", it_pic);
 	GL_Bind( draw_chars->texnum );
+#ifndef PSP
 	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+#endif
 }
 
 
@@ -75,6 +77,7 @@ void Draw_Char (int x, int y, int num)
 
 	GL_Bind (draw_chars->texnum);
 
+#ifndef PSP
 	qglBegin (GL_QUADS);
 	qglTexCoord2f (fcol, frow);
 	qglVertex2f (x, y);
@@ -85,6 +88,7 @@ void Draw_Char (int x, int y, int num)
 	qglTexCoord2f (fcol, frow + size);
 	qglVertex2f (x, y+8);
 	qglEnd ();
+#endif
 }
 
 /*
@@ -146,6 +150,7 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 	if (scrap_dirty)
 		Scrap_Upload ();
 
+#ifndef PSP
 	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) && !gl->has_alpha)
 		qglDisable (GL_ALPHA_TEST);
 
@@ -163,6 +168,7 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 
 	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) && !gl->has_alpha)
 		qglEnable (GL_ALPHA_TEST);
+#endif
 }
 
 
@@ -184,6 +190,7 @@ void Draw_Pic (int x, int y, char *pic)
 	if (scrap_dirty)
 		Scrap_Upload ();
 
+#ifndef PSP
 	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) && !gl->has_alpha)
 		qglDisable (GL_ALPHA_TEST);
 
@@ -201,6 +208,7 @@ void Draw_Pic (int x, int y, char *pic)
 
 	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) )  && !gl->has_alpha)
 		qglEnable (GL_ALPHA_TEST);
+#endif
 }
 
 /*
@@ -222,6 +230,7 @@ void Draw_TileClear (int x, int y, int w, int h, char *pic)
 		return;
 	}
 
+#ifndef PSP
 	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) )  && !image->has_alpha)
 		qglDisable (GL_ALPHA_TEST);
 
@@ -239,6 +248,7 @@ void Draw_TileClear (int x, int y, int w, int h, char *pic)
 
 	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) )  && !image->has_alpha)
 		qglEnable (GL_ALPHA_TEST);
+#endif
 }
 
 
@@ -260,6 +270,7 @@ void Draw_Fill (int x, int y, int w, int h, int c)
 	if ( (unsigned)c > 255)
 		ri.Sys_Error (ERR_FATAL, "Draw_Fill: bad color");
 
+#ifndef PSP
 	qglDisable (GL_TEXTURE_2D);
 
 	color.c = d_8to24table[c];
@@ -277,6 +288,7 @@ void Draw_Fill (int x, int y, int w, int h, int c)
 	qglEnd ();
 	qglColor3f (1,1,1);
 	qglEnable (GL_TEXTURE_2D);
+#endif
 }
 
 //=============================================================================
@@ -289,6 +301,7 @@ Draw_FadeScreen
 */
 void Draw_FadeScreen (void)
 {
+#ifndef PSP
 	qglEnable (GL_BLEND);
 	qglDisable (GL_TEXTURE_2D);
 	qglColor4f (0, 0, 0, 0.8);
@@ -303,6 +316,7 @@ void Draw_FadeScreen (void)
 	qglColor4f (1,1,1,1);
 	qglEnable (GL_TEXTURE_2D);
 	qglDisable (GL_BLEND);
+#endif
 }
 
 
@@ -318,6 +332,7 @@ extern unsigned	r_rawpalette[256];
 
 void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data)
 {
+#ifndef PSP
 	unsigned	image32[256*256];
 	unsigned char image8[256*256];
 	int			i, j, trows;
@@ -411,5 +426,6 @@ void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 
 	if ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) 
 		qglEnable (GL_ALPHA_TEST);
+#endif
 }
 

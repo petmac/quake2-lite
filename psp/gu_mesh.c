@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // gl_mesh.c: triangle model functions
 
-#include "gl_local.h"
+#include "gu_local.h"
 
 /*
 =============================================================
@@ -32,7 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define NUMVERTEXNORMALS	162
 
 float	r_avertexnormals[NUMVERTEXNORMALS][3] = {
-#include "anorms.h"
+#include "../ref_gl/anorms.h"
 };
 
 typedef float vec4_t[4];
@@ -46,7 +46,7 @@ float	shadelight[3];
 // precalculated dot products for quantized angles
 #define SHADEDOT_QUANT 16
 float	r_avertexnormal_dots[SHADEDOT_QUANT][256] =
-#include "anormtab.h"
+#include "../ref_gl/anormtab.h"
 ;
 
 float	*shadedots = r_avertexnormal_dots[0];
