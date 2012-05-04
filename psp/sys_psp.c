@@ -99,8 +99,7 @@ void	Sys_UnloadGame (void)
 
 void	*Sys_GetGameAPI (void *parms)
 {
-	return NULL;
-	//return GetGameAPI(parms);
+	return GetGameAPI(parms);
 }
 
 char *Sys_ConsoleInput (void)
