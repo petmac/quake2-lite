@@ -1105,6 +1105,8 @@ void R_BeginRegistration (char *model)
 {
 	char	fullname[MAX_QPATH];
 
+	Com_DPrintf("%s {\n", __FUNCTION__);
+
 	r_oldviewcluster = -1;		// force markleafs
 
 	Com_sprintf (fullname, sizeof(fullname), "maps/%s.bsp", model);
@@ -1116,6 +1118,8 @@ void R_BeginRegistration (char *model)
 	r_worldmodel = Mod_ForName(fullname, true);
 
 	r_viewcluster = -1;
+
+	Com_DPrintf("}\n");
 }
 
 
@@ -1131,6 +1135,8 @@ struct model_s *R_RegisterModel (char *name)
 	int		i;
 	dsprite_t	*sprout;
 	dmdl_t		*pheader;
+
+	Com_DPrintf("%s {\n", __FUNCTION__);
 
 	mod = Mod_ForName (name, false);
 	if (mod)
@@ -1159,6 +1165,9 @@ struct model_s *R_RegisterModel (char *name)
 #endif
 		}
 	}
+
+	Com_DPrintf("}\n");
+
 	return mod;
 }
 
@@ -1171,7 +1180,11 @@ R_EndRegistration
 */
 void R_EndRegistration (void)
 {
+	Com_DPrintf("%s {\n", __FUNCTION__);
+
 	GL_FreeUnusedImages ();
+
+	Com_DPrintf("}\n");
 }
 
 

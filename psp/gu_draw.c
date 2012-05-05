@@ -60,13 +60,21 @@ void Draw_Char (int x, int y, int num)
 	int				row, col;
 	float			frow, fcol, size;
 
+	Com_DPrintf("%s {\n", __FUNCTION__);
+
 	num &= 255;
 	
 	if ( (num&127) == 32 )
+	{
+		Com_DPrintf("}\n");
 		return;		// space
+	}
 
 	if (y <= -8)
+	{
+		Com_DPrintf("}\n");
 		return;			// totally off screen
+	}
 
 	row = num>>4;
 	col = num&15;
@@ -89,6 +97,8 @@ void Draw_Char (int x, int y, int num)
 	qglVertex2f (x, y+8);
 	qglEnd ();
 #endif
+
+	Com_DPrintf("}\n");
 }
 
 /*
@@ -101,6 +111,8 @@ image_t	*Draw_FindPic (char *name)
 	image_t *gl;
 	char	fullname[MAX_QPATH];
 
+	Com_DPrintf("%s {\n", __FUNCTION__);
+
 	if (name[0] != '/' && name[0] != '\\')
 	{
 		Com_sprintf (fullname, sizeof(fullname), "pics/%s.pcx", name);
@@ -108,6 +120,8 @@ image_t	*Draw_FindPic (char *name)
 	}
 	else
 		gl = GL_FindImage (name+1, it_pic);
+
+	Com_DPrintf("}\n");
 
 	return gl;
 }
@@ -121,14 +135,21 @@ void Draw_GetPicSize (int *w, int *h, char *pic)
 {
 	image_t *gl;
 
+	Com_DPrintf("%s {\n", __FUNCTION__);
+
 	gl = Draw_FindPic (pic);
 	if (!gl)
 	{
 		*w = *h = -1;
+
+		Com_DPrintf("}\n");
+
 		return;
 	}
 	*w = gl->width;
 	*h = gl->height;
+
+	Com_DPrintf("}\n");
 }
 
 /*
@@ -140,10 +161,15 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 {
 	image_t *gl;
 
+	Com_DPrintf("%s {\n", __FUNCTION__);
+
 	gl = Draw_FindPic (pic);
 	if (!gl)
 	{
 		ri.Con_Printf (PRINT_ALL, "Can't find pic: %s\n", pic);
+
+		Com_DPrintf("}\n");
+
 		return;
 	}
 
@@ -169,6 +195,8 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) && !gl->has_alpha)
 		qglEnable (GL_ALPHA_TEST);
 #endif
+
+	Com_DPrintf("}\n");
 }
 
 
@@ -181,10 +209,15 @@ void Draw_Pic (int x, int y, char *pic)
 {
 	image_t *gl;
 
+	Com_DPrintf("%s {\n", __FUNCTION__);
+
 	gl = Draw_FindPic (pic);
 	if (!gl)
 	{
 		ri.Con_Printf (PRINT_ALL, "Can't find pic: %s\n", pic);
+
+		Com_DPrintf("}\n");
+
 		return;
 	}
 	if (scrap_dirty)
@@ -209,6 +242,8 @@ void Draw_Pic (int x, int y, char *pic)
 	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) )  && !gl->has_alpha)
 		qglEnable (GL_ALPHA_TEST);
 #endif
+
+	Com_DPrintf("}\n");
 }
 
 /*
@@ -223,10 +258,15 @@ void Draw_TileClear (int x, int y, int w, int h, char *pic)
 {
 	image_t	*image;
 
+	Com_DPrintf("%s {\n", __FUNCTION__);
+
 	image = Draw_FindPic (pic);
 	if (!image)
 	{
 		ri.Con_Printf (PRINT_ALL, "Can't find pic: %s\n", pic);
+
+		Com_DPrintf("}\n");
+
 		return;
 	}
 
@@ -249,6 +289,8 @@ void Draw_TileClear (int x, int y, int w, int h, char *pic)
 	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) )  && !image->has_alpha)
 		qglEnable (GL_ALPHA_TEST);
 #endif
+
+	Com_DPrintf("}\n");
 }
 
 
@@ -266,6 +308,8 @@ void Draw_Fill (int x, int y, int w, int h, int c)
 		unsigned	c;
 		byte		v[4];
 	} color;
+
+	Com_DPrintf("%s {\n", __FUNCTION__);
 
 	if ( (unsigned)c > 255)
 		ri.Sys_Error (ERR_FATAL, "Draw_Fill: bad color");
@@ -289,6 +333,8 @@ void Draw_Fill (int x, int y, int w, int h, int c)
 	qglColor3f (1,1,1);
 	qglEnable (GL_TEXTURE_2D);
 #endif
+
+	Com_DPrintf("}\n");
 }
 
 //=============================================================================
@@ -301,6 +347,8 @@ Draw_FadeScreen
 */
 void Draw_FadeScreen (void)
 {
+	Com_DPrintf("%s {\n", __FUNCTION__);
+
 #ifndef PSP
 	qglEnable (GU_BLEND);
 	qglDisable (GL_TEXTURE_2D);
@@ -317,6 +365,8 @@ void Draw_FadeScreen (void)
 	qglEnable (GL_TEXTURE_2D);
 	qglDisable (GU_BLEND);
 #endif
+
+	Com_DPrintf("}\n");
 }
 
 
@@ -332,6 +382,8 @@ extern unsigned	r_rawpalette[256];
 
 void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data)
 {
+	//Com_DPrintf("%s {\n", __FUNCTION__);
+
 #ifndef PSP
 	unsigned	image32[256*256];
 	unsigned char image8[256*256];
@@ -427,5 +479,7 @@ void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 	if ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) 
 		qglEnable (GL_ALPHA_TEST);
 #endif
+
+	//Com_DPrintf("}\n");
 }
 

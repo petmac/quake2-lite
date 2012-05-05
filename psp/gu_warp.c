@@ -631,6 +631,8 @@ void R_SetSky (char *name, float rotate, vec3_t axis)
 	int		i;
 	char	pathname[MAX_QPATH];
 
+	Com_DPrintf("%s {\n", __FUNCTION__);
+
 	strncpy (skyname, name, sizeof(skyname)-1);
 	skyrotate = rotate;
 	VectorCopy (axis, skyaxis);
@@ -670,4 +672,6 @@ void R_SetSky (char *name, float rotate, vec3_t axis)
 			sky_max = 511.0/512;
 		}
 	}
+
+	Com_DPrintf("}\n");
 }

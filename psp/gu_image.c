@@ -1299,6 +1299,7 @@ R_RegisterSkin
 */
 struct image_s *R_RegisterSkin (char *name)
 {
+	Com_DPrintf("%s {}\n", __FUNCTION__);
 	return GL_FindImage (name, it_skin);
 }
 

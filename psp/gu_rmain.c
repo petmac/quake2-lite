@@ -973,9 +973,13 @@ R_RenderFrame
 */
 void R_RenderFrame (refdef_t *fd)
 {
+	Com_DPrintf("%s {\n", __FUNCTION__);
+
 	R_RenderView( fd );
 	R_SetLightLevel ();
 	R_SetGL2D ();
+
+	Com_DPrintf("}\n");
 }
 
 
@@ -1105,6 +1109,8 @@ int R_Init( void *hinstance, void *hWnd )
 	int		j;
 	extern float r_turbsin[256];
 
+	Com_DPrintf("%s {\n", __FUNCTION__);
+
 	// TODO PeterM This may get done more than once.
 	for ( j = 0; j < 256; j++ )
 	{
@@ -1205,6 +1211,8 @@ int R_Init( void *hinstance, void *hWnd )
 		ri.Con_Printf (PRINT_ALL, "glGetError() = 0x%x\n", err);
 #endif
 
+	Com_DPrintf("}\n");
+
 	return true;
 }
 
@@ -1214,7 +1222,9 @@ R_Shutdown
 ===============
 */
 void R_Shutdown (void)
-{	
+{
+	Com_DPrintf("%s {\n", __FUNCTION__);
+
 	ri.Cmd_RemoveCommand ("modellist");
 	ri.Cmd_RemoveCommand ("screenshot");
 	ri.Cmd_RemoveCommand ("imagelist");
@@ -1223,6 +1233,8 @@ void R_Shutdown (void)
 	Mod_FreeAll ();
 
 	GL_ShutdownImages ();
+
+	Com_DPrintf("}\n");
 }
 
 
@@ -1234,6 +1246,7 @@ R_BeginFrame
 */
 void R_BeginFrame( float camera_separation )
 {
+	//Com_DPrintf("%s {\n", __FUNCTION__);
 
 	gl_state.camera_separation = camera_separation;
 
@@ -1311,6 +1324,8 @@ void R_BeginFrame( float camera_separation )
 	// clear screen if desired
 	//
 	R_Clear ();
+
+	//Com_DPrintf("}\n");
 }
 
 /*
@@ -1325,6 +1340,8 @@ void R_SetPalette ( const unsigned char *palette)
 	int		i;
 
 	byte *rp = ( byte * ) r_rawpalette;
+
+	Com_DPrintf("%s {\n", __FUNCTION__);
 
 	if ( palette )
 	{
@@ -1353,6 +1370,8 @@ void R_SetPalette ( const unsigned char *palette)
 	qglClear (GL_COLOR_BUFFER_BIT);
 	qglClearColor (1,0, 0.5 , 0.5);
 #endif
+
+	Com_DPrintf("}\n");
 }
 
 /*
