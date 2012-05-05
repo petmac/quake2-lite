@@ -166,31 +166,29 @@ void GL_ScreenShot_f (void)
 */
 void GL_SetDefaultState( void )
 {
+	sceGuClearColor(GU_COLOR(1, 0, 0.5, 0.5));
+	sceGuFrontFace(GU_CW); // TODO PeterM Is this right?
 #ifndef PSP
-	qglClearColor (1,0, 0.5 , 0.5);
-	qglCullFace(GL_FRONT);
 	qglEnable(GL_TEXTURE_2D);
-
-	qglEnable(GL_ALPHA_TEST);
-	qglAlphaFunc(GL_GREATER, 0.666);
-
-	qglDisable (GL_DEPTH_TEST);
-	qglDisable (GL_CULL_FACE);
-	qglDisable (GU_BLEND);
-
-	qglColor4f (1,1,1,1);
-
-	qglPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
-	qglShadeModel (GL_FLAT);
-
-	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gl_filter_min);
-	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gl_filter_max);
-
-	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	qglBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 #endif
+
+	sceGuEnable(GU_ALPHA_TEST);
+	sceGuAlphaFunc(GU_GREATER, 170, 0xff);
+
+	sceGuDisable (GU_DEPTH_TEST);
+	sceGuDisable (GU_CULL_FACE);
+	sceGuDisable (GU_BLEND);
+
+	sceGuColor(0xffffffff);
+
+#ifndef PSP
+	qglPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
+#endif
+	sceGuShadeModel (GU_FLAT);
+
+	sceGuTexFilter(GU_LINEAR, GU_LINEAR);
+	sceGuTexWrap(GU_REPEAT, GU_REPEAT);
+	sceGuBlendFunc(GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
 
 	GL_TexEnv( GU_TFX_REPLACE );
 

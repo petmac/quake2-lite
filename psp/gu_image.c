@@ -124,9 +124,7 @@ void GL_TexEnv( int mode )
 
 	if ( mode != lastmodes[gl_state.currenttmu] )
 	{
-#ifndef PSP
-		qglTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, mode );
-#endif
+		sceGuTexFunc(mode, GU_TCC_RGBA);
 		lastmodes[gl_state.currenttmu] = mode;
 	}
 }

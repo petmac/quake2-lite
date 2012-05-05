@@ -1039,14 +1039,14 @@ R_Init
 ===============
 */
 
-#define BUF_WIDTH (512)
-#define SCR_WIDTH (480)
-#define SCR_HEIGHT (272)
+#define BUF_WIDTH 512
+#define SCR_WIDTH 480
+#define SCR_HEIGHT 272
 
 typedef struct
 {
-	ScePspRGBA8888 fb1[BUF_WIDTH * SCR_HEIGHT];
-	ScePspRGBA8888 fb2[BUF_WIDTH * SCR_HEIGHT];
+	ScePspRGB565 fb1[BUF_WIDTH * SCR_HEIGHT];
+	ScePspRGB565 fb2[BUF_WIDTH * SCR_HEIGHT];
 	u16 depth[BUF_WIDTH * SCR_HEIGHT];
 } vram_t;
 
@@ -1086,40 +1086,23 @@ int R_Init( void *hinstance, void *hWnd )
 	R_Register();
 
 	sceGuInit();
-	sceGuStart(GU_DIRECT,list);
-	sceGuDrawBuffer(GU_PSM_8888,vram->fb1,BUF_WIDTH);
-	sceGuDispBuffer(SCR_WIDTH,SCR_HEIGHT,vram->fb2,BUF_WIDTH);
-	sceGuDepthBuffer(vram->depth,BUF_WIDTH);
-	sceGuOffset(2048 - (SCR_WIDTH/2),2048 - (SCR_HEIGHT/2));
-	sceGuViewport(2048,2048,SCR_WIDTH,SCR_HEIGHT);
-	sceGuDepthRange(65535,0);
-	sceGuScissor(0,0,SCR_WIDTH,SCR_HEIGHT);
+	sceGuStart(GU_DIRECT, list);
+	sceGuDrawBuffer(GU_PSM_5650, vram->fb1, BUF_WIDTH);
+	sceGuDispBuffer(SCR_WIDTH, SCR_HEIGHT, vram->fb2, BUF_WIDTH);
+	sceGuDepthBuffer(vram->depth, BUF_WIDTH);
+	sceGuOffset(2048 - (SCR_WIDTH / 2), 2048 - (SCR_HEIGHT / 2));
+	sceGuViewport(2048, 2048, SCR_WIDTH, SCR_HEIGHT);
+	sceGuDepthRange(65535, 0);
+	sceGuScissor(0, 0, SCR_WIDTH, SCR_HEIGHT);
 	sceGuEnable(GU_SCISSOR_TEST);
 	sceGuFrontFace(GU_CW);
 	sceGuShadeModel(GU_SMOOTH);
 	sceGuDisable(GU_TEXTURE_2D);
 	sceGuFinish();
-	sceGuSync(0,0);
+	sceGuSync(GU_SYNC_FINISH, GU_SYNC_WHAT_DONE);
 
 	sceDisplayWaitVblankStart();
-	sceGuDisplay(1);
-
-#ifndef PSP
-	// initialize our QGL dynamic bindings
-	if ( !QGL_Init( gl_driver->string ) )
-	{
-		QGL_Shutdown();
-        ri.Con_Printf (PRINT_ALL, "ref_gl::R_Init() - could not load \"%s\"\n", gl_driver->string );
-		return -1;
-	}
-
-	// initialize OS-specific parts of OpenGL
-	if ( !GLimp_Init( hinstance, hWnd ) )
-	{
-		QGL_Shutdown();
-		return -1;
-	}
-#endif
+	sceGuDisplay(GU_TRUE);
 
 	ri.Vid_MenuInit();
 
@@ -1272,7 +1255,7 @@ void R_BeginFrame( float camera_separation )
 	sceGumDrawArray(GU_TRIANGLES,GU_COLOR_8888|GU_VERTEX_32BITF|GU_TRANSFORM_3D,1*3,0,vertices);
 
 	sceGuFinish();
-	sceGuSync(0,0);
+	sceGuSync(GU_SYNC_FINISH, GU_SYNC_WHAT_DONE);
 
 	/*
 	** draw buffer stuff
