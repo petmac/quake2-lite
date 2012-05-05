@@ -85,7 +85,6 @@ cvar_t	*gl_drawbuffer;
 cvar_t  *gl_driver;
 cvar_t	*gl_lightmap;
 cvar_t	*gl_shadows;
-cvar_t	*gl_mode;
 cvar_t	*gl_dynamic;
 cvar_t  *gl_monolightmap;
 cvar_t	*gl_modulate;
@@ -104,10 +103,6 @@ cvar_t	*gl_playermip;
 cvar_t  *gl_saturatelighting;
 cvar_t	*gl_swapinterval;
 cvar_t	*gl_lockpvs;
-
-cvar_t	*vid_fullscreen;
-cvar_t	*vid_gamma;
-cvar_t	*vid_ref;
 
 /*
 =================
@@ -1009,7 +1004,6 @@ void R_Register( void )
 	gl_modulate = ri.Cvar_Get ("gl_modulate", "1", CVAR_ARCHIVE );
 	gl_log = ri.Cvar_Get( "gl_log", "0", 0 );
 	gl_bitdepth = ri.Cvar_Get( "gl_bitdepth", "0", 0 );
-	gl_mode = ri.Cvar_Get( "gl_mode", "3", CVAR_ARCHIVE );
 	gl_lightmap = ri.Cvar_Get ("gl_lightmap", "0", 0);
 	gl_shadows = ri.Cvar_Get ("gl_shadows", "0", CVAR_ARCHIVE );
 	gl_dynamic = ri.Cvar_Get ("gl_dynamic", "1", 0);
@@ -1034,71 +1028,9 @@ void R_Register( void )
 
 	gl_saturatelighting = ri.Cvar_Get( "gl_saturatelighting", "0", 0 );
 
-	vid_fullscreen = ri.Cvar_Get( "vid_fullscreen", "0", CVAR_ARCHIVE );
-	vid_gamma = ri.Cvar_Get( "vid_gamma", "1.0", CVAR_ARCHIVE );
-	vid_ref = ri.Cvar_Get( "vid_ref", "soft", CVAR_ARCHIVE );
-
 	ri.Cmd_AddCommand( "imagelist", GL_ImageList_f );
 	ri.Cmd_AddCommand( "screenshot", GL_ScreenShot_f );
 	ri.Cmd_AddCommand( "modellist", Mod_Modellist_f );
-}
-
-/*
-==================
-R_SetMode
-==================
-*/
-qboolean R_SetMode (void)
-{
-	rserr_t err;
-	qboolean fullscreen;
-
-	if ( vid_fullscreen->modified )
-	{
-		ri.Con_Printf( PRINT_ALL, "R_SetMode() - CDS not allowed with this driver\n" );
-		ri.Cvar_SetValue( "vid_fullscreen", !vid_fullscreen->value );
-		vid_fullscreen->modified = false;
-	}
-
-	fullscreen = vid_fullscreen->value;
-
-	vid_fullscreen->modified = false;
-	gl_mode->modified = false;
-
-#ifndef PSP
-	if ( ( err = GLimp_SetMode( &vid.width, &vid.height, gl_mode->value, fullscreen ) ) == rserr_ok )
-	{
-		gl_state.prev_mode = gl_mode->value;
-	}
-	else
-	{
-		if ( err == rserr_invalid_fullscreen )
-		{
-			ri.Cvar_SetValue( "vid_fullscreen", 0);
-			vid_fullscreen->modified = false;
-			ri.Con_Printf( PRINT_ALL, "ref_gl::R_SetMode() - fullscreen unavailable in this mode\n" );
-			if ( ( err = GLimp_SetMode( &vid.width, &vid.height, gl_mode->value, false ) ) == rserr_ok )
-				return true;
-		}
-		else if ( err == rserr_invalid_mode )
-		{
-			ri.Cvar_SetValue( "gl_mode", gl_state.prev_mode );
-			gl_mode->modified = false;
-			ri.Con_Printf( PRINT_ALL, "ref_gl::R_SetMode() - invalid mode\n" );
-		}
-
-		// try setting it back to something safe
-		if ( ( err = GLimp_SetMode( &vid.width, &vid.height, gl_state.prev_mode, false ) ) != rserr_ok )
-		{
-			ri.Con_Printf( PRINT_ALL, "ref_gl::R_SetMode() - could not revert to safe mode\n" );
-			return false;
-		}
-	}
-#else
-	// let the sound and input subsystems know about the new window
-	ri.Vid_NewWindow (480, 272);
-#endif
-	return true;
 }
 
 /*
@@ -1106,11 +1038,38 @@ qboolean R_SetMode (void)
 R_Init
 ===============
 */
+
+#define BUF_WIDTH (512)
+#define SCR_WIDTH (480)
+#define SCR_HEIGHT (272)
+
+typedef struct
+{
+	ScePspRGBA8888 fb1[BUF_WIDTH * SCR_HEIGHT];
+	ScePspRGBA8888 fb2[BUF_WIDTH * SCR_HEIGHT];
+	u16 depth[BUF_WIDTH * SCR_HEIGHT];
+} vram_t;
+
+static unsigned int __attribute__((aligned(16))) list[262144];
+
+struct Vertex
+{
+   unsigned int color;
+   float x, y, z;
+};
+
+struct Vertex __attribute__((aligned(16))) vertices[1*3] =
+{
+       {0xFF0000FF, 0.0f, -50.0f, 0.0f}, // Top, red
+       {0xFF00FF00, 50.0f, 50.0f, 0.0f}, // Right, green
+       {0xFFFF0000, -50.0f, 50.0f, 0.0f}, // Left, blue
+};
+
 int R_Init( void *hinstance, void *hWnd )
 {	
-	int		err;
 	int		j;
 	extern float r_turbsin[256];
+	vram_t *vram = NULL;
 
 	LOG_FUNCTION_ENTRY;
 
@@ -1125,6 +1084,25 @@ int R_Init( void *hinstance, void *hWnd )
 	Draw_GetPalette ();
 
 	R_Register();
+
+	sceGuInit();
+	sceGuStart(GU_DIRECT,list);
+	sceGuDrawBuffer(GU_PSM_8888,vram->fb1,BUF_WIDTH);
+	sceGuDispBuffer(SCR_WIDTH,SCR_HEIGHT,vram->fb2,BUF_WIDTH);
+	sceGuDepthBuffer(vram->depth,BUF_WIDTH);
+	sceGuOffset(2048 - (SCR_WIDTH/2),2048 - (SCR_HEIGHT/2));
+	sceGuViewport(2048,2048,SCR_WIDTH,SCR_HEIGHT);
+	sceGuDepthRange(65535,0);
+	sceGuScissor(0,0,SCR_WIDTH,SCR_HEIGHT);
+	sceGuEnable(GU_SCISSOR_TEST);
+	sceGuFrontFace(GU_CW);
+	sceGuShadeModel(GU_SMOOTH);
+	sceGuDisable(GU_TEXTURE_2D);
+	sceGuFinish();
+	sceGuSync(0,0);
+
+	sceDisplayWaitVblankStart();
+	sceGuDisplay(1);
 
 #ifndef PSP
 	// initialize our QGL dynamic bindings
@@ -1142,19 +1120,6 @@ int R_Init( void *hinstance, void *hWnd )
 		return -1;
 	}
 #endif
-
-	// set our "safe" modes
-	gl_state.prev_mode = 3;
-
-	// create the window and set up the context
-	if ( !R_SetMode () )
-	{
-#ifndef PSP
-		QGL_Shutdown();
-#endif
-        ri.Con_Printf (PRINT_ALL, "ref_gl::R_Init() - could not R_SetMode()\n" );
-		return false;
-	}
 
 	ri.Vid_MenuInit();
 
@@ -1253,17 +1218,6 @@ void R_BeginFrame( float camera_separation )
 
 	gl_state.camera_separation = camera_separation;
 
-	/*
-	** change modes if necessary
-	*/
-	if ( gl_mode->modified || vid_fullscreen->modified )
-	{	// FIXME: only restart if CDS is required
-		cvar_t	*ref;
-
-		ref = ri.Cvar_Get ("vid_ref", "gl", 0);
-		ref->modified = true;
-	}
-
 	if ( gl_log->modified )
 	{
 #ifndef PSP
@@ -1277,15 +1231,6 @@ void R_BeginFrame( float camera_separation )
 #ifndef PSP
 		GLimp_LogNewFrame();
 #endif
-	}
-
-	/*
-	** update 3Dfx gamma -- it is expected that a user will do a vid_restart
-	** after tweaking this value
-	*/
-	if ( vid_gamma->modified )
-	{
-		vid_gamma->modified = false;
 	}
 
 	/*
@@ -1304,6 +1249,28 @@ void R_BeginFrame( float camera_separation )
 	qglEnable (GL_ALPHA_TEST);
 	qglColor4f (1,1,1,1);
 #endif
+	sceGuStart(GU_DIRECT,list);
+
+	sceGuClearColor(0);
+	sceGuClearDepth(0);
+	sceGuClear(GU_COLOR_BUFFER_BIT|GU_DEPTH_BUFFER_BIT);
+
+	sceGumMatrixMode(GU_PROJECTION);
+	sceGumLoadIdentity();
+	sceGumOrtho(0, SCR_WIDTH, SCR_HEIGHT, 0, -1, 1);
+
+	sceGumMatrixMode(GU_VIEW);
+	sceGumLoadIdentity();
+
+	sceGumMatrixMode(GU_MODEL);
+	sceGumLoadIdentity();
+
+	// Draw triangle
+
+	sceGumDrawArray(GU_TRIANGLES,GU_COLOR_8888|GU_VERTEX_32BITF|GU_TRANSFORM_3D,1*3,0,vertices);
+
+	sceGuFinish();
+	sceGuSync(0,0);
 
 	/*
 	** draw buffer stuff
@@ -1477,6 +1444,8 @@ GetRefAPI
 */
 static void R_EndFrame (void)
 {
+	sceDisplayWaitVblankStart();
+	sceGuSwapBuffers();
 }
 
 static void R_AppActivate (qboolean activate)

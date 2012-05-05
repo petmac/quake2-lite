@@ -115,7 +115,7 @@ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS = $(CFLAGS)
 
 ;LIBDIR = $(PSPSDK)/lib
-LIBS = -lm -lpsprtc
+LIBS = -lm -lpsprtc -lpspgum -lpspgu
 LDFLAGS =
 
 EXTRA_TARGETS = EBOOT.PBP

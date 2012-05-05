@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../qcommon/qcommon.h"
 #include "../client/keys.h"
 
-#include <pspdisplay.h>
+#include <pspctrl.h>
 #include <pspgu.h>
 #include <pspkernel.h>
 #include <psprtc.h>
@@ -31,10 +31,6 @@ PSP_MODULE_INFO("Quake 2", 0, 1, 1);
 
 /* Define the main thread's attribute value (optional) */
 PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
-
-/* Define printf, just to make typing easier */
-#define printf	pspDebugScreenPrintf
-#define puts pspDebugScreenPuts
 
 void *GetGameAPI (void *import);
 
@@ -92,9 +88,11 @@ void Sys_Error (char *error, ...)
 	buffer[255] = '\0';
 	va_end (argptr);
 
+	pspDebugScreenInit();
+	pspDebugScreenPuts("Sys_Error:\n\n");
 	pspDebugScreenSetTextColor(GU_RGBA(255, 0, 0, 255));
-	Sys_ConsoleOutput(buffer);
-	Sys_ConsoleOutput("\n");
+	pspDebugScreenPuts(buffer);
+	pspDebugScreenPuts("\n");
 
 	while (go)
 	{
@@ -126,8 +124,6 @@ char *Sys_ConsoleInput (void)
 void	Sys_ConsoleOutput (char *string)
 {
 	FILE *file = NULL;
-
-	puts(string);
 
 	file = fopen("log.txt", "a");
 	if (file != NULL)
@@ -193,30 +189,15 @@ void	Sys_Init (void)
 
 //=============================================================================
 
-#if 0
-static void psp_debug_error_handler(PspDebugRegBlock *regs)
-{
-	Sys_Error("Error handler invoked.\n");
-}
-#endif
-
 int main (int argc, char **argv)
 {
 	FILE *log = NULL;
 	u32 ticks_per_s;
 	int oldtime;
 
-	pspDebugScreenInit();
-	printf("Debug screen initialised.\n");
-
 	SetupCallbacks();
-	printf("Callbacks set up.\n");
 
-#if 0
-	// Install debug handler.
-	pspDebugInstallErrorHandler(&psp_debug_error_handler);
-#endif
-
+	// Wipe log file.
 	log = fopen("log.txt", "w");
 	if (log != NULL)
 	{
@@ -230,6 +211,10 @@ int main (int argc, char **argv)
 	ticks_per_s = sceRtcGetTickResolution();
 	ticks_per_ms = ticks_per_s / 1000.0;
 
+	// TODO Move elsewhere.
+	sceCtrlSetSamplingCycle(0);
+	sceCtrlSetSamplingMode(PSP_CTRL_MODE_ANALOG);
+
 	// Initialise Quake.
 	Qcommon_Init (argc, argv);
 
@@ -238,6 +223,8 @@ int main (int argc, char **argv)
 	// Run the main loop.
 	while (go)
 	{
+		SceCtrlData pad;
+
 		curtime = Sys_Milliseconds();
 
 		if (curtime < oldtime)
@@ -245,7 +232,12 @@ int main (int argc, char **argv)
 			Sys_Error("curtime (%d) < oldtime (%d)\n", curtime, oldtime);
 		}
 
-		sceDisplayWaitVblankStart();
+		sceCtrlPeekBufferPositive(&pad, 1);
+		if (pad.Buttons & PSP_CTRL_CROSS)
+		{
+			go = false;
+		}
+
 		Qcommon_Frame (curtime - oldtime);
 
 		oldtime = curtime;

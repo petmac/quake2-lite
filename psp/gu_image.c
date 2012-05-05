@@ -1389,7 +1389,6 @@ GL_InitImages
 void	GL_InitImages (void)
 {
 	int		i, j;
-	float	g = vid_gamma->value;
 
 	// init intensity conversions
 	intensity = ri.Cvar_Get ("intensity", "2", 0);
@@ -1407,21 +1406,7 @@ void	GL_InitImages (void)
 
 	for ( i = 0; i < 256; i++ )
 	{
-		if ( g == 1 )
-		{
-			gammatable[i] = i;
-		}
-		else
-		{
-			float inf;
-
-			inf = 255 * pow ( (i+0.5)/255.5 , g ) + 0.5;
-			if (inf < 0)
-				inf = 0;
-			if (inf > 255)
-				inf = 255;
-			gammatable[i] = inf;
-		}
+		gammatable[i] = i;
 	}
 
 	for (i=0 ; i<256 ; i++)

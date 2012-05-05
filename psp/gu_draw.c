@@ -382,7 +382,7 @@ extern unsigned	r_rawpalette[256];
 
 void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data)
 {
-	//LOG_FUNCTION_ENTRY;
+	LOG_FUNCTION_ENTRY;
 
 #ifndef PSP
 	unsigned	image32[256*256];
@@ -480,6 +480,6 @@ void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 		qglEnable (GL_ALPHA_TEST);
 #endif
 
-	//LOG_FUNCTION_EXIT;
+	LOG_FUNCTION_EXIT;
 }
 

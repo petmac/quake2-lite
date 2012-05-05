@@ -23,11 +23,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../client/ref.h"
 
+#include <pspdisplay.h>
+#include <pspge.h>
 #include <pspgu.h>
 #include <pspgum.h>
 
-#define LOG_FUNCTION_ENTRY Com_DPrintf("%s {\n", __FUNCTION__)
-#define LOG_FUNCTION_EXIT Com_DPrintf("}\n")
+#if 0
+#	define LOG_FUNCTION_ENTRY Com_DPrintf("%s {\n", __FUNCTION__)
+#	define LOG_FUNCTION_EXIT Com_DPrintf("}\n")
+#else
+#	define LOG_FUNCTION_ENTRY do { } while (0)
+#	define LOG_FUNCTION_EXIT do { } while (0)
+#endif
 
 extern int GL_TEXTURE0, GL_TEXTURE1;
 
@@ -173,7 +180,6 @@ extern	cvar_t	*r_lerpmodels;
 extern	cvar_t	*r_lightlevel;	// FIXME: This is a HACK to get the client's light level
 
 extern	cvar_t	*gl_bitdepth;
-extern	cvar_t	*gl_mode;
 extern	cvar_t	*gl_log;
 extern	cvar_t	*gl_lightmap;
 extern	cvar_t	*gl_shadows;
@@ -200,9 +206,6 @@ extern  cvar_t  *gl_driver;
 extern	cvar_t	*gl_swapinterval;
 extern  cvar_t  *gl_saturatelighting;
 extern  cvar_t  *gl_lockpvs;
-
-extern	cvar_t	*vid_fullscreen;
-extern	cvar_t	*vid_gamma;
 
 extern	cvar_t		*intensity;
 
@@ -311,9 +314,6 @@ void GL_DrawParticles( int n, const particle_t particles[], const unsigned color
 typedef struct
 {
 	float inverse_intensity;
-	qboolean fullscreen;
-
-	int     prev_mode;
 
 	unsigned char *d_16to8table;
 
@@ -324,10 +324,6 @@ typedef struct
 
 	float camera_separation;
 	qboolean stereo_enabled;
-
-	unsigned char originalRedGammaTable[256];
-	unsigned char originalGreenGammaTable[256];
-	unsigned char originalBlueGammaTable[256];
 } glstate_t;
 
 extern glstate_t   gl_state;
