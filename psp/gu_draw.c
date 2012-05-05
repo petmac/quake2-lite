@@ -60,19 +60,19 @@ void Draw_Char (int x, int y, int num)
 	int				row, col;
 	float			frow, fcol, size;
 
-	Com_DPrintf("%s {\n", __FUNCTION__);
+	LOG_FUNCTION_ENTRY;
 
 	num &= 255;
 	
 	if ( (num&127) == 32 )
 	{
-		Com_DPrintf("}\n");
+		LOG_FUNCTION_EXIT;
 		return;		// space
 	}
 
 	if (y <= -8)
 	{
-		Com_DPrintf("}\n");
+		LOG_FUNCTION_EXIT;
 		return;			// totally off screen
 	}
 
@@ -98,7 +98,7 @@ void Draw_Char (int x, int y, int num)
 	qglEnd ();
 #endif
 
-	Com_DPrintf("}\n");
+	LOG_FUNCTION_EXIT;
 }
 
 /*
@@ -111,7 +111,7 @@ image_t	*Draw_FindPic (char *name)
 	image_t *gl;
 	char	fullname[MAX_QPATH];
 
-	Com_DPrintf("%s {\n", __FUNCTION__);
+	LOG_FUNCTION_ENTRY;
 
 	if (name[0] != '/' && name[0] != '\\')
 	{
@@ -121,7 +121,7 @@ image_t	*Draw_FindPic (char *name)
 	else
 		gl = GL_FindImage (name+1, it_pic);
 
-	Com_DPrintf("}\n");
+	LOG_FUNCTION_EXIT;
 
 	return gl;
 }
@@ -135,21 +135,21 @@ void Draw_GetPicSize (int *w, int *h, char *pic)
 {
 	image_t *gl;
 
-	Com_DPrintf("%s {\n", __FUNCTION__);
+	LOG_FUNCTION_ENTRY;
 
 	gl = Draw_FindPic (pic);
 	if (!gl)
 	{
 		*w = *h = -1;
 
-		Com_DPrintf("}\n");
+		LOG_FUNCTION_EXIT;
 
 		return;
 	}
 	*w = gl->width;
 	*h = gl->height;
 
-	Com_DPrintf("}\n");
+	LOG_FUNCTION_EXIT;
 }
 
 /*
@@ -161,14 +161,14 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 {
 	image_t *gl;
 
-	Com_DPrintf("%s {\n", __FUNCTION__);
+	LOG_FUNCTION_ENTRY;
 
 	gl = Draw_FindPic (pic);
 	if (!gl)
 	{
 		ri.Con_Printf (PRINT_ALL, "Can't find pic: %s\n", pic);
 
-		Com_DPrintf("}\n");
+		LOG_FUNCTION_EXIT;
 
 		return;
 	}
@@ -196,7 +196,7 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 		qglEnable (GL_ALPHA_TEST);
 #endif
 
-	Com_DPrintf("}\n");
+	LOG_FUNCTION_EXIT;
 }
 
 
@@ -209,14 +209,14 @@ void Draw_Pic (int x, int y, char *pic)
 {
 	image_t *gl;
 
-	Com_DPrintf("%s {\n", __FUNCTION__);
+	LOG_FUNCTION_ENTRY;
 
 	gl = Draw_FindPic (pic);
 	if (!gl)
 	{
 		ri.Con_Printf (PRINT_ALL, "Can't find pic: %s\n", pic);
 
-		Com_DPrintf("}\n");
+		LOG_FUNCTION_EXIT;
 
 		return;
 	}
@@ -243,7 +243,7 @@ void Draw_Pic (int x, int y, char *pic)
 		qglEnable (GL_ALPHA_TEST);
 #endif
 
-	Com_DPrintf("}\n");
+	LOG_FUNCTION_EXIT;
 }
 
 /*
@@ -258,14 +258,14 @@ void Draw_TileClear (int x, int y, int w, int h, char *pic)
 {
 	image_t	*image;
 
-	Com_DPrintf("%s {\n", __FUNCTION__);
+	LOG_FUNCTION_ENTRY;
 
 	image = Draw_FindPic (pic);
 	if (!image)
 	{
 		ri.Con_Printf (PRINT_ALL, "Can't find pic: %s\n", pic);
 
-		Com_DPrintf("}\n");
+		LOG_FUNCTION_EXIT;
 
 		return;
 	}
@@ -290,7 +290,7 @@ void Draw_TileClear (int x, int y, int w, int h, char *pic)
 		qglEnable (GL_ALPHA_TEST);
 #endif
 
-	Com_DPrintf("}\n");
+	LOG_FUNCTION_EXIT;
 }
 
 
@@ -309,7 +309,7 @@ void Draw_Fill (int x, int y, int w, int h, int c)
 		byte		v[4];
 	} color;
 
-	Com_DPrintf("%s {\n", __FUNCTION__);
+	LOG_FUNCTION_ENTRY;
 
 	if ( (unsigned)c > 255)
 		ri.Sys_Error (ERR_FATAL, "Draw_Fill: bad color");
@@ -334,7 +334,7 @@ void Draw_Fill (int x, int y, int w, int h, int c)
 	qglEnable (GL_TEXTURE_2D);
 #endif
 
-	Com_DPrintf("}\n");
+	LOG_FUNCTION_EXIT;
 }
 
 //=============================================================================
@@ -347,7 +347,7 @@ Draw_FadeScreen
 */
 void Draw_FadeScreen (void)
 {
-	Com_DPrintf("%s {\n", __FUNCTION__);
+	LOG_FUNCTION_ENTRY;
 
 #ifndef PSP
 	qglEnable (GU_BLEND);
@@ -366,7 +366,7 @@ void Draw_FadeScreen (void)
 	qglDisable (GU_BLEND);
 #endif
 
-	Com_DPrintf("}\n");
+	LOG_FUNCTION_EXIT;
 }
 
 
@@ -382,7 +382,7 @@ extern unsigned	r_rawpalette[256];
 
 void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data)
 {
-	//Com_DPrintf("%s {\n", __FUNCTION__);
+	//LOG_FUNCTION_ENTRY;
 
 #ifndef PSP
 	unsigned	image32[256*256];
@@ -480,6 +480,6 @@ void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 		qglEnable (GL_ALPHA_TEST);
 #endif
 
-	//Com_DPrintf("}\n");
+	//LOG_FUNCTION_EXIT;
 }
 

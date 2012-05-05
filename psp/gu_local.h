@@ -26,6 +26,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <pspgu.h>
 #include <pspgum.h>
 
+#define LOG_FUNCTION_ENTRY Com_DPrintf("%s {\n", __FUNCTION__)
+#define LOG_FUNCTION_EXIT Com_DPrintf("}\n")
+
 extern int GL_TEXTURE0, GL_TEXTURE1;
 
 #define	REF_VERSION	"GU 0.01"

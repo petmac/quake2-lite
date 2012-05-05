@@ -973,13 +973,13 @@ R_RenderFrame
 */
 void R_RenderFrame (refdef_t *fd)
 {
-	Com_DPrintf("%s {\n", __FUNCTION__);
+	LOG_FUNCTION_ENTRY;
 
 	R_RenderView( fd );
 	R_SetLightLevel ();
 	R_SetGL2D ();
 
-	Com_DPrintf("}\n");
+	LOG_FUNCTION_EXIT;
 }
 
 
@@ -1094,6 +1094,9 @@ qboolean R_SetMode (void)
 			return false;
 		}
 	}
+#else
+	// let the sound and input subsystems know about the new window
+	ri.Vid_NewWindow (480, 272);
 #endif
 	return true;
 }
@@ -1109,7 +1112,7 @@ int R_Init( void *hinstance, void *hWnd )
 	int		j;
 	extern float r_turbsin[256];
 
-	Com_DPrintf("%s {\n", __FUNCTION__);
+	LOG_FUNCTION_ENTRY;
 
 	// TODO PeterM This may get done more than once.
 	for ( j = 0; j < 256; j++ )
@@ -1211,7 +1214,7 @@ int R_Init( void *hinstance, void *hWnd )
 		ri.Con_Printf (PRINT_ALL, "glGetError() = 0x%x\n", err);
 #endif
 
-	Com_DPrintf("}\n");
+	LOG_FUNCTION_EXIT;
 
 	return true;
 }
@@ -1223,7 +1226,7 @@ R_Shutdown
 */
 void R_Shutdown (void)
 {
-	Com_DPrintf("%s {\n", __FUNCTION__);
+	LOG_FUNCTION_ENTRY;
 
 	ri.Cmd_RemoveCommand ("modellist");
 	ri.Cmd_RemoveCommand ("screenshot");
@@ -1234,7 +1237,7 @@ void R_Shutdown (void)
 
 	GL_ShutdownImages ();
 
-	Com_DPrintf("}\n");
+	LOG_FUNCTION_EXIT;
 }
 
 
@@ -1246,7 +1249,7 @@ R_BeginFrame
 */
 void R_BeginFrame( float camera_separation )
 {
-	//Com_DPrintf("%s {\n", __FUNCTION__);
+	LOG_FUNCTION_ENTRY;
 
 	gl_state.camera_separation = camera_separation;
 
@@ -1325,7 +1328,7 @@ void R_BeginFrame( float camera_separation )
 	//
 	R_Clear ();
 
-	//Com_DPrintf("}\n");
+	LOG_FUNCTION_EXIT;
 }
 
 /*
@@ -1341,7 +1344,7 @@ void R_SetPalette ( const unsigned char *palette)
 
 	byte *rp = ( byte * ) r_rawpalette;
 
-	Com_DPrintf("%s {\n", __FUNCTION__);
+	LOG_FUNCTION_ENTRY;
 
 	if ( palette )
 	{
@@ -1371,7 +1374,7 @@ void R_SetPalette ( const unsigned char *palette)
 	qglClearColor (1,0, 0.5 , 0.5);
 #endif
 
-	Com_DPrintf("}\n");
+	LOG_FUNCTION_EXIT;
 }
 
 /*

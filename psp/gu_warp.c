@@ -631,7 +631,7 @@ void R_SetSky (char *name, float rotate, vec3_t axis)
 	int		i;
 	char	pathname[MAX_QPATH];
 
-	Com_DPrintf("%s {\n", __FUNCTION__);
+	LOG_FUNCTION_ENTRY;
 
 	strncpy (skyname, name, sizeof(skyname)-1);
 	skyrotate = rotate;
@@ -673,5 +673,5 @@ void R_SetSky (char *name, float rotate, vec3_t axis)
 		}
 	}
 
-	Com_DPrintf("}\n");
+	LOG_FUNCTION_EXIT;
 }

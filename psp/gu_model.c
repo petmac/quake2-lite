@@ -1105,7 +1105,7 @@ void R_BeginRegistration (char *model)
 {
 	char	fullname[MAX_QPATH];
 
-	Com_DPrintf("%s {\n", __FUNCTION__);
+	LOG_FUNCTION_ENTRY;
 
 	r_oldviewcluster = -1;		// force markleafs
 
@@ -1119,7 +1119,7 @@ void R_BeginRegistration (char *model)
 
 	r_viewcluster = -1;
 
-	Com_DPrintf("}\n");
+	LOG_FUNCTION_EXIT;
 }
 
 
@@ -1136,7 +1136,7 @@ struct model_s *R_RegisterModel (char *name)
 	dsprite_t	*sprout;
 	dmdl_t		*pheader;
 
-	Com_DPrintf("%s {\n", __FUNCTION__);
+	LOG_FUNCTION_ENTRY;
 
 	mod = Mod_ForName (name, false);
 	if (mod)
@@ -1166,7 +1166,7 @@ struct model_s *R_RegisterModel (char *name)
 		}
 	}
 
-	Com_DPrintf("}\n");
+	LOG_FUNCTION_EXIT;
 
 	return mod;
 }
@@ -1180,11 +1180,11 @@ R_EndRegistration
 */
 void R_EndRegistration (void)
 {
-	Com_DPrintf("%s {\n", __FUNCTION__);
+	LOG_FUNCTION_ENTRY;
 
 	GL_FreeUnusedImages ();
 
-	Com_DPrintf("}\n");
+	LOG_FUNCTION_EXIT;
 }
 
 
