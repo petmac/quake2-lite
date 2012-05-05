@@ -46,9 +46,6 @@ typedef struct
 	int		dirlen;
 } dpackheader_t;
 
-#define	MAX_FILES_IN_PACK	4096
-
-
 /*
 ========================================================================
 

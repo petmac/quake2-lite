@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../client/ref.h"
 
 #include <pspgu.h>
+#include <pspgum.h>
 
 extern int GL_TEXTURE0, GL_TEXTURE1;
 
@@ -78,7 +79,6 @@ typedef struct image_s
 	imagetype_t	type;
 	int		width, height;				// source image
 	int		upload_width, upload_height;	// after power of two and picmip
-	int		registration_sequence;		// 0 = free
 	struct msurface_s	*texturechain;	// for sort-by-texture world drawing
 	int		texnum;						// gl texture binding
 	float	sl, tl, sh, th;				// 0,0 - 1,1 unless part of the scrap
@@ -112,7 +112,6 @@ void GL_BeginRendering (int *x, int *y, int *width, int *height);
 void GL_EndRendering (void);
 
 void GL_SetDefaultState( void );
-void GL_UpdateSwapInterval( void );
 
 extern	float	gldepthmin, gldepthmax;
 
@@ -144,9 +143,6 @@ extern	int			r_framecount;
 extern	cplane_t	frustum[4];
 extern	int			c_brush_polys, c_alias_polys;
 
-
-extern	int			gl_filter_min, gl_filter_max;
-
 //
 // view origin
 //
@@ -173,22 +169,6 @@ extern	cvar_t	*r_lerpmodels;
 
 extern	cvar_t	*r_lightlevel;	// FIXME: This is a HACK to get the client's light level
 
-extern cvar_t	*gl_vertex_arrays;
-
-extern cvar_t	*gl_ext_swapinterval;
-extern cvar_t	*gl_ext_palettedtexture;
-extern cvar_t	*gl_ext_multitexture;
-extern cvar_t	*gl_ext_pointparameters;
-extern cvar_t	*gl_ext_compiled_vertex_array;
-
-extern cvar_t	*gl_particle_min_size;
-extern cvar_t	*gl_particle_max_size;
-extern cvar_t	*gl_particle_size;
-extern cvar_t	*gl_particle_att_a;
-extern cvar_t	*gl_particle_att_b;
-extern cvar_t	*gl_particle_att_c;
-
-extern	cvar_t	*gl_nosubimage;
 extern	cvar_t	*gl_bitdepth;
 extern	cvar_t	*gl_mode;
 extern	cvar_t	*gl_log;
@@ -213,12 +193,8 @@ extern	cvar_t	*gl_lightmaptype;
 extern	cvar_t	*gl_modulate;
 extern	cvar_t	*gl_playermip;
 extern	cvar_t	*gl_drawbuffer;
-extern	cvar_t	*gl_3dlabs_broken;
 extern  cvar_t  *gl_driver;
 extern	cvar_t	*gl_swapinterval;
-extern	cvar_t	*gl_texturemode;
-extern	cvar_t	*gl_texturealphamode;
-extern	cvar_t	*gl_texturesolidmode;
 extern  cvar_t  *gl_saturatelighting;
 extern  cvar_t  *gl_lockpvs;
 
@@ -226,12 +202,6 @@ extern	cvar_t	*vid_fullscreen;
 extern	cvar_t	*vid_gamma;
 
 extern	cvar_t		*intensity;
-
-extern	int		gl_lightmap_format;
-extern	int		gl_solid_format;
-extern	int		gl_alpha_format;
-extern	int		gl_tex_solid_format;
-extern	int		gl_tex_alpha_format;
 
 extern	int		c_visible_lightmaps;
 extern	int		c_visible_textures;
@@ -253,9 +223,6 @@ void R_PushDlights (void);
 extern	model_t	*r_worldmodel;
 
 extern	unsigned	d_8to24table[256];
-
-extern	int		registration_sequence;
-
 
 void V_AddBlend (float r, float g, float b, float a, float *v_blend);
 
@@ -338,60 +305,6 @@ void GL_TextureSolidMode( char *string );
 */
 void GL_DrawParticles( int n, const particle_t particles[], const unsigned colortable[768] );
 
-/*
-** GL config stuff
-*/
-#define GL_RENDERER_VOODOO		0x00000001
-#define GL_RENDERER_VOODOO2   	0x00000002
-#define GL_RENDERER_VOODOO_RUSH	0x00000004
-#define GL_RENDERER_BANSHEE		0x00000008
-#define		GL_RENDERER_3DFX		0x0000000F
-
-#define GL_RENDERER_PCX1		0x00000010
-#define GL_RENDERER_PCX2		0x00000020
-#define GL_RENDERER_PMX			0x00000040
-#define		GL_RENDERER_POWERVR		0x00000070
-
-#define GL_RENDERER_PERMEDIA2	0x00000100
-#define GL_RENDERER_GLINT_MX	0x00000200
-#define GL_RENDERER_GLINT_TX	0x00000400
-#define GL_RENDERER_3DLABS_MISC	0x00000800
-#define		GL_RENDERER_3DLABS	0x00000F00
-
-#define GL_RENDERER_REALIZM		0x00001000
-#define GL_RENDERER_REALIZM2	0x00002000
-#define		GL_RENDERER_INTERGRAPH	0x00003000
-
-#define GL_RENDERER_3DPRO		0x00004000
-#define GL_RENDERER_REAL3D		0x00008000
-#define GL_RENDERER_RIVA128		0x00010000
-#define GL_RENDERER_DYPIC		0x00020000
-
-#define GL_RENDERER_V1000		0x00040000
-#define GL_RENDERER_V2100		0x00080000
-#define GL_RENDERER_V2200		0x00100000
-#define		GL_RENDERER_RENDITION	0x001C0000
-
-#define GL_RENDERER_O2          0x00100000
-#define GL_RENDERER_IMPACT      0x00200000
-#define GL_RENDERER_RE			0x00400000
-#define GL_RENDERER_IR			0x00800000
-#define		GL_RENDERER_SGI			0x00F00000
-
-#define GL_RENDERER_MCD			0x01000000
-#define GL_RENDERER_OTHER		0x80000000
-
-typedef struct
-{
-	int         renderer;
-	const char *renderer_string;
-	const char *vendor_string;
-	const char *version_string;
-	const char *extensions_string;
-
-	qboolean	allow_cds;
-} glconfig_t;
-
 typedef struct
 {
 	float inverse_intensity;
@@ -414,7 +327,6 @@ typedef struct
 	unsigned char originalBlueGammaTable[256];
 } glstate_t;
 
-extern glconfig_t  gl_config;
 extern glstate_t   gl_state;
 
 /*
@@ -426,22 +338,3 @@ IMPORTED FUNCTIONS
 */
 
 extern	refimport_t	ri;
-
-
-/*
-====================================================================
-
-IMPLEMENTATION SPECIFIC FUNCTIONS
-
-====================================================================
-*/
-
-void		GLimp_BeginFrame( float camera_separation );
-void		GLimp_EndFrame( void );
-qboolean	GLimp_Init( void *hinstance, void *hWnd );
-void		GLimp_Shutdown( void );
-int     	GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen );
-void		GLimp_AppActivate( qboolean active );
-void		GLimp_EnableLogging( qboolean enable );
-void		GLimp_LogNewFrame( void );
-

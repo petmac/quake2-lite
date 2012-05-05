@@ -22,7 +22,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../client/keys.h"
 
 #include <pspdisplay.h>
+#include <pspgu.h>
 #include <pspkernel.h>
+#include <psprtc.h>
 
 /* Define the module info section */
 PSP_MODULE_INFO("Quake 2", 0, 1, 1);
@@ -32,6 +34,7 @@ PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
 
 /* Define printf, just to make typing easier */
 #define printf	pspDebugScreenPrintf
+#define puts pspDebugScreenPuts
 
 void *GetGameAPI (void *import);
 
@@ -39,6 +42,7 @@ int	curtime;
 unsigned	sys_frame_time;
 
 static qboolean go = true;
+static double ticks_per_ms;
 
 /* Exit callback */
 static int exit_callback(void)
@@ -77,14 +81,25 @@ static int SetupCallbacks(void)
 
 void Sys_Error (char *error, ...)
 {
+	char buffer[256];
+	int i;
+
 	va_list		argptr;
 
-	printf ("Sys_Error: ");	
-	va_start (argptr,error);
-	vprintf (error,argptr);
+	va_start (argptr, error);
+	vsnprintf (buffer, 255, error, argptr);
+	buffer[255] = '\0';
 	va_end (argptr);
-	printf ("\n");
 
+	pspDebugScreenSetTextColor(GU_RGBA(255, 0, 0, 255));
+	puts(buffer);
+	puts("\n");
+
+	while (go)
+	{
+		sceDisplayWaitVblankStart();
+	}
+	
 	sceKernelExitGame();
 }
 
@@ -109,7 +124,7 @@ char *Sys_ConsoleInput (void)
 
 void	Sys_ConsoleOutput (char *string)
 {
-	printf("%s", string);
+	puts(string);
 }
 
 void Sys_SendKeyEvents (void)
@@ -131,7 +146,14 @@ char *Sys_GetClipboardData( void )
 
 int		Sys_Milliseconds (void)
 {
-	return 0;
+	u64 ticks = 0;
+	int ms;
+
+	sceRtcGetCurrentTick(&ticks);
+
+	ms = ticks / ticks_per_ms;
+
+	return ms;
 }
 
 void	Sys_Mkdir (char *path)
@@ -159,8 +181,16 @@ void	Sys_Init (void)
 
 //=============================================================================
 
+#if 0
+static void psp_debug_error_handler(PspDebugRegBlock *regs)
+{
+	Sys_Error("Error handler invoked.\n");
+}
+#endif
+
 int main (int argc, char **argv)
 {
+	u32 ticks_per_s;
 	int oldtime;
 	int curtime;
 
@@ -170,7 +200,18 @@ int main (int argc, char **argv)
 	SetupCallbacks();
 	printf("Callbacks set up.\n");
 
-	//Qcommon_Init (argc, argv);
+#if 0
+	// Install debug handler.
+	pspDebugInstallErrorHandler(&psp_debug_error_handler);
+#endif
+
+	// Calculate the clock resolution.
+	ticks_per_s = sceRtcGetTickResolution();
+	ticks_per_ms = ticks_per_s / 1000.0;
+	printf("%u ticks per second.\n", ticks_per_s);
+	printf("%f ticks per ms.\n", ticks_per_ms);
+
+	Qcommon_Init (argc, argv);
 	printf("Game initialised.\n");
 
 	oldtime = Sys_Milliseconds();
@@ -180,7 +221,7 @@ int main (int argc, char **argv)
 		curtime = Sys_Milliseconds();
 
 		sceDisplayWaitVblankStart();
-		//Qcommon_Frame (curtime - oldtime);
+		Qcommon_Frame (curtime - oldtime);
 
 		oldtime = curtime;
 	}

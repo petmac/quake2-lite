@@ -120,9 +120,11 @@ void GL_DrawAliasFrameLerp (dmdl_t *paliashdr, float backlerp)
 	else
 		alpha = 1.0;
 
+#ifndef PSP
 	// PMM - added double shell
 	if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
 		qglDisable( GL_TEXTURE_2D );
+#endif
 
 	frontlerp = 1.0 - backlerp;
 
@@ -151,6 +153,7 @@ void GL_DrawAliasFrameLerp (dmdl_t *paliashdr, float backlerp)
 
 	GL_LerpVerts( paliashdr->num_xyz, v, ov, verts, lerp, move, frontv, backv );
 
+#ifndef PSP
 	if ( gl_vertex_arrays->value )
 	{
 		float colorArray[MAX_VERTS*4];
@@ -292,6 +295,7 @@ void GL_DrawAliasFrameLerp (dmdl_t *paliashdr, float backlerp)
 	// PMM - added double damage shell
 	if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
 		qglEnable( GL_TEXTURE_2D );
+#endif
 }
 
 
@@ -305,6 +309,7 @@ extern	vec3_t			lightspot;
 
 void GL_DrawAliasShadow (dmdl_t *paliashdr, int posenum)
 {
+#ifndef PSP
 	dtrivertx_t	*verts;
 	int		*order;
 	vec3_t	point;
@@ -362,7 +367,8 @@ void GL_DrawAliasShadow (dmdl_t *paliashdr, int posenum)
 		} while (--count);
 
 		qglEnd ();
-	}	
+	}
+#endif
 }
 
 #endif
@@ -732,13 +738,16 @@ void R_DrawAliasModel (entity_t *e)
 	//
 	// draw all the triangles
 	//
+#ifndef PSP
 	if (currententity->flags & RF_DEPTHHACK) // hack the depth range to prevent view model from poking into walls
 		qglDepthRange (gldepthmin, gldepthmin + 0.3*(gldepthmax-gldepthmin));
+#endif
 
 	if ( ( currententity->flags & RF_WEAPONMODEL ) && ( r_lefthand->value == 1.0F ) )
 	{
-		extern void MYgluPerspective( GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar );
+		extern void MYgluPerspective( double fovy, double aspect, double zNear, double zFar );
 
+#ifndef PSP
 		qglMatrixMode( GL_PROJECTION );
 		qglPushMatrix();
 		qglLoadIdentity();
@@ -747,9 +756,12 @@ void R_DrawAliasModel (entity_t *e)
 		qglMatrixMode( GL_MODELVIEW );
 
 		qglCullFace( GL_BACK );
+#endif
 	}
 
+#ifndef PSP
     qglPushMatrix ();
+#endif
 	e->angles[PITCH] = -e->angles[PITCH];	// sigh.
 	R_RotateForEntity (e);
 	e->angles[PITCH] = -e->angles[PITCH];	// sigh.
@@ -774,12 +786,16 @@ void R_DrawAliasModel (entity_t *e)
 
 	// draw it
 
+#ifndef PSP
 	qglShadeModel (GL_SMOOTH);
+#endif
 
-	GL_TexEnv( GL_MODULATE );
+	GL_TexEnv( GU_TFX_MODULATE );
 	if ( currententity->flags & RF_TRANSLUCENT )
 	{
-		qglEnable (GL_BLEND);
+#ifndef PSP
+		qglEnable (GU_BLEND);
+#endif
 	}
 
 
@@ -805,7 +821,8 @@ void R_DrawAliasModel (entity_t *e)
 		currententity->backlerp = 0;
 	GL_DrawAliasFrameLerp (paliashdr, currententity->backlerp);
 
-	GL_TexEnv( GL_REPLACE );
+	GL_TexEnv( GU_TFX_REPLACE );
+#ifndef PSP
 	qglShadeModel (GL_FLAT);
 
 	qglPopMatrix ();
@@ -835,7 +852,7 @@ void R_DrawAliasModel (entity_t *e)
 
 	if ( currententity->flags & RF_TRANSLUCENT )
 	{
-		qglDisable (GL_BLEND);
+		qglDisable (GU_BLEND);
 	}
 
 	if (currententity->flags & RF_DEPTHHACK)
@@ -847,15 +864,16 @@ void R_DrawAliasModel (entity_t *e)
 		qglPushMatrix ();
 		R_RotateForEntity (e);
 		qglDisable (GL_TEXTURE_2D);
-		qglEnable (GL_BLEND);
+		qglEnable (GU_BLEND);
 		qglColor4f (0,0,0,0.5);
 		GL_DrawAliasShadow (paliashdr, currententity->frame );
 		qglEnable (GL_TEXTURE_2D);
-		qglDisable (GL_BLEND);
+		qglDisable (GU_BLEND);
 		qglPopMatrix ();
 	}
 #endif
 	qglColor4f (1,1,1,1);
+#endif
 }
 
 

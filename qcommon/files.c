@@ -453,8 +453,6 @@ pack_t *FS_LoadPackFile (char *packfile)
 	int				numpackfiles;
 	pack_t			*pack;
 	FILE			*packhandle;
-	dpackfile_t		info[MAX_FILES_IN_PACK];
-	unsigned		checksum;
 
 	packhandle = fopen(packfile, "rb");
 	if (!packhandle)
@@ -468,27 +466,19 @@ pack_t *FS_LoadPackFile (char *packfile)
 
 	numpackfiles = header.dirlen / sizeof(dpackfile_t);
 
-	if (numpackfiles > MAX_FILES_IN_PACK)
-		Com_Error (ERR_FATAL, "%s has %i files", packfile, numpackfiles);
-
 	newfiles = Z_Malloc (numpackfiles * sizeof(packfile_t));
 
 	fseek (packhandle, header.dirofs, SEEK_SET);
-	fread (info, 1, header.dirlen, packhandle);
 
-// crc the directory to check for modifications
-	checksum = Com_BlockChecksum ((void *)info, header.dirlen);
-
-#ifdef NO_ADDONS
-	if (checksum != PAK0_CHECKSUM)
-		return NULL;
-#endif
 // parse the directory
 	for (i=0 ; i<numpackfiles ; i++)
 	{
-		strcpy (newfiles[i].name, info[i].name);
-		newfiles[i].filepos = LittleLong(info[i].filepos);
-		newfiles[i].filelen = LittleLong(info[i].filelen);
+		dpackfile_t info;
+		fread (&info, 1, sizeof(info), packhandle);
+
+		strcpy (newfiles[i].name, info.name);
+		newfiles[i].filepos = LittleLong(info.filepos);
+		newfiles[i].filelen = LittleLong(info.filelen);
 	}
 
 	pack = Z_Malloc (sizeof (pack_t));

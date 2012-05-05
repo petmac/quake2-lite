@@ -225,6 +225,7 @@ void EmitWaterPolys (msurface_t *fa)
 	{
 		p = bp;
 
+#ifndef PSP
 		qglBegin (GL_TRIANGLE_FAN);
 		for (i=0,v=p->verts[0] ; i<p->numverts ; i++, v+=VERTEXSIZE)
 		{
@@ -243,6 +244,7 @@ void EmitWaterPolys (msurface_t *fa)
 			qglVertex3fv (v);
 		}
 		qglEnd ();
+#endif
 	}
 }
 
@@ -542,8 +544,10 @@ void MakeSkyVec (float s, float t, int axis)
 		t = sky_max;
 
 	t = 1.0 - t;
+#ifndef PSP
 	qglTexCoord2f (s, t);
 	qglVertex3fv (v);
+#endif
 }
 
 /*
@@ -557,7 +561,7 @@ void R_DrawSkyBox (void)
 	int		i;
 
 #if 0
-qglEnable (GL_BLEND);
+qglEnable (GU_BLEND);
 GL_TexEnv( GL_MODULATE );
 qglColor4f (1,1,1,0.5);
 qglDisable (GL_DEPTH_TEST);
@@ -572,9 +576,11 @@ qglDisable (GL_DEPTH_TEST);
 			return;		// nothing visible
 	}
 
+#ifndef PSP
 qglPushMatrix ();
 qglTranslatef (r_origin[0], r_origin[1], r_origin[2]);
 qglRotatef (r_newrefdef.time * skyrotate, skyaxis[0], skyaxis[1], skyaxis[2]);
+#endif
 
 	for (i=0 ; i<6 ; i++)
 	{
@@ -592,14 +598,18 @@ qglRotatef (r_newrefdef.time * skyrotate, skyaxis[0], skyaxis[1], skyaxis[2]);
 
 		GL_Bind (sky_images[skytexorder[i]]->texnum);
 
+#ifndef PSP
 		qglBegin (GL_QUADS);
 		MakeSkyVec (skymins[0][i], skymins[1][i], i);
 		MakeSkyVec (skymins[0][i], skymaxs[1][i], i);
 		MakeSkyVec (skymaxs[0][i], skymaxs[1][i], i);
 		MakeSkyVec (skymaxs[0][i], skymins[1][i], i);
 		qglEnd ();
+#endif
 	}
+#ifndef PSP
 qglPopMatrix ();
+#endif
 #if 0
 glDisable (GL_BLEND);
 glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -631,10 +641,18 @@ void R_SetSky (char *name, float rotate, vec3_t axis)
 		if (gl_skymip->value || skyrotate)
 			gl_picmip->value++;
 
+#ifndef PSP
 		if ( qglColorTableEXT && gl_ext_palettedtexture->value )
+#endif
+		{
 			Com_sprintf (pathname, sizeof(pathname), "env/%s%s.pcx", skyname, suf[i]);
+		}
+#ifndef PSP
 		else
+		{
 			Com_sprintf (pathname, sizeof(pathname), "env/%s%s.tga", skyname, suf[i]);
+		}
+#endif
 
 		sky_images[i] = GL_FindImage (pathname, it_sky);
 		if (!sky_images[i])

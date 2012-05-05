@@ -140,7 +140,9 @@ void GL_ScreenShot_f (void)
 	buffer[15] = vid.height>>8;
 	buffer[16] = 24;	// pixel size
 
+#ifndef PSP
 	qglReadPixels (0, 0, vid.width, vid.height, GL_RGB, GL_UNSIGNED_BYTE, buffer+18 ); 
+#endif
 
 	// swap rgb to bgr
 	c = 18+vid.width*vid.height*3;
@@ -157,17 +159,6 @@ void GL_ScreenShot_f (void)
 
 	Z_Free (buffer);
 	ri.Con_Printf (PRINT_ALL, "Wrote %s\n", picname);
-} 
-
-/*
-** GL_Strings_f
-*/
-void GL_Strings_f( void )
-{
-	ri.Con_Printf (PRINT_ALL, "GL_VENDOR: %s\n", gl_config.vendor_string );
-	ri.Con_Printf (PRINT_ALL, "GL_RENDERER: %s\n", gl_config.renderer_string );
-	ri.Con_Printf (PRINT_ALL, "GL_VERSION: %s\n", gl_config.version_string );
-	ri.Con_Printf (PRINT_ALL, "GL_EXTENSIONS: %s\n", gl_config.extensions_string );
 }
 
 /*
@@ -175,6 +166,7 @@ void GL_Strings_f( void )
 */
 void GL_SetDefaultState( void )
 {
+#ifndef PSP
 	qglClearColor (1,0, 0.5 , 0.5);
 	qglCullFace(GL_FRONT);
 	qglEnable(GL_TEXTURE_2D);
@@ -184,16 +176,12 @@ void GL_SetDefaultState( void )
 
 	qglDisable (GL_DEPTH_TEST);
 	qglDisable (GL_CULL_FACE);
-	qglDisable (GL_BLEND);
+	qglDisable (GU_BLEND);
 
 	qglColor4f (1,1,1,1);
 
 	qglPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
 	qglShadeModel (GL_FLAT);
-
-	GL_TextureMode( gl_texturemode->string );
-	GL_TextureAlphaMode( gl_texturealphamode->string );
-	GL_TextureSolidMode( gl_texturesolidmode->string );
 
 	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gl_filter_min);
 	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gl_filter_max);
@@ -202,45 +190,9 @@ void GL_SetDefaultState( void )
 	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	qglBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	GL_TexEnv( GL_REPLACE );
-
-	if ( qglPointParameterfEXT )
-	{
-		float attenuations[3];
-
-		attenuations[0] = gl_particle_att_a->value;
-		attenuations[1] = gl_particle_att_b->value;
-		attenuations[2] = gl_particle_att_c->value;
-
-		qglEnable( GL_POINT_SMOOTH );
-		qglPointParameterfEXT( GL_POINT_SIZE_MIN_EXT, gl_particle_min_size->value );
-		qglPointParameterfEXT( GL_POINT_SIZE_MAX_EXT, gl_particle_max_size->value );
-		qglPointParameterfvEXT( GL_DISTANCE_ATTENUATION_EXT, attenuations );
-	}
-
-	if ( qglColorTableEXT && gl_ext_palettedtexture->value )
-	{
-		qglEnable( GL_SHARED_TEXTURE_PALETTE_EXT );
-
-		GL_SetTexturePalette( d_8to24table );
-	}
-
-	GL_UpdateSwapInterval();
-}
-
-void GL_UpdateSwapInterval( void )
-{
-	if ( gl_swapinterval->modified )
-	{
-		gl_swapinterval->modified = false;
-
-		if ( !gl_state.stereo_enabled ) 
-		{
-#ifdef _WIN32
-			if ( qwglSwapIntervalEXT )
-				qwglSwapIntervalEXT( gl_swapinterval->value );
 #endif
-		}
-	}
+
+	GL_TexEnv( GU_TFX_REPLACE );
+
+	GL_SetTexturePalette( d_8to24table );
 }

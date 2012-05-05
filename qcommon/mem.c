@@ -35,27 +35,39 @@ struct hunk_s
 #define GAME_HUNK_CAPACITY (1 * 1024 * 1024)
 #define LEVEL_HUNK_CAPACITY (32 * 1024)
 #define REF_HUNK_CAPACITY (7 * 1024 * 1024)
+#ifdef PSP
+#define SND_HUNK_CAPACITY (1 * 1024 * 1024)
+#else
 #define SND_HUNK_CAPACITY (9 * 1024 * 1024)
-
-static char game_mem[GAME_HUNK_CAPACITY];
-static char level_mem[LEVEL_HUNK_CAPACITY];
-static char ref_mem[REF_HUNK_CAPACITY];
-static char snd_mem[SND_HUNK_CAPACITY];
+#endif
 
 hunk_t hunk_game;
 hunk_t hunk_level;
 hunk_t hunk_ref;
 hunk_t hunk_snd;
 
-static void Hunk_Init (hunk_t *hunk, const char *name, int capacity, void *membase)
+static void Hunk_Init (hunk_t *hunk, const char *name, int capacity)
 {
-	const int base_as_int = (int)membase;
+	void *membase;
+	int base_as_int;
 
+	// Allocate memory.
+	membase = calloc(capacity, 1);
+	if (membase == NULL)
+	{
+		Sys_Error ("Hunk_Init: Failed to allocate hunk \"%s\".", name);
+		return;
+	}
+
+	// Check alignment.
+	base_as_int = (int)membase;
 	if ((base_as_int % HUNK_ALIGNMENT) != 0)
 	{
 		Sys_Error ("Hunk_Init: Hunk \"%s\" membase is not aligned.", name);
+		return;
 	}
 
+	// Store info.
 	hunk->cursize = 0;
 	hunk->capacity = capacity;
 	hunk->membase = membase;
@@ -65,10 +77,10 @@ static void Hunk_Init (hunk_t *hunk, const char *name, int capacity, void *memba
 
 void Mem_Init (void)
 {
-	Hunk_Init (&hunk_game, "Game", GAME_HUNK_CAPACITY, game_mem);
-	Hunk_Init (&hunk_level, "Level", LEVEL_HUNK_CAPACITY, level_mem);
-	Hunk_Init (&hunk_ref, "Refresh", REF_HUNK_CAPACITY, ref_mem);
-	Hunk_Init (&hunk_snd, "Sound", SND_HUNK_CAPACITY, snd_mem);
+	Hunk_Init (&hunk_game, "Game", GAME_HUNK_CAPACITY);
+	Hunk_Init (&hunk_level, "Level", LEVEL_HUNK_CAPACITY);
+	Hunk_Init (&hunk_ref, "Refresh", REF_HUNK_CAPACITY);
+	Hunk_Init (&hunk_snd, "Sound", SND_HUNK_CAPACITY);
 }
 
 void *Hunk_Alloc (hunk_t *hunk, int size)

@@ -38,8 +38,6 @@ int		mod_numknown;
 // the inline * models from the current map are kept seperate
 model_t	mod_inline[MAX_MOD_KNOWN];
 
-int		registration_sequence;
-
 /*
 ===============
 Mod_PointInLeaf
@@ -224,7 +222,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 	//
 	// load the file
 	//
-	modfilelen = ri.FS_LoadFile (mod->name, &buf);
+	modfilelen = ri.FS_LoadFile (mod->name, (void **)&buf);
 	if (!buf)
 	{
 		if (crash)
@@ -1107,7 +1105,6 @@ void R_BeginRegistration (char *model)
 {
 	char	fullname[MAX_QPATH];
 
-	registration_sequence++;
 	r_oldviewcluster = -1;		// force markleafs
 
 	Com_sprintf (fullname, sizeof(fullname), "maps/%s.bsp", model);
@@ -1156,8 +1153,10 @@ struct model_s *R_RegisterModel (char *name)
 		}
 		else if (mod->type == mod_brush)
 		{
+#ifndef PSP
 			for (i=0 ; i<mod->numtexinfo ; i++)
 				mod->texinfo[i].image->registration_sequence = registration_sequence;
+#endif
 		}
 	}
 	return mod;

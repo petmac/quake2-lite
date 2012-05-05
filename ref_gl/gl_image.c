@@ -967,8 +967,8 @@ qboolean uploaded_paletted;
 qboolean GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap)
 {
 	int			samples;
-	unsigned	scaled[256*256];
-	unsigned char paletted_texture[256*256];
+	static unsigned	scaled[256*256];
+	static unsigned char paletted_texture[256*256];
 	int			scaled_width, scaled_height;
 	int			i, c;
 	byte		*scan;
@@ -1175,7 +1175,7 @@ static qboolean IsPowerOf2( int value )
 
 qboolean GL_Upload8 (byte *data, int width, int height,  qboolean mipmap, qboolean is_sky )
 {
-	unsigned	trans[512*256];
+	static unsigned	trans[512*256];
 	int			i, s;
 	int			p;
 

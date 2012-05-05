@@ -1102,7 +1102,7 @@ qboolean R_SetMode (void)
 R_Init
 ===============
 */
-qboolean R_Init( void *hinstance, void *hWnd )
+int R_Init( void *hinstance, void *hWnd )
 {	
 	char renderer_buffer[1000];
 	char vendor_buffer[1000];

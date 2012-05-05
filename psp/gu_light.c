@@ -52,6 +52,7 @@ void R_RenderDlight (dlight_t *light)
 	}
 #endif
 
+#ifndef PSP
 	qglBegin (GL_TRIANGLE_FAN);
 	qglColor3f (light->color[0]*0.2, light->color[1]*0.2, light->color[2]*0.2);
 	for (i=0 ; i<3 ; i++)
@@ -67,6 +68,7 @@ void R_RenderDlight (dlight_t *light)
 		qglVertex3fv (v);
 	}
 	qglEnd ();
+#endif
 }
 
 /*
@@ -84,21 +86,25 @@ void R_RenderDlights (void)
 
 	r_dlightframecount = r_framecount + 1;	// because the count hasn't
 											//  advanced yet for this frame
+#ifndef PSP
 	qglDepthMask (0);
 	qglDisable (GL_TEXTURE_2D);
 	qglShadeModel (GL_SMOOTH);
-	qglEnable (GL_BLEND);
+	qglEnable (GU_BLEND);
 	qglBlendFunc (GL_ONE, GL_ONE);
+#endif
 
 	l = r_newrefdef.dlights;
 	for (i=0 ; i<r_newrefdef.num_dlights ; i++, l++)
 		R_RenderDlight (l);
 
+#ifndef PSP
 	qglColor3f (1,1,1);
-	qglDisable (GL_BLEND);
+	qglDisable (GU_BLEND);
 	qglEnable (GL_TEXTURE_2D);
 	qglBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	qglDepthMask (1);
+#endif
 }
 
 

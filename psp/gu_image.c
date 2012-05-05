@@ -34,18 +34,9 @@ unsigned	d_8to24table[256];
 qboolean GL_Upload8 (byte *data, int width, int height,  qboolean mipmap, qboolean is_sky );
 qboolean GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap);
 
-
-int		gl_solid_format = 3;
-int		gl_alpha_format = 4;
-
-int		gl_tex_solid_format = 3;
-int		gl_tex_alpha_format = 4;
-
-int		gl_filter_min = GL_LINEAR_MIPMAP_NEAREST;
-int		gl_filter_max = GL_LINEAR;
-
 void GL_SetTexturePalette( unsigned palette[256] )
 {
+#ifndef PSP
 	int i;
 	unsigned char temptable[768];
 
@@ -65,10 +56,12 @@ void GL_SetTexturePalette( unsigned palette[256] )
 						   GL_UNSIGNED_BYTE,
 						   temptable );
 	}
+#endif
 }
 
 void GL_EnableMultitexture( qboolean enable )
 {
+#ifndef PSP
 	if ( !qglSelectTextureSGIS && !qglActiveTextureARB )
 		return;
 
@@ -76,20 +69,22 @@ void GL_EnableMultitexture( qboolean enable )
 	{
 		GL_SelectTexture( GL_TEXTURE1 );
 		qglEnable( GL_TEXTURE_2D );
-		GL_TexEnv( GL_REPLACE );
+		GL_TexEnv( GU_TFX_REPLACE );
 	}
 	else
 	{
 		GL_SelectTexture( GL_TEXTURE1 );
 		qglDisable( GL_TEXTURE_2D );
-		GL_TexEnv( GL_REPLACE );
+		GL_TexEnv( GU_TFX_REPLACE );
 	}
 	GL_SelectTexture( GL_TEXTURE0 );
-	GL_TexEnv( GL_REPLACE );
+	GL_TexEnv( GU_TFX_REPLACE );
+#endif
 }
 
 void GL_SelectTexture( int texture )
 {
+#ifndef PSP
 	int tmu;
 
 	if ( !qglSelectTextureSGIS && !qglActiveTextureARB )
@@ -120,6 +115,7 @@ void GL_SelectTexture( int texture )
 		qglActiveTextureARB( texture );
 		qglClientActiveTextureARB( texture );
 	}
+#endif
 }
 
 void GL_TexEnv( int mode )
@@ -128,7 +124,9 @@ void GL_TexEnv( int mode )
 
 	if ( mode != lastmodes[gl_state.currenttmu] )
 	{
+#ifndef PSP
 		qglTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, mode );
+#endif
 		lastmodes[gl_state.currenttmu] = mode;
 	}
 }
@@ -142,7 +140,9 @@ void GL_Bind (int texnum)
 	if ( gl_state.currenttextures[gl_state.currenttmu] == texnum)
 		return;
 	gl_state.currenttextures[gl_state.currenttmu] = texnum;
+#ifndef PSP
 	qglBindTexture (GL_TEXTURE_2D, texnum);
+#endif
 }
 
 void GL_MBind( int target, int texnum )
@@ -159,139 +159,6 @@ void GL_MBind( int target, int texnum )
 			return;
 	}
 	GL_Bind( texnum );
-}
-
-typedef struct
-{
-	char *name;
-	int	minimize, maximize;
-} glmode_t;
-
-glmode_t modes[] = {
-	{"GL_NEAREST", GL_NEAREST, GL_NEAREST},
-	{"GL_LINEAR", GL_LINEAR, GL_LINEAR},
-	{"GL_NEAREST_MIPMAP_NEAREST", GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST},
-	{"GL_LINEAR_MIPMAP_NEAREST", GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR},
-	{"GL_NEAREST_MIPMAP_LINEAR", GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST},
-	{"GL_LINEAR_MIPMAP_LINEAR", GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR}
-};
-
-#define NUM_GL_MODES (sizeof(modes) / sizeof (glmode_t))
-
-typedef struct
-{
-	char *name;
-	int mode;
-} gltmode_t;
-
-gltmode_t gl_alpha_modes[] = {
-	{"default", 4},
-	{"GL_RGBA", GL_RGBA},
-	{"GL_RGBA8", GL_RGBA8},
-	{"GL_RGB5_A1", GL_RGB5_A1},
-	{"GL_RGBA4", GL_RGBA4},
-	{"GL_RGBA2", GL_RGBA2},
-};
-
-#define NUM_GL_ALPHA_MODES (sizeof(gl_alpha_modes) / sizeof (gltmode_t))
-
-gltmode_t gl_solid_modes[] = {
-	{"default", 3},
-	{"GL_RGB", GL_RGB},
-	{"GL_RGB8", GL_RGB8},
-	{"GL_RGB5", GL_RGB5},
-	{"GL_RGB4", GL_RGB4},
-	{"GL_R3_G3_B2", GL_R3_G3_B2},
-#ifdef GL_RGB2_EXT
-	{"GL_RGB2", GL_RGB2_EXT},
-#endif
-};
-
-#define NUM_GL_SOLID_MODES (sizeof(gl_solid_modes) / sizeof (gltmode_t))
-
-/*
-===============
-GL_TextureMode
-===============
-*/
-void GL_TextureMode( char *string )
-{
-	int		i;
-	image_t	*glt;
-
-	for (i=0 ; i< NUM_GL_MODES ; i++)
-	{
-		if ( !Q_stricmp( modes[i].name, string ) )
-			break;
-	}
-
-	if (i == NUM_GL_MODES)
-	{
-		ri.Con_Printf (PRINT_ALL, "bad filter name\n");
-		return;
-	}
-
-	gl_filter_min = modes[i].minimize;
-	gl_filter_max = modes[i].maximize;
-
-	// change all the existing mipmap texture objects
-	for (i=0, glt=gltextures ; i<numgltextures ; i++, glt++)
-	{
-		if (glt->type != it_pic && glt->type != it_sky )
-		{
-			GL_Bind (glt->texnum);
-			qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gl_filter_min);
-			qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gl_filter_max);
-		}
-	}
-}
-
-/*
-===============
-GL_TextureAlphaMode
-===============
-*/
-void GL_TextureAlphaMode( char *string )
-{
-	int		i;
-
-	for (i=0 ; i< NUM_GL_ALPHA_MODES ; i++)
-	{
-		if ( !Q_stricmp( gl_alpha_modes[i].name, string ) )
-			break;
-	}
-
-	if (i == NUM_GL_ALPHA_MODES)
-	{
-		ri.Con_Printf (PRINT_ALL, "bad alpha texture mode name\n");
-		return;
-	}
-
-	gl_tex_alpha_format = gl_alpha_modes[i].mode;
-}
-
-/*
-===============
-GL_TextureSolidMode
-===============
-*/
-void GL_TextureSolidMode( char *string )
-{
-	int		i;
-
-	for (i=0 ; i< NUM_GL_SOLID_MODES ; i++)
-	{
-		if ( !Q_stricmp( gl_solid_modes[i].name, string ) )
-			break;
-	}
-
-	if (i == NUM_GL_SOLID_MODES)
-	{
-		ri.Con_Printf (PRINT_ALL, "bad solid texture mode name\n");
-		return;
-	}
-
-	gl_tex_solid_format = gl_solid_modes[i].mode;
 }
 
 /*
@@ -966,6 +833,7 @@ qboolean uploaded_paletted;
 
 qboolean GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap)
 {
+#ifndef PSP
 	int			samples;
 	unsigned	scaled[256*256];
 	unsigned char paletted_texture[256*256];
@@ -1147,6 +1015,9 @@ done: ;
 	}
 
 	return (samples == gl_alpha_format);
+#else
+	return false;
+#endif
 }
 
 /*
@@ -1175,6 +1046,7 @@ static qboolean IsPowerOf2( int value )
 
 qboolean GL_Upload8 (byte *data, int width, int height,  qboolean mipmap, qboolean is_sky )
 {
+#ifndef PSP
 	unsigned	trans[512*256];
 	int			i, s;
 	int			p;
@@ -1233,6 +1105,9 @@ qboolean GL_Upload8 (byte *data, int width, int height,  qboolean mipmap, qboole
 
 		return GL_Upload32 (trans, width, height, mipmap);
 	}
+#else
+	return false;
+#endif
 }
 
 
@@ -1265,7 +1140,6 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 	if (strlen(name) >= sizeof(image->name))
 		ri.Sys_Error (ERR_DROP, "Draw_LoadPic: \"%s\" is too long", name);
 	strcpy (image->name, name);
-	image->registration_sequence = registration_sequence;
 
 	image->width = width;
 	image->height = height;
@@ -1377,7 +1251,6 @@ image_t	*GL_FindImage (char *name, imagetype_t type)
 	{
 		if (!strcmp(name, image->name))
 		{
-			image->registration_sequence = registration_sequence;
 			return image;
 		}
 	}
@@ -1443,20 +1316,20 @@ void GL_FreeUnusedImages (void)
 	int		i;
 	image_t	*image;
 
-	// never free r_notexture or particle texture
-	r_notexture->registration_sequence = registration_sequence;
-	r_particletexture->registration_sequence = registration_sequence;
-
 	for (i=0, image=gltextures ; i<numgltextures ; i++, image++)
 	{
-		if (image->registration_sequence == registration_sequence)
-			continue;		// used this sequence
-		if (!image->registration_sequence)
-			continue;		// free image_t slot
+		// never free r_notexture or particle texture
+		if ((image == r_notexture) || (image == r_particletexture))
+		{
+			continue;
+		}
+
 		if (image->type == it_pic)
 			continue;		// don't free pics
 		// free it
+#ifndef PSP
 		qglDeleteTextures (1, &image->texnum);
+#endif
 		memset (image, 0, sizeof(*image));
 	}
 }
@@ -1510,8 +1383,6 @@ void	GL_InitImages (void)
 	int		i, j;
 	float	g = vid_gamma->value;
 
-	registration_sequence = 1;
-
 	// init intensity conversions
 	intensity = ri.Cvar_Get ("intensity", "2", 0);
 
@@ -1522,17 +1393,9 @@ void	GL_InitImages (void)
 
 	Draw_GetPalette ();
 
-	if ( qglColorTableEXT )
-	{
-		ri.FS_LoadFile( "pics/16to8.dat", &gl_state.d_16to8table );
-		if ( !gl_state.d_16to8table )
-			ri.Sys_Error( ERR_FATAL, "Couldn't load pics/16to8.pcx");
-	}
-
-	if ( gl_config.renderer & ( GL_RENDERER_VOODOO | GL_RENDERER_VOODOO2 ) )
-	{
-		g = 1.0F;
-	}
+	ri.FS_LoadFile( "pics/16to8.dat", (void **)&gl_state.d_16to8table );
+	if ( !gl_state.d_16to8table )
+		ri.Sys_Error( ERR_FATAL, "Couldn't load pics/16to8.pcx");
 
 	for ( i = 0; i < 256; i++ )
 	{
@@ -1572,12 +1435,14 @@ void	GL_ShutdownImages (void)
 	int		i;
 	image_t	*image;
 
+	// PeterM TODO What to do with gl_state.d_16to8table?
+
 	for (i=0, image=gltextures ; i<numgltextures ; i++, image++)
 	{
-		if (!image->registration_sequence)
-			continue;		// free image_t slot
 		// free it
+#ifndef PSP
 		qglDeleteTextures (1, &image->texnum);
+#endif
 		memset (image, 0, sizeof(*image));
 	}
 }

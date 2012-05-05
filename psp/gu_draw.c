@@ -302,7 +302,7 @@ Draw_FadeScreen
 void Draw_FadeScreen (void)
 {
 #ifndef PSP
-	qglEnable (GL_BLEND);
+	qglEnable (GU_BLEND);
 	qglDisable (GL_TEXTURE_2D);
 	qglColor4f (0, 0, 0, 0.8);
 	qglBegin (GL_QUADS);
@@ -315,7 +315,7 @@ void Draw_FadeScreen (void)
 	qglEnd ();
 	qglColor4f (1,1,1,1);
 	qglEnable (GL_TEXTURE_2D);
-	qglDisable (GL_BLEND);
+	qglDisable (GU_BLEND);
 #endif
 }
 
