@@ -428,8 +428,8 @@ byte *SCR_ReadNextFrame (void)
 {
 	int		r;
 	int		command;
-	byte	samples[22050/14*4];
-	byte	compressed[0x20000];
+	static byte	samples[22050/14*4];
+	static byte	compressed[0x20000];
 	int		size;
 	byte	*pic;
 	cblock_t	in, huf1;

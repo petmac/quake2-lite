@@ -42,6 +42,7 @@ int	curtime;
 unsigned	sys_frame_time;
 
 static qboolean go = true;
+static u64 first_ticks;
 static double ticks_per_ms;
 
 /* Exit callback */
@@ -92,8 +93,8 @@ void Sys_Error (char *error, ...)
 	va_end (argptr);
 
 	pspDebugScreenSetTextColor(GU_RGBA(255, 0, 0, 255));
-	puts(buffer);
-	puts("\n");
+	Sys_ConsoleOutput(buffer);
+	Sys_ConsoleOutput("\n");
 
 	while (go)
 	{
@@ -124,7 +125,18 @@ char *Sys_ConsoleInput (void)
 
 void	Sys_ConsoleOutput (char *string)
 {
+	FILE *file = NULL;
+
 	puts(string);
+
+	file = fopen("log.txt", "a");
+	if (file != NULL)
+	{
+		fputs(string, file);
+		fflush(file);
+		fclose(file);
+		file = NULL;
+	}
 }
 
 void Sys_SendKeyEvents (void)
@@ -147,11 +159,11 @@ char *Sys_GetClipboardData( void )
 int		Sys_Milliseconds (void)
 {
 	u64 ticks = 0;
-	int ms;
+	u64 ms;
 
 	sceRtcGetCurrentTick(&ticks);
 
-	ms = ticks / ticks_per_ms;
+	ms = (ticks - first_ticks) / ticks_per_ms;
 
 	return ms;
 }
@@ -190,9 +202,9 @@ static void psp_debug_error_handler(PspDebugRegBlock *regs)
 
 int main (int argc, char **argv)
 {
+	FILE *log = NULL;
 	u32 ticks_per_s;
 	int oldtime;
-	int curtime;
 
 	pspDebugScreenInit();
 	printf("Debug screen initialised.\n");
@@ -205,20 +217,33 @@ int main (int argc, char **argv)
 	pspDebugInstallErrorHandler(&psp_debug_error_handler);
 #endif
 
+	log = fopen("log.txt", "w");
+	if (log != NULL)
+	{
+		fputs("LOG START\n\n", log);
+		fclose(log);
+		log = NULL;
+	}
+
 	// Calculate the clock resolution.
+	sceRtcGetCurrentTick(&first_ticks);
 	ticks_per_s = sceRtcGetTickResolution();
 	ticks_per_ms = ticks_per_s / 1000.0;
-	printf("%u ticks per second.\n", ticks_per_s);
-	printf("%f ticks per ms.\n", ticks_per_ms);
 
+	// Initialise Quake.
 	Qcommon_Init (argc, argv);
-	printf("Game initialised.\n");
 
 	oldtime = Sys_Milliseconds();
 
+	// Run the main loop.
 	while (go)
 	{
 		curtime = Sys_Milliseconds();
+
+		if (curtime < oldtime)
+		{
+			Sys_Error("curtime (%d) < oldtime (%d)\n", curtime, oldtime);
+		}
 
 		sceDisplayWaitVblankStart();
 		Qcommon_Frame (curtime - oldtime);
@@ -226,7 +251,6 @@ int main (int argc, char **argv)
 		oldtime = curtime;
 	}
 
-	printf("Exiting.\n");
 	sceKernelExitGame();
 
 	return 0;
