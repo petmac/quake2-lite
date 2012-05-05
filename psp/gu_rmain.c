@@ -1202,6 +1202,8 @@ void R_Shutdown (void)
 
 	GL_ShutdownImages ();
 
+	sceGuTerm();
+
 	LOG_FUNCTION_EXIT;
 }
 
