@@ -123,6 +123,7 @@ char *Sys_ConsoleInput (void)
 
 void	Sys_ConsoleOutput (char *string)
 {
+#if 0
 	FILE *file = NULL;
 
 	file = fopen("log.txt", "a");
@@ -133,6 +134,7 @@ void	Sys_ConsoleOutput (char *string)
 		fclose(file);
 		file = NULL;
 	}
+#endif
 }
 
 void Sys_SendKeyEvents (void)

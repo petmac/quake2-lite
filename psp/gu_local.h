@@ -23,11 +23,26 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../client/ref.h"
 
+/*
+====================================================================
+
+PSP specifics.
+
+====================================================================
+*/
+
+// PSP SDK.
 #include <pspdisplay.h>
 #include <pspge.h>
 #include <pspgu.h>
 #include <pspgum.h>
 
+// Vertex type.
+typedef struct {
+	ScePspFVector3 pos;
+} gu_2d_vertex_t;
+
+// Debugging/profiling.
 #if 0
 #	define LOG_FUNCTION_ENTRY Com_DPrintf("%s {\n", __FUNCTION__)
 #	define LOG_FUNCTION_EXIT Com_DPrintf("}\n")
@@ -35,6 +50,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #	define LOG_FUNCTION_ENTRY do { } while (0)
 #	define LOG_FUNCTION_EXIT do { } while (0)
 #endif
+
+// Constants.
+#define GU_SCR_WIDTH 480
+#define GU_SCR_HEIGHT 272
+
+// Display lists.
+void GU_StartDisplayList(void);
+void GU_FinishDisplayList(void);
+void GU_SyncDisplayList(void);
+
+/*
+====================================================================
+
+Modified gl_local.h follows.
+
+====================================================================
+*/
 
 extern int GL_TEXTURE0, GL_TEXTURE1;
 
@@ -48,17 +80,6 @@ extern int GL_TEXTURE0, GL_TEXTURE1;
 
 // fall over
 #define	ROLL	2
-
-
-#ifndef __VIDDEF_T
-#define __VIDDEF_T
-typedef struct
-{
-	unsigned		width, height;			// coordinates from main game
-} viddef_t;
-#endif
-
-extern	viddef_t	vid;
 
 
 /*
@@ -201,7 +222,6 @@ extern	cvar_t	*gl_flashblend;
 extern	cvar_t	*gl_lightmaptype;
 extern	cvar_t	*gl_modulate;
 extern	cvar_t	*gl_playermip;
-extern	cvar_t	*gl_drawbuffer;
 extern  cvar_t  *gl_driver;
 extern	cvar_t	*gl_swapinterval;
 extern  cvar_t  *gl_saturatelighting;

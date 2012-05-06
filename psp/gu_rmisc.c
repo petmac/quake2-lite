@@ -131,21 +131,21 @@ void GL_ScreenShot_f (void)
  	}
 
 
-	buffer = Z_Malloc(vid.width*vid.height*3 + 18);
+	buffer = Z_Malloc(GU_SCR_WIDTH*GU_SCR_HEIGHT*3 + 18);
 	memset (buffer, 0, 18);
 	buffer[2] = 2;		// uncompressed type
-	buffer[12] = vid.width&255;
-	buffer[13] = vid.width>>8;
-	buffer[14] = vid.height&255;
-	buffer[15] = vid.height>>8;
+	buffer[12] = GU_SCR_WIDTH&255;
+	buffer[13] = GU_SCR_WIDTH>>8;
+	buffer[14] = GU_SCR_HEIGHT&255;
+	buffer[15] = GU_SCR_HEIGHT>>8;
 	buffer[16] = 24;	// pixel size
 
 #ifndef PSP
-	qglReadPixels (0, 0, vid.width, vid.height, GL_RGB, GL_UNSIGNED_BYTE, buffer+18 ); 
+	qglReadPixels (0, 0, GU_SCR_WIDTH, GU_SCR_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, buffer+18 ); 
 #endif
 
 	// swap rgb to bgr
-	c = 18+vid.width*vid.height*3;
+	c = 18+GU_SCR_WIDTH*GU_SCR_HEIGHT*3;
 	for (i=18 ; i<c ; i+=3)
 	{
 		temp = buffer[i];
@@ -172,7 +172,7 @@ void GL_SetDefaultState( void )
 	qglEnable(GL_TEXTURE_2D);
 #endif
 
-	sceGuEnable(GU_ALPHA_TEST);
+	//sceGuEnable(GU_ALPHA_TEST);
 	sceGuAlphaFunc(GU_GREATER, 170, 0xff);
 
 	sceGuDisable (GU_DEPTH_TEST);

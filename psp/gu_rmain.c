@@ -22,8 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 void R_Clear (void);
 
-viddef_t	vid;
-
 refimport_t	ri;
 
 int GL_TEXTURE0, GL_TEXTURE1;
@@ -81,7 +79,6 @@ cvar_t	*r_lightlevel;	// FIXME: This is a HACK to get the client's light level
 
 cvar_t	*gl_log;
 cvar_t	*gl_bitdepth;
-cvar_t	*gl_drawbuffer;
 cvar_t  *gl_driver;
 cvar_t	*gl_lightmap;
 cvar_t	*gl_shadows;
@@ -652,7 +649,7 @@ void R_SetupFrame (void)
 #ifndef PSP
 		qglEnable( GL_SCISSOR_TEST );
 		qglClearColor( 0.3, 0.3, 0.3, 1 );
-		qglScissor( r_newrefdef.x, vid.height - r_newrefdef.height - r_newrefdef.y, r_newrefdef.width, r_newrefdef.height );
+		qglScissor( r_newrefdef.x, GU_SCR_HEIGHT - r_newrefdef.height - r_newrefdef.y, r_newrefdef.width, r_newrefdef.height );
 		qglClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		qglClearColor( 1, 0, 0.5, 0.5 );
 		qglDisable( GL_SCISSOR_TEST );
@@ -695,10 +692,10 @@ void R_SetupGL (void)
 	//
 	// set up viewport
 	//
-	x = floor(r_newrefdef.x * vid.width / vid.width);
-	x2 = ceil((r_newrefdef.x + r_newrefdef.width) * vid.width / vid.width);
-	y = floor(vid.height - r_newrefdef.y * vid.height / vid.height);
-	y2 = ceil(vid.height - (r_newrefdef.y + r_newrefdef.height) * vid.height / vid.height);
+	x = floor(r_newrefdef.x * GU_SCR_WIDTH / GU_SCR_WIDTH);
+	x2 = ceil((r_newrefdef.x + r_newrefdef.width) * GU_SCR_WIDTH / GU_SCR_WIDTH);
+	y = floor(GU_SCR_HEIGHT - r_newrefdef.y * GU_SCR_HEIGHT / GU_SCR_HEIGHT);
+	y2 = ceil(GU_SCR_HEIGHT - (r_newrefdef.y + r_newrefdef.height) * GU_SCR_HEIGHT / GU_SCR_HEIGHT);
 
 	w = x2 - x;
 	h = y - y2;
@@ -757,41 +754,14 @@ R_Clear
 */
 void R_Clear (void)
 {
-#ifndef PSP
-	if (gl_ztrick->value)
+	if (gl_clear->value)
 	{
-		static int trickframe;
-
-		if (gl_clear->value)
-			qglClear (GL_COLOR_BUFFER_BIT);
-
-		trickframe++;
-		if (trickframe & 1)
-		{
-			gldepthmin = 0;
-			gldepthmax = 0.49999;
-			qglDepthFunc (GL_LEQUAL);
-		}
-		else
-		{
-			gldepthmin = 1;
-			gldepthmax = 0.5;
-			qglDepthFunc (GL_GEQUAL);
-		}
+		sceGuClear(GU_COLOR_BUFFER_BIT | GU_DEPTH_BUFFER_BIT);
 	}
 	else
 	{
-		if (gl_clear->value)
-			qglClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		else
-			qglClear (GL_DEPTH_BUFFER_BIT);
-		gldepthmin = 0;
-		gldepthmax = 1;
-		qglDepthFunc (GL_LEQUAL);
+		sceGuClear(GU_DEPTH_BUFFER_BIT);
 	}
-
-	qglDepthRange (gldepthmin, gldepthmax);
-#endif
 }
 
 void R_Flash( void )
@@ -862,20 +832,20 @@ void R_RenderView (refdef_t *fd)
 
 void	R_SetGL2D (void)
 {
-#ifndef PSP
-	// set 2D virtual screen size
-	qglViewport (0,0, vid.width, vid.height);
-	qglMatrixMode(GL_PROJECTION);
-    qglLoadIdentity ();
-	qglOrtho  (0, vid.width, vid.height, 0, -99999, 99999);
-	qglMatrixMode(GL_MODELVIEW);
-    qglLoadIdentity ();
-	qglDisable (GL_DEPTH_TEST);
-	qglDisable (GL_CULL_FACE);
-	qglDisable (GU_BLEND);
-	qglEnable (GL_ALPHA_TEST);
-	qglColor4f (1,1,1,1);
-#endif
+	sceGuViewport(2048, 2048, GU_SCR_WIDTH, GU_SCR_HEIGHT);
+	sceGumMatrixMode(GU_PROJECTION);
+	sceGumLoadIdentity();
+	sceGumOrtho(0, GU_SCR_WIDTH, GU_SCR_HEIGHT, 0, -99999, 99999);
+	sceGumMatrixMode(GU_VIEW);
+	sceGumLoadIdentity();
+	sceGumMatrixMode(GU_MODEL);
+	sceGumLoadIdentity();
+	sceGumUpdateMatrix();
+	sceGuDisable(GU_DEPTH_TEST);
+	sceGuDisable(GU_CULL_FACE);
+	sceGuDisable(GU_BLEND);
+	//sceGuEnable(GU_ALPHA_TEST);
+	sceGuColor(GU_COLOR(1, 1, 1, 1));
 }
 
 static void GL_DrawColoredStereoLinePair( float r, float g, float b, float y )
@@ -883,10 +853,10 @@ static void GL_DrawColoredStereoLinePair( float r, float g, float b, float y )
 #ifndef PSP
 	qglColor3f( r, g, b );
 	qglVertex2f( 0, y );
-	qglVertex2f( vid.width, y );
+	qglVertex2f( GU_SCR_WIDTH, y );
 	qglColor3f( 0, 0, 0 );
 	qglVertex2f( 0, y + 1 );
-	qglVertex2f( vid.width, y + 1 );
+	qglVertex2f( GU_SCR_WIDTH, y + 1 );
 #endif
 }
 
@@ -1014,7 +984,7 @@ void R_Register( void )
 	gl_showtris = ri.Cvar_Get ("gl_showtris", "0", 0);
 	gl_ztrick = ri.Cvar_Get ("gl_ztrick", "0", 0);
 	gl_finish = ri.Cvar_Get ("gl_finish", "0", CVAR_ARCHIVE);
-	gl_clear = ri.Cvar_Get ("gl_clear", "0", 0);
+	gl_clear = ri.Cvar_Get ("gl_clear", "1", 0); // TODO PeterM Reset to 0.
 	gl_cull = ri.Cvar_Get ("gl_cull", "1", 0);
 	gl_polyblend = ri.Cvar_Get ("gl_polyblend", "1", 0);
 	gl_flashblend = ri.Cvar_Get ("gl_flashblend", "0", 0);
@@ -1023,7 +993,6 @@ void R_Register( void )
 	gl_driver = ri.Cvar_Get( "gl_driver", "opengl32", CVAR_ARCHIVE );
 	gl_lockpvs = ri.Cvar_Get( "gl_lockpvs", "0", 0 );
 
-	gl_drawbuffer = ri.Cvar_Get( "gl_drawbuffer", "GL_BACK", 0 );
 	gl_swapinterval = ri.Cvar_Get( "gl_swapinterval", "1", CVAR_ARCHIVE );
 
 	gl_saturatelighting = ri.Cvar_Get( "gl_saturatelighting", "0", 0 );
@@ -1040,17 +1009,13 @@ R_Init
 */
 
 #define BUF_WIDTH 512
-#define SCR_WIDTH 480
-#define SCR_HEIGHT 272
 
 typedef struct
 {
-	ScePspRGB565 fb1[BUF_WIDTH * SCR_HEIGHT];
-	ScePspRGB565 fb2[BUF_WIDTH * SCR_HEIGHT];
-	u16 depth[BUF_WIDTH * SCR_HEIGHT];
+	ScePspRGB565 fb1[BUF_WIDTH * GU_SCR_HEIGHT];
+	ScePspRGB565 fb2[BUF_WIDTH * GU_SCR_HEIGHT];
+	u16 depth[BUF_WIDTH * GU_SCR_HEIGHT];
 } vram_t;
-
-static unsigned int __attribute__((aligned(16))) list[262144];
 
 struct Vertex
 {
@@ -1086,20 +1051,20 @@ int R_Init( void *hinstance, void *hWnd )
 	R_Register();
 
 	sceGuInit();
-	sceGuStart(GU_DIRECT, list);
+	GU_StartDisplayList();
 	sceGuDrawBuffer(GU_PSM_5650, vram->fb1, BUF_WIDTH);
-	sceGuDispBuffer(SCR_WIDTH, SCR_HEIGHT, vram->fb2, BUF_WIDTH);
+	sceGuDispBuffer(GU_SCR_WIDTH, GU_SCR_HEIGHT, vram->fb2, BUF_WIDTH);
 	sceGuDepthBuffer(vram->depth, BUF_WIDTH);
-	sceGuOffset(2048 - (SCR_WIDTH / 2), 2048 - (SCR_HEIGHT / 2));
-	sceGuViewport(2048, 2048, SCR_WIDTH, SCR_HEIGHT);
+	sceGuOffset(2048 - (GU_SCR_WIDTH / 2), 2048 - (GU_SCR_HEIGHT / 2));
+	sceGuViewport(2048, 2048, GU_SCR_WIDTH, GU_SCR_HEIGHT);
 	sceGuDepthRange(65535, 0);
-	sceGuScissor(0, 0, SCR_WIDTH, SCR_HEIGHT);
+	sceGuScissor(0, 0, GU_SCR_WIDTH, GU_SCR_HEIGHT);
 	sceGuEnable(GU_SCISSOR_TEST);
 	sceGuFrontFace(GU_CW);
 	sceGuShadeModel(GU_SMOOTH);
 	sceGuDisable(GU_TEXTURE_2D);
-	sceGuFinish();
-	sceGuSync(GU_SYNC_FINISH, GU_SYNC_WHAT_DONE);
+	GU_FinishDisplayList();
+	GU_SyncDisplayList();
 
 	sceDisplayWaitVblankStart();
 	sceGuDisplay(GU_TRUE);
@@ -1218,62 +1183,12 @@ void R_BeginFrame( float camera_separation )
 #endif
 	}
 
+	GU_StartDisplayList();
+
 	/*
 	** go into 2D mode
 	*/
-#ifndef PSP
-	qglViewport (0,0, vid.width, vid.height);
-	qglMatrixMode(GL_PROJECTION);
-    qglLoadIdentity ();
-	qglOrtho  (0, vid.width, vid.height, 0, -99999, 99999);
-	qglMatrixMode(GL_MODELVIEW);
-    qglLoadIdentity ();
-	qglDisable (GL_DEPTH_TEST);
-	qglDisable (GL_CULL_FACE);
-	qglDisable (GU_BLEND);
-	qglEnable (GL_ALPHA_TEST);
-	qglColor4f (1,1,1,1);
-#endif
-	sceGuStart(GU_DIRECT,list);
-
-	sceGuClearColor(0);
-	sceGuClearDepth(0);
-	sceGuClear(GU_COLOR_BUFFER_BIT|GU_DEPTH_BUFFER_BIT);
-
-	sceGumMatrixMode(GU_PROJECTION);
-	sceGumLoadIdentity();
-	sceGumOrtho(0, SCR_WIDTH, SCR_HEIGHT, 0, -1, 1);
-
-	sceGumMatrixMode(GU_VIEW);
-	sceGumLoadIdentity();
-
-	sceGumMatrixMode(GU_MODEL);
-	sceGumLoadIdentity();
-
-	// Draw triangle
-
-	sceGumDrawArray(GU_TRIANGLES,GU_COLOR_8888|GU_VERTEX_32BITF|GU_TRANSFORM_3D,1*3,0,vertices);
-
-	sceGuFinish();
-	sceGuSync(GU_SYNC_FINISH, GU_SYNC_WHAT_DONE);
-
-	/*
-	** draw buffer stuff
-	*/
-	if ( gl_drawbuffer->modified )
-	{
-		gl_drawbuffer->modified = false;
-
-		if ( gl_state.camera_separation == 0 || !gl_state.stereo_enabled )
-		{
-#ifndef PSP
-			if ( Q_stricmp( gl_drawbuffer->string, "GL_FRONT" ) == 0 )
-				qglDrawBuffer( GL_FRONT );
-			else
-				qglDrawBuffer( GL_BACK );
-#endif
-		}
-	}
+	R_SetGL2D();
 
 	//
 	// clear screen if desired
@@ -1429,6 +1344,9 @@ GetRefAPI
 */
 static void R_EndFrame (void)
 {
+	GU_FinishDisplayList();
+	GU_SyncDisplayList();
+
 	sceDisplayWaitVblankStart();
 	sceGuSwapBuffers();
 }

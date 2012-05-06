@@ -59,6 +59,7 @@ void Draw_Char (int x, int y, int num)
 {
 	int				row, col;
 	float			frow, fcol, size;
+	gu_2d_vertex_t	*vertices;
 
 	LOG_FUNCTION_ENTRY;
 
@@ -97,6 +98,14 @@ void Draw_Char (int x, int y, int num)
 	qglVertex2f (x, y+8);
 	qglEnd ();
 #endif
+	vertices = sceGuGetMemory(sizeof(gu_2d_vertex_t) * 2);
+	vertices[0].pos.x = x;
+	vertices[0].pos.y = y;
+	vertices[0].pos.z = 0;
+	vertices[1].pos.x = x + 8;
+	vertices[1].pos.y = y + 8;
+	vertices[1].pos.z = 0;
+	sceGuDrawArray(GU_SPRITES, GU_VERTEX_32BITF | GU_TRANSFORM_2D, 2, NULL, vertices);
 
 	LOG_FUNCTION_EXIT;
 }
@@ -356,9 +365,9 @@ void Draw_FadeScreen (void)
 	qglBegin (GL_QUADS);
 
 	qglVertex2f (0,0);
-	qglVertex2f (vid.width, 0);
-	qglVertex2f (vid.width, vid.height);
-	qglVertex2f (0, vid.height);
+	qglVertex2f (GU_SCR_WIDTH, 0);
+	qglVertex2f (GU_SCR_WIDTH, GU_SCR_HEIGHT);
+	qglVertex2f (0, GU_SCR_HEIGHT);
 
 	qglEnd ();
 	qglColor4f (1,1,1,1);
@@ -478,6 +487,8 @@ void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 
 	if ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) 
 		qglEnable (GL_ALPHA_TEST);
+#else
+	Draw_Char(0, 0, 'A');
 #endif
 
 	LOG_FUNCTION_EXIT;
