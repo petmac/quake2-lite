@@ -125,6 +125,8 @@ PSPSDK=$(shell psp-config --pspsdk-path)
 include $(PSPSDK)/lib/build.mak
 
 deploy: all
+	psp-readelf --sections $(TARGET).elf >sections.txt
+	psp-nm --size-sort --reverse-sort --radix=d $(TARGET).elf >symbols.txt
 	$(MKDIR) -p F:/PSP/GAME/Quake2
 	$(CP) EBOOT.PBP F:/PSP/GAME/Quake2/EBOOT.PBP
 	$(CP) PARAM.SFO F:/PSP/GAME/Quake2/PARAM.SFO

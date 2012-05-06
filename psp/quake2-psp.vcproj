@@ -631,6 +631,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sections.txt"
+				>
+			</File>
+			<File
+				RelativePath=".\symbols.txt"
+				>
+			</File>
+			<File
 				RelativePath=".\sys_psp.c"
 				>
 			</File>
