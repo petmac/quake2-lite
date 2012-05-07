@@ -1176,31 +1176,20 @@ void R_SetPalette ( const unsigned char *palette)
 {
 	int		i;
 
-	byte *rp = ( byte * ) r_rawpalette;
-
 	LOG_FUNCTION_ENTRY;
 
 	if ( palette )
 	{
 		for ( i = 0; i < 256; i++ )
 		{
-			rp[i*4+0] = palette[i*3+0];
-			rp[i*4+1] = palette[i*3+1];
-			rp[i*4+2] = palette[i*3+2];
-			rp[i*4+3] = 0xff;
+			r_rawpalette[i] = GU_RGBA(palette[i*3+0], palette[i*3+1], palette[i*3+2], 0xff);
 		}
+		GL_SetTexturePalette(r_rawpalette);
 	}
 	else
 	{
-		for ( i = 0; i < 256; i++ )
-		{
-			rp[i*4+0] = d_8to24table[i] & 0xff;
-			rp[i*4+1] = ( d_8to24table[i] >> 8 ) & 0xff;
-			rp[i*4+2] = ( d_8to24table[i] >> 16 ) & 0xff;
-			rp[i*4+3] = 0xff;
-		}
+		GL_SetTexturePalette(d_8to24table);
 	}
-	GL_SetTexturePalette( r_rawpalette );
 
 #ifndef PSP
 	qglClearColor (0,0,0,0);

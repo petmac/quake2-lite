@@ -36,27 +36,9 @@ qboolean GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap);
 
 void GL_SetTexturePalette( unsigned palette[256] )
 {
-#ifndef PSP
-	int i;
-	unsigned char temptable[768];
-
-	if ( qglColorTableEXT && gl_ext_palettedtexture->value )
-	{
-		for ( i = 0; i < 256; i++ )
-		{
-			temptable[i*3+0] = ( palette[i] >> 0 ) & 0xff;
-			temptable[i*3+1] = ( palette[i] >> 8 ) & 0xff;
-			temptable[i*3+2] = ( palette[i] >> 16 ) & 0xff;
-		}
-
-		qglColorTableEXT( GL_SHARED_TEXTURE_PALETTE_EXT,
-						   GL_RGB,
-						   256,
-						   GL_RGB,
-						   GL_UNSIGNED_BYTE,
-						   temptable );
-	}
-#endif
+	sceKernelDcacheWritebackRange(&palette[0], 256 * sizeof(palette[0]));
+	sceGuClutMode(GU_PSM_8888, 0, 255, 0);
+	sceGuClutLoad(32, palette);
 }
 
 void GL_EnableMultitexture( qboolean enable )
@@ -1069,18 +1051,16 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 	if (type == it_skin && bits == 8)
 		R_FloodFillSkin(pic, width, height);
 
+#if 0
 	Com_DPrintf("Texture %s, %d x %d.\n", name, width, height);
+#endif
 
-	image->texnum = GU_AllocateVRAM(width * height * 2);
+	image->texnum = GU_AllocateVRAM(width * height);
 	if (image->texnum != NULL)
 	{
-		for (i = 0; i < (width * height * 2); ++i)
-		{
-			((char *)(image->texnum))[i] = rand() & 0xff;
-		}
+		memcpy(image->texnum, pic, width * height);
+		sceKernelDcacheWritebackRange(image->texnum, width * height);
 	}
-
-	sceKernelDcacheWritebackAll();
 
 	return image;
 }
@@ -1256,12 +1236,10 @@ int Draw_GetPalette (void)
 		r = pal[i*3+0];
 		g = pal[i*3+1];
 		b = pal[i*3+2];
-		
-		v = (255<<24) + (r<<0) + (g<<8) + (b<<16);
-		d_8to24table[i] = LittleLong(v);
+		d_8to24table[i] = GU_RGBA(r, g, b, 255);
 	}
 
-	d_8to24table[255] &= LittleLong(0xffffff);	// 255 is transparent
+	d_8to24table[255] &= GU_RGBA(255, 255, 255, 0);	// 255 is transparent
 
 	Z_Free (pic);
 	Z_Free (pal);
@@ -1286,8 +1264,6 @@ void	GL_InitImages (void)
 		ri.Cvar_Set( "intensity", "1" );
 
 	gl_state.inverse_intensity = 1 / intensity->value;
-
-	Draw_GetPalette ();
 
 	ri.FS_LoadFile( "pics/16to8.dat", (void **)&gl_state.d_16to8table );
 	if ( !gl_state.d_16to8table )

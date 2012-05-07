@@ -177,7 +177,7 @@ void GL_SetDefaultState( void )
 	sceGuClearColor(GU_COLOR(1, 0, 0.5, 0.5));
 	sceGuFrontFace(GU_CW); // TODO PeterM Is this right?
 	sceGuEnable(GU_TEXTURE_2D);
-	sceGuTexMode(GU_PSM_5650, 0, 0, GU_FALSE);
+	sceGuTexMode(GU_PSM_T8, 0, 0, GU_FALSE);
 	sceGuTexLevelMode(GU_TEXTURE_AUTO, 0);
 	sceGuTexMapMode(GU_TEXTURE_COORDS, 0, 0);
 
@@ -196,7 +196,7 @@ void GL_SetDefaultState( void )
 #endif
 	sceGuShadeModel (GU_FLAT);
 
-	sceGuTexFilter(GU_LINEAR, GU_LINEAR);
+	sceGuTexFilter(GU_NEAREST, GU_NEAREST);
 	sceGuTexWrap(GU_REPEAT, GU_REPEAT);
 	sceGuBlendFunc(GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
 

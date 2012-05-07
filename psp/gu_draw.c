@@ -53,61 +53,50 @@ smoothly scrolled off.
 */
 void Draw_Char (int x, int y, int num)
 {
-	int				row, col;
-	float			frow, fcol, size;
-	gu_2d_vertex_t	*vertices;
+	int u;
+	int v;
+	gu_2d_vertex_t *vertices;
 
 	LOG_FUNCTION_ENTRY;
 
-	num &= 255;
-	
-	if ( (num&127) == 32 )
+	// Skip spaces.
+	if ((num & 127) == 32)
 	{
 		LOG_FUNCTION_EXIT;
-		return;		// space
+		return;
 	}
 
+	// Skip characters off the top of the screen.
 	if (y <= -8)
 	{
 		LOG_FUNCTION_EXIT;
-		return;			// totally off screen
+		return;
 	}
 
-	row = num>>4;
-	col = num&15;
+	// Keep in the texture page.
+	num &= 255;
+	
+	// Calculate texture coordinates.
+	u = (num & 15) << 3;
+	v = (num >> 4) << 3;
 
-	frow = row*0.0625;
-	fcol = col*0.0625;
-	size = 0.0625;
-
-#ifndef PSP
-	GL_Bind (draw_chars->texnum);
-
-	qglBegin (GL_QUADS);
-	qglTexCoord2f (fcol, frow);
-	qglVertex2f (x, y);
-	qglTexCoord2f (fcol + size, frow);
-	qglVertex2f (x+8, y);
-	qglTexCoord2f (fcol + size, frow + size);
-	qglVertex2f (x+8, y+8);
-	qglTexCoord2f (fcol, frow + size);
-	qglVertex2f (x, y+8);
-	qglEnd ();
-#endif
-	sceGuTexFlush();
+	// Set the texture image.
 	sceGuTexImage(0, draw_chars->width, draw_chars->height, draw_chars->width, draw_chars->texnum);
 
+	// Fill the vertices.
 	vertices = sceGuGetMemory(sizeof(gu_2d_vertex_t) * 2);
-	vertices[0].uv.x = col;
-	vertices[0].uv.y = row;
+	vertices[0].uv.x = u;
+	vertices[0].uv.y = v;
 	vertices[0].pos.x = x;
 	vertices[0].pos.y = y;
 	vertices[0].pos.z = 0;
-	vertices[1].uv.x = col + 8;
-	vertices[1].uv.y = row + 8;
+	vertices[1].uv.x = u + 8;
+	vertices[1].uv.y = v + 8;
 	vertices[1].pos.x = x + 8;
 	vertices[1].pos.y = y + 8;
 	vertices[1].pos.z = 0;
+
+	// Draw the character.
 	sceGuDrawArray(GU_SPRITES, GU_TEXTURE_32BITF | GU_VERTEX_32BITF | GU_TRANSFORM_2D, 2, NULL, vertices);
 
 	LOG_FUNCTION_EXIT;
