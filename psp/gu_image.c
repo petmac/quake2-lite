@@ -22,22 +22,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 image_t		gltextures[MAX_GLTEXTURES];
 int			numgltextures;
-int			base_textureid;		// gltextures[i] = base_textureid+i
 
 static byte			 intensitytable[256];
 static unsigned char gammatable[256];
 
 cvar_t		*intensity;
 
-unsigned	d_8to24table[256];
+ScePspRGBA8888 __attribute__((aligned(16))) d_8to24table[256];
 
 qboolean GL_Upload8 (byte *data, int width, int height,  qboolean mipmap, qboolean is_sky );
 qboolean GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap);
 
-void GL_SetTexturePalette( unsigned palette[256] )
+void GL_SetTexturePalette(const ScePspRGBA8888 *palette)
 {
-	sceKernelDcacheWritebackRange(&palette[0], 256 * sizeof(palette[0]));
-	sceGuClutMode(GU_PSM_8888, 0, 255, 0);
+	sceKernelDcacheWritebackAll();
 	sceGuClutLoad(32, palette);
 }
 
@@ -106,7 +104,7 @@ void GL_TexEnv( int mode )
 
 	if ( mode != lastmodes[gl_state.currenttmu] )
 	{
-		sceGuTexFunc(mode, GU_TCC_RGBA);
+		//sceGuTexFunc(mode, GU_TCC_RGBA);
 		lastmodes[gl_state.currenttmu] = mode;
 	}
 }
@@ -1021,8 +1019,9 @@ This is also used as an entry point for the generated r_notexture
 */
 image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t type, int bits)
 {
-	image_t		*image;
-	int			i;
+	int i;
+	image_t *image;
+	int buffer_width;
 
 	// find a free image_t
 	for (i=0, image=gltextures ; i<numgltextures ; i++,image++)
@@ -1040,27 +1039,37 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 
 	if (strlen(name) >= sizeof(image->name))
 		ri.Sys_Error (ERR_DROP, "Draw_LoadPic: \"%s\" is too long", name);
-	memset(image, 0, sizeof(*image));
-	strcpy (image->name, name);
-
-	image->width = width;
-	image->height = height;
-	image->type = type;
-	image->has_alpha = false;
-
 	if (type == it_skin && bits == 8)
 		R_FloodFillSkin(pic, width, height);
+
+	// Calculate buffer width.
+	buffer_width = (width + 15) & ~15;
 
 #if 0
 	Com_DPrintf("Texture %s, %d x %d.\n", name, width, height);
 #endif
 
-	image->texnum = GU_AllocateVRAM(width * height);
+	memset(image, 0, sizeof(*image));
+
+	image->texnum = GU_AllocateVRAM(buffer_width * height);
 	if (image->texnum != NULL)
 	{
-		memcpy(image->texnum, pic, width * height);
-		sceKernelDcacheWritebackRange(image->texnum, width * height);
+		for (i = 0; i < height; ++i)
+		{
+			char *const dst = ((char *)(image->texnum)) + (i * buffer_width);
+			const char *const src = pic + (i * width);
+			memcpy(dst, src, width);
+		}
+
+		sceKernelDcacheWritebackAll();
 	}
+
+	strcpy (image->name, name);
+	image->width = width;
+	image->height = height;
+	image->buffer_width = buffer_width;
+	image->type = type;
+	image->has_alpha = false;
 
 	return image;
 }
@@ -1142,10 +1151,14 @@ image_t	*GL_FindImage (char *name, imagetype_t type)
 	}
 	else if (!strcmp(name+len-4, ".tga"))
 	{
+#ifndef PSP
 		LoadTGA (name, &pic, &width, &height);
 		if (!pic)
 			return NULL; // ri.Sys_Error (ERR_DROP, "GL_FindImage: can't load %s", name);
 		image = GL_LoadPic (name, pic, width, height, type, 32);
+#else
+		return NULL;
+#endif
 	}
 	else
 		return NULL;	//	ri.Sys_Error (ERR_DROP, "GL_FindImage: bad extension on: %s", name);

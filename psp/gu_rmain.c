@@ -1170,7 +1170,7 @@ void R_BeginFrame( float camera_separation )
 R_SetPalette
 =============
 */
-unsigned r_rawpalette[256];
+static ScePspRGBA8888 __attribute__((aligned(16))) r_rawpalette[256];
 
 void R_SetPalette ( const unsigned char *palette)
 {

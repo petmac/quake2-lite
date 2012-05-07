@@ -81,23 +81,23 @@ void Draw_Char (int x, int y, int num)
 	v = (num >> 4) << 3;
 
 	// Set the texture image.
-	sceGuTexImage(0, draw_chars->width, draw_chars->height, draw_chars->width, draw_chars->texnum);
+	sceGuTexImage(0, draw_chars->width, draw_chars->height, draw_chars->buffer_width, draw_chars->texnum);
 
 	// Fill the vertices.
 	vertices = sceGuGetMemory(sizeof(gu_2d_vertex_t) * 2);
-	vertices[0].uv.x = u;
-	vertices[0].uv.y = v;
-	vertices[0].pos.x = x;
-	vertices[0].pos.y = y;
-	vertices[0].pos.z = 0;
-	vertices[1].uv.x = u + 8;
-	vertices[1].uv.y = v + 8;
-	vertices[1].pos.x = x + 8;
-	vertices[1].pos.y = y + 8;
-	vertices[1].pos.z = 0;
+	vertices[0].u = u;
+	vertices[0].v = v;
+	vertices[0].x = x;
+	vertices[0].y = y;
+	vertices[0].z = 0;
+	vertices[1].u = u + 8;
+	vertices[1].v = v + 8;
+	vertices[1].x = x + 8;
+	vertices[1].y = y + 8;
+	vertices[1].z = 0;
 
 	// Draw the character.
-	sceGuDrawArray(GU_SPRITES, GU_TEXTURE_32BITF | GU_VERTEX_32BITF | GU_TRANSFORM_2D, 2, NULL, vertices);
+	sceGuDrawArray(GU_SPRITES, GU_2D_VERTEX_TYPE, 2, NULL, vertices);
 
 	LOG_FUNCTION_EXIT;
 }
@@ -161,11 +161,12 @@ Draw_StretchPic
 void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 {
 	image_t *gl;
+	gu_2d_vertex_t *vertices;
 
 	LOG_FUNCTION_ENTRY;
 
 	gl = Draw_FindPic (pic);
-	if (!gl)
+	if (!gl || !gl->texnum)
 	{
 		ri.Con_Printf (PRINT_ALL, "Can't find pic: %s\n", pic);
 
@@ -174,25 +175,24 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 		return;
 	}
 
-#ifndef PSP
-	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) && !gl->has_alpha)
-		qglDisable (GL_ALPHA_TEST);
+	// Set the texture image.
+	sceGuTexImage(0, gl->width, gl->height, gl->buffer_width, gl->texnum);
 
-	GL_Bind (gl->texnum);
-	qglBegin (GL_QUADS);
-	qglTexCoord2f (gl->sl, gl->tl);
-	qglVertex2f (x, y);
-	qglTexCoord2f (gl->sh, gl->tl);
-	qglVertex2f (x+w, y);
-	qglTexCoord2f (gl->sh, gl->th);
-	qglVertex2f (x+w, y+h);
-	qglTexCoord2f (gl->sl, gl->th);
-	qglVertex2f (x, y+h);
-	qglEnd ();
+	// Fill the vertices.
+	vertices = sceGuGetMemory(sizeof(gu_2d_vertex_t) * 2);
+	vertices[0].u = 0;
+	vertices[0].v = 0;
+	vertices[0].x = x;
+	vertices[0].y = y;
+	vertices[0].z = 0;
+	vertices[1].u = gl->width;
+	vertices[1].v = gl->height;
+	vertices[1].x = x + w;
+	vertices[1].y = y + h;
+	vertices[1].z = 0;
 
-	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) && !gl->has_alpha)
-		qglEnable (GL_ALPHA_TEST);
-#endif
+	// Draw the character.
+	sceGuDrawArray(GU_SPRITES, GU_2D_VERTEX_TYPE, 2, NULL, vertices);
 
 	LOG_FUNCTION_EXIT;
 }
@@ -206,11 +206,12 @@ Draw_Pic
 void Draw_Pic (int x, int y, char *pic)
 {
 	image_t *gl;
+	gu_2d_vertex_t *vertices;
 
 	LOG_FUNCTION_ENTRY;
 
 	gl = Draw_FindPic (pic);
-	if (!gl)
+	if (!gl || !gl->texnum)
 	{
 		ri.Con_Printf (PRINT_ALL, "Can't find pic: %s\n", pic);
 
@@ -219,25 +220,24 @@ void Draw_Pic (int x, int y, char *pic)
 		return;
 	}
 
-#ifndef PSP
-	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) && !gl->has_alpha)
-		qglDisable (GL_ALPHA_TEST);
+	// Set the texture image.
+	sceGuTexImage(0, gl->width, gl->height, gl->buffer_width, gl->texnum);
 
-	GL_Bind (gl->texnum);
-	qglBegin (GL_QUADS);
-	qglTexCoord2f (gl->sl, gl->tl);
-	qglVertex2f (x, y);
-	qglTexCoord2f (gl->sh, gl->tl);
-	qglVertex2f (x+gl->width, y);
-	qglTexCoord2f (gl->sh, gl->th);
-	qglVertex2f (x+gl->width, y+gl->height);
-	qglTexCoord2f (gl->sl, gl->th);
-	qglVertex2f (x, y+gl->height);
-	qglEnd ();
+	// Fill the vertices.
+	vertices = sceGuGetMemory(sizeof(gu_2d_vertex_t) * 2);
+	vertices[0].u = 0;
+	vertices[0].v = 0;
+	vertices[0].x = x;
+	vertices[0].y = y;
+	vertices[0].z = 0;
+	vertices[1].u = gl->width;
+	vertices[1].v = gl->height;
+	vertices[1].x = x + gl->width;
+	vertices[1].y = y + gl->height;
+	vertices[1].z = 0;
 
-	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) )  && !gl->has_alpha)
-		qglEnable (GL_ALPHA_TEST);
-#endif
+	// Draw the character.
+	sceGuDrawArray(GU_SPRITES, GU_2D_VERTEX_TYPE, 2, NULL, vertices);
 
 	LOG_FUNCTION_EXIT;
 }
@@ -299,36 +299,36 @@ Fills a box of pixels with a single color
 */
 void Draw_Fill (int x, int y, int w, int h, int c)
 {
-	union
-	{
-		unsigned	c;
-		byte		v[4];
-	} color;
+	gu_2d_vertex_t *vertices;
 
 	LOG_FUNCTION_ENTRY;
 
 	if ( (unsigned)c > 255)
 		ri.Sys_Error (ERR_FATAL, "Draw_Fill: bad color");
 
-#ifndef PSP
-	qglDisable (GL_TEXTURE_2D);
+	// Set state.
+	sceGuDisable(GU_TEXTURE_2D);
+	sceGuColor(d_8to24table[c]);
 
-	color.c = d_8to24table[c];
-	qglColor3f (color.v[0]/255.0,
-		color.v[1]/255.0,
-		color.v[2]/255.0);
+	// Fill the vertices.
+	vertices = sceGuGetMemory(sizeof(gu_2d_vertex_t) * 2);
+	vertices[0].u = 0;
+	vertices[0].v = 0;
+	vertices[0].x = x;
+	vertices[0].y = y;
+	vertices[0].z = 0;
+	vertices[1].u = 0;
+	vertices[1].v = 0;
+	vertices[1].x = x + w;
+	vertices[1].y = y + h;
+	vertices[1].z = 0;
 
-	qglBegin (GL_QUADS);
+	// Draw the character.
+	sceGuDrawArray(GU_SPRITES, GU_2D_VERTEX_TYPE, 2, NULL, vertices);
 
-	qglVertex2f (x,y);
-	qglVertex2f (x+w, y);
-	qglVertex2f (x+w, y+h);
-	qglVertex2f (x, y+h);
-
-	qglEnd ();
-	qglColor3f (1,1,1);
-	qglEnable (GL_TEXTURE_2D);
-#endif
+	// Restore state.
+	sceGuColor(0xffffffff);
+	sceGuEnable(GU_TEXTURE_2D);
 
 	LOG_FUNCTION_EXIT;
 }
@@ -474,8 +474,6 @@ void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 
 	if ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) 
 		qglEnable (GL_ALPHA_TEST);
-#else
-	Draw_Char(0, 0, 'A');
 #endif
 
 	LOG_FUNCTION_EXIT;

@@ -39,10 +39,11 @@ PSP specifics.
 
 // Vertex type.
 typedef struct {
-	// TODO PeterM Look into using a smaller format?
-	ScePspFVector2 uv;
-	ScePspFVector3 pos;
+	float u, v;
+	float x, y, z;
 } gu_2d_vertex_t;
+
+#define GU_2D_VERTEX_TYPE (GU_TEXTURE_32BITF | GU_VERTEX_32BITF | GU_TRANSFORM_2D)
 
 // Debugging/profiling.
 #if 0
@@ -122,12 +123,17 @@ typedef enum
 
 typedef struct image_s
 {
-	char	name[MAX_QPATH];			// game path, including extension
-	imagetype_t	type;
-	int		width, height;				// source image
-	struct msurface_s	*texturechain;	// for sort-by-texture world drawing
+	char name[MAX_QPATH];			// game path, including extension
+	imagetype_t type;
+
+	int width;
+	int height;
+	
 	void *texnum;						// texture address in VRAM.
-	qboolean	has_alpha;
+	int buffer_width;
+
+	struct msurface_s *texturechain;	// for sort-by-texture world drawing
+	qboolean has_alpha;
 } image_t;
 
 #define		MAX_GLTEXTURES	1024
@@ -255,7 +261,7 @@ void R_PushDlights (void);
 
 extern	model_t	*r_worldmodel;
 
-extern	unsigned	d_8to24table[256];
+extern ScePspRGBA8888 d_8to24table[256];
 
 void V_AddBlend (float r, float g, float b, float a, float *v_blend);
 
@@ -323,7 +329,7 @@ image_t	*GL_FindImage (char *name, imagetype_t type);
 void	GL_TextureMode( char *string );
 void	GL_ImageList_f (void);
 
-void	GL_SetTexturePalette( unsigned palette[256] );
+void	GL_SetTexturePalette(const ScePspRGBA8888 *palette);
 
 void	GL_InitImages (void);
 void	GL_ShutdownImages (void);

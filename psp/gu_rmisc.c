@@ -166,41 +166,44 @@ void GL_ScreenShot_f (void)
 */
 void GL_SetDefaultState( void )
 {
+	// Viewport.
 	sceGuOffset(2048 - (GU_SCR_WIDTH / 2), 2048 - (GU_SCR_HEIGHT / 2));
 	sceGuViewport(2048, 2048, GU_SCR_WIDTH, GU_SCR_HEIGHT);
-	sceGuDepthRange(65535, 0);
 	sceGuScissor(0, 0, GU_SCR_WIDTH, GU_SCR_HEIGHT);
 	sceGuEnable(GU_SCISSOR_TEST);
-	sceGuFrontFace(GU_CW);
+
+	// Depth.
+	sceGuDepthRange(65535, 0);
+	sceGuDisable (GU_DEPTH_TEST);
+
+	// Shading.
+	sceGuColor(0xffffffff);
 	sceGuShadeModel(GU_SMOOTH);
 
+	// Clear.
 	sceGuClearColor(GU_COLOR(1, 0, 0.5, 0.5));
-	sceGuFrontFace(GU_CW); // TODO PeterM Is this right?
-	sceGuEnable(GU_TEXTURE_2D);
+
+	// Culling.
+	sceGuFrontFace(GU_CW);
+	sceGuDisable(GU_CULL_FACE);
+
+	// Texturing.
+	sceGuClutMode(GU_PSM_8888, 0, 255, 0);
+	sceGuTexFilter(GU_LINEAR, GU_LINEAR);
+	sceGuTexFunc(GU_TFX_REPLACE, GU_TCC_RGBA);
 	sceGuTexMode(GU_PSM_T8, 0, 0, GU_FALSE);
-	sceGuTexLevelMode(GU_TEXTURE_AUTO, 0);
-	sceGuTexMapMode(GU_TEXTURE_COORDS, 0, 0);
-
-	//sceGuEnable(GU_ALPHA_TEST);
-	sceGuAlphaFunc(GU_GREATER, 170, 0xff);
-
-	sceGuDisable (GU_DEPTH_TEST);
-	sceGuDisable (GU_CULL_FACE);
-	sceGuDisable (GU_BLEND);
-	sceGuDisable (GU_LIGHTING);
-
-	sceGuColor(0xffffffff);
-
-#ifndef PSP
-	qglPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
-#endif
-	sceGuShadeModel (GU_FLAT);
-
-	sceGuTexFilter(GU_NEAREST, GU_NEAREST);
 	sceGuTexWrap(GU_REPEAT, GU_REPEAT);
+	sceGuEnable(GU_TEXTURE_2D);
+
+	// Blending.
 	sceGuBlendFunc(GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
+	sceGuDisable(GU_BLEND);
+	//sceGuEnable(GU_ALPHA_TEST);
+	//sceGuAlphaFunc(GU_GREATER, 170, 0xff);
 
-	sceGuTexFunc(GU_TFX_REPLACE, GU_TCC_RGB);
+	// Lighting.
+	sceGuDisable(GU_LIGHTING);
 
+	// Upload the CLUT.
 	GL_SetTexturePalette( d_8to24table );
 }
