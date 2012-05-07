@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "gu_local.h"
 
-#define GU_DISPLAY_LIST_SIZE (1024 * 1024)
+#define GU_DISPLAY_LIST_SIZE (1024 * 1024) // TODO PeterM Shrink?
 
 // The display list.
 static char __attribute__((aligned(16))) gu_display_list[GU_DISPLAY_LIST_SIZE];

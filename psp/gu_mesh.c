@@ -788,9 +788,9 @@ void R_DrawAliasModel (entity_t *e)
 
 #ifndef PSP
 	qglShadeModel (GL_SMOOTH);
-#endif
 
 	GL_TexEnv( GU_TFX_MODULATE );
+#endif
 	if ( currententity->flags & RF_TRANSLUCENT )
 	{
 #ifndef PSP
@@ -821,8 +821,8 @@ void R_DrawAliasModel (entity_t *e)
 		currententity->backlerp = 0;
 	GL_DrawAliasFrameLerp (paliashdr, currententity->backlerp);
 
-	GL_TexEnv( GU_TFX_REPLACE );
 #ifndef PSP
+	GL_TexEnv( GU_TFX_REPLACE );
 	qglShadeModel (GL_FLAT);
 
 	qglPopMatrix ();

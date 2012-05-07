@@ -129,7 +129,7 @@ void GL_TexEnv( int mode )
 	}
 }
 
-void GL_Bind (int texnum)
+void GL_Bind (const image_t *texnum)
 {
 	extern	image_t	*draw_chars;
 
@@ -143,7 +143,7 @@ void GL_Bind (int texnum)
 #endif
 }
 
-void GL_MBind( int target, int texnum )
+void GL_MBind( int target, const image_t *texnum )
 {
 	GL_SelectTexture( target );
 	if ( target == GL_TEXTURE0 )
@@ -168,7 +168,6 @@ void	GL_ImageList_f (void)
 {
 	int		i;
 	image_t	*image;
-	int		texels;
 	const char *palstrings[2] =
 	{
 		"RGB",
@@ -176,13 +175,11 @@ void	GL_ImageList_f (void)
 	};
 
 	ri.Con_Printf (PRINT_ALL, "------------------\n");
-	texels = 0;
 
 	for (i=0, image=gltextures ; i<numgltextures ; i++, image++)
 	{
 		if (image->texnum <= 0)
 			continue;
-		texels += image->upload_width*image->upload_height;
 		switch (image->type)
 		{
 		case it_skin:
@@ -202,82 +199,9 @@ void	GL_ImageList_f (void)
 			break;
 		}
 
-		ri.Con_Printf (PRINT_ALL,  " %3i %3i %s: %s\n",
-			image->upload_width, image->upload_height, palstrings[image->paletted], image->name);
+		ri.Con_Printf (PRINT_ALL,  " %3i %3i %s\n",
+			image->width, image->height, image->name);
 	}
-	ri.Con_Printf (PRINT_ALL, "Total texel count (not counting mipmaps): %i\n", texels);
-}
-
-
-/*
-=============================================================================
-
-  scrap allocation
-
-  Allocate all the little status bar obejcts into a single texture
-  to crutch up inefficient hardware / drivers
-
-=============================================================================
-*/
-
-#define	MAX_SCRAPS		1
-#define	BLOCK_WIDTH		256
-#define	BLOCK_HEIGHT	256
-
-int			scrap_allocated[MAX_SCRAPS][BLOCK_WIDTH];
-byte		scrap_texels[MAX_SCRAPS][BLOCK_WIDTH*BLOCK_HEIGHT];
-qboolean	scrap_dirty;
-
-// returns a texture number and the position inside it
-int Scrap_AllocBlock (int w, int h, int *x, int *y)
-{
-	int		i, j;
-	int		best, best2;
-	int		texnum;
-
-	for (texnum=0 ; texnum<MAX_SCRAPS ; texnum++)
-	{
-		best = BLOCK_HEIGHT;
-
-		for (i=0 ; i<BLOCK_WIDTH-w ; i++)
-		{
-			best2 = 0;
-
-			for (j=0 ; j<w ; j++)
-			{
-				if (scrap_allocated[texnum][i+j] >= best)
-					break;
-				if (scrap_allocated[texnum][i+j] > best2)
-					best2 = scrap_allocated[texnum][i+j];
-			}
-			if (j == w)
-			{	// this is a valid spot
-				*x = i;
-				*y = best = best2;
-			}
-		}
-
-		if (best + h > BLOCK_HEIGHT)
-			continue;
-
-		for (i=0 ; i<w ; i++)
-			scrap_allocated[texnum][*x + i] = best + h;
-
-		return texnum;
-	}
-
-	return -1;
-//	Sys_Error ("Scrap_AllocBlock: full");
-}
-
-int	scrap_uploads;
-
-void Scrap_Upload (void)
-{
-	scrap_uploads++;
-	GL_Bind(TEXNUM_SCRAPS);
-	GL_Upload8 (scrap_texels[0], BLOCK_WIDTH, BLOCK_HEIGHT, false, false );
-	scrap_dirty = false;
 }
 
 /*
@@ -826,9 +750,6 @@ void GL_BuildPalettedTexture( unsigned char *paletted_texture, unsigned char *sc
 	}
 }
 
-int		upload_width, upload_height;
-qboolean uploaded_paletted;
-
 qboolean GL_Upload32 (unsigned *data, int width, int height,  qboolean mipmap)
 {
 #ifndef PSP
@@ -1137,59 +1058,29 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 
 	if (strlen(name) >= sizeof(image->name))
 		ri.Sys_Error (ERR_DROP, "Draw_LoadPic: \"%s\" is too long", name);
+	memset(image, 0, sizeof(*image));
 	strcpy (image->name, name);
 
 	image->width = width;
 	image->height = height;
 	image->type = type;
+	image->has_alpha = false;
 
 	if (type == it_skin && bits == 8)
 		R_FloodFillSkin(pic, width, height);
 
-	// load little pics into the scrap
-	if (image->type == it_pic && bits == 8
-		&& image->width < 64 && image->height < 64)
-	{
-		int		x, y;
-		int		i, j, k;
-		int		texnum;
+	Com_DPrintf("Texture %s, %d x %d.\n", name, width, height);
 
-		texnum = Scrap_AllocBlock (image->width, image->height, &x, &y);
-		if (texnum == -1)
-			goto nonscrap;
-		scrap_dirty = true;
-
-		// copy the texels into the scrap block
-		k = 0;
-		for (i=0 ; i<image->height ; i++)
-			for (j=0 ; j<image->width ; j++, k++)
-				scrap_texels[texnum][(y+i)*BLOCK_WIDTH + x + j] = pic[k];
-		image->texnum = TEXNUM_SCRAPS + texnum;
-		image->scrap = true;
-		image->has_alpha = true;
-		image->sl = (x+0.01)/(float)BLOCK_WIDTH;
-		image->sh = (x+image->width-0.01)/(float)BLOCK_WIDTH;
-		image->tl = (y+0.01)/(float)BLOCK_WIDTH;
-		image->th = (y+image->height-0.01)/(float)BLOCK_WIDTH;
-	}
-	else
+	image->texnum = GU_AllocateVRAM(width * height * 2);
+	if (image->texnum != NULL)
 	{
-nonscrap:
-		image->scrap = false;
-		image->texnum = TEXNUM_IMAGES + (image - gltextures);
-		GL_Bind(image->texnum);
-		if (bits == 8)
-			image->has_alpha = GL_Upload8 (pic, width, height, (image->type != it_pic && image->type != it_sky), image->type == it_sky );
-		else
-			image->has_alpha = GL_Upload32 ((unsigned *)pic, width, height, (image->type != it_pic && image->type != it_sky) );
-		image->upload_width = upload_width;		// after power of 2 and scales
-		image->upload_height = upload_height;
-		image->paletted = uploaded_paletted;
-		image->sl = 0;
-		image->sh = 1;
-		image->tl = 0;
-		image->th = 1;
+		for (i = 0; i < (width * height * 2); ++i)
+		{
+			((char *)(image->texnum))[i] = rand() & 0xff;
+		}
 	}
+
+	sceKernelDcacheWritebackAll();
 
 	return image;
 }

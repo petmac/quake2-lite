@@ -10,6 +10,7 @@ OBJS = \
 	gu_rmain.o \
 	gu_rmisc.o \
 	gu_rsurf.o \
+	gu_vram.o \
 	gu_warp.o \
 	\
 	net_psp.o \
@@ -126,7 +127,7 @@ PSPSDK=$(shell psp-config --pspsdk-path)
 include $(PSPSDK)/lib/build.mak
 
 deploy: all
-	psp-readelf --sections $(TARGET).elf >sections.txt
+	psp-readelf --sections --wide $(TARGET).elf >sections.txt
 	psp-nm --size-sort --reverse-sort --radix=d $(TARGET).elf >symbols.txt
 	$(MKDIR) -p G:/PSP/GAME/Quake2
 	$(CP) EBOOT.PBP G:/PSP/GAME/Quake2/EBOOT.PBP

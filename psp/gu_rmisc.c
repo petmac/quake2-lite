@@ -166,11 +166,20 @@ void GL_ScreenShot_f (void)
 */
 void GL_SetDefaultState( void )
 {
+	sceGuOffset(2048 - (GU_SCR_WIDTH / 2), 2048 - (GU_SCR_HEIGHT / 2));
+	sceGuViewport(2048, 2048, GU_SCR_WIDTH, GU_SCR_HEIGHT);
+	sceGuDepthRange(65535, 0);
+	sceGuScissor(0, 0, GU_SCR_WIDTH, GU_SCR_HEIGHT);
+	sceGuEnable(GU_SCISSOR_TEST);
+	sceGuFrontFace(GU_CW);
+	sceGuShadeModel(GU_SMOOTH);
+
 	sceGuClearColor(GU_COLOR(1, 0, 0.5, 0.5));
 	sceGuFrontFace(GU_CW); // TODO PeterM Is this right?
-#ifndef PSP
-	qglEnable(GL_TEXTURE_2D);
-#endif
+	sceGuEnable(GU_TEXTURE_2D);
+	sceGuTexMode(GU_PSM_5650, 0, 0, GU_FALSE);
+	sceGuTexLevelMode(GU_TEXTURE_AUTO, 0);
+	sceGuTexMapMode(GU_TEXTURE_COORDS, 0, 0);
 
 	//sceGuEnable(GU_ALPHA_TEST);
 	sceGuAlphaFunc(GU_GREATER, 170, 0xff);
@@ -178,6 +187,7 @@ void GL_SetDefaultState( void )
 	sceGuDisable (GU_DEPTH_TEST);
 	sceGuDisable (GU_CULL_FACE);
 	sceGuDisable (GU_BLEND);
+	sceGuDisable (GU_LIGHTING);
 
 	sceGuColor(0xffffffff);
 
@@ -190,7 +200,7 @@ void GL_SetDefaultState( void )
 	sceGuTexWrap(GU_REPEAT, GU_REPEAT);
 	sceGuBlendFunc(GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
 
-	GL_TexEnv( GU_TFX_REPLACE );
+	sceGuTexFunc(GU_TFX_REPLACE, GU_TCC_RGB);
 
 	GL_SetTexturePalette( d_8to24table );
 }

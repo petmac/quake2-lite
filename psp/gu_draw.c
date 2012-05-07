@@ -24,10 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 image_t		*draw_chars;
 
-extern	qboolean	scrap_dirty;
-void Scrap_Upload (void);
-
-
 /*
 ===============
 Draw_InitLocal
@@ -84,9 +80,9 @@ void Draw_Char (int x, int y, int num)
 	fcol = col*0.0625;
 	size = 0.0625;
 
+#ifndef PSP
 	GL_Bind (draw_chars->texnum);
 
-#ifndef PSP
 	qglBegin (GL_QUADS);
 	qglTexCoord2f (fcol, frow);
 	qglVertex2f (x, y);
@@ -98,14 +94,21 @@ void Draw_Char (int x, int y, int num)
 	qglVertex2f (x, y+8);
 	qglEnd ();
 #endif
+	sceGuTexFlush();
+	sceGuTexImage(0, draw_chars->width, draw_chars->height, draw_chars->width, draw_chars->texnum);
+
 	vertices = sceGuGetMemory(sizeof(gu_2d_vertex_t) * 2);
+	vertices[0].uv.x = col;
+	vertices[0].uv.y = row;
 	vertices[0].pos.x = x;
 	vertices[0].pos.y = y;
 	vertices[0].pos.z = 0;
+	vertices[1].uv.x = col + 8;
+	vertices[1].uv.y = row + 8;
 	vertices[1].pos.x = x + 8;
 	vertices[1].pos.y = y + 8;
 	vertices[1].pos.z = 0;
-	sceGuDrawArray(GU_SPRITES, GU_VERTEX_32BITF | GU_TRANSFORM_2D, 2, NULL, vertices);
+	sceGuDrawArray(GU_SPRITES, GU_TEXTURE_32BITF | GU_VERTEX_32BITF | GU_TRANSFORM_2D, 2, NULL, vertices);
 
 	LOG_FUNCTION_EXIT;
 }
@@ -182,9 +185,6 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 		return;
 	}
 
-	if (scrap_dirty)
-		Scrap_Upload ();
-
 #ifndef PSP
 	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) && !gl->has_alpha)
 		qglDisable (GL_ALPHA_TEST);
@@ -229,8 +229,6 @@ void Draw_Pic (int x, int y, char *pic)
 
 		return;
 	}
-	if (scrap_dirty)
-		Scrap_Upload ();
 
 #ifndef PSP
 	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) && !gl->has_alpha)

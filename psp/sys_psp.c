@@ -123,14 +123,14 @@ char *Sys_ConsoleInput (void)
 
 void	Sys_ConsoleOutput (char *string)
 {
-#if 0
+#if 1
 	FILE *file = NULL;
 
 	file = fopen("log.txt", "a");
 	if (file != NULL)
 	{
 		fputs(string, file);
-		fflush(file);
+		//fflush(file);
 		fclose(file);
 		file = NULL;
 	}

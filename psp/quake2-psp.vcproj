@@ -619,11 +619,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\gu_vram.c"
+				>
+			</File>
+			<File
 				RelativePath=".\gu_warp.c"
 				>
 			</File>
 			<File
-				RelativePath="F:\PSP\GAME\Quake2\log.txt"
+				RelativePath="G:\PSP\GAME\Quake2\log.txt"
 				>
 			</File>
 			<File

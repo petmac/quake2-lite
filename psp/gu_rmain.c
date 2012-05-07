@@ -150,6 +150,7 @@ R_DrawSpriteModel
 */
 void R_DrawSpriteModel (entity_t *e)
 {
+#ifndef PSP
 	float alpha = 1.0F;
 	vec3_t	point;
 	dsprframe_t	*frame;
@@ -191,18 +192,15 @@ void R_DrawSpriteModel (entity_t *e)
 	if ( e->flags & RF_TRANSLUCENT )
 		alpha = e->alpha;
 
-#ifndef PSP
 	if ( alpha != 1.0F )
 		qglEnable( GU_BLEND );
 
 	qglColor4f( 1, 1, 1, alpha );
-#endif
 
     GL_Bind(currentmodel->skins[e->frame]->texnum);
 
 	GL_TexEnv( GU_TFX_MODULATE );
 
-#ifndef PSP
 	if ( alpha == 1.0 )
 		qglEnable (GL_ALPHA_TEST);
 	else
@@ -233,10 +231,8 @@ void R_DrawSpriteModel (entity_t *e)
 	qglEnd ();
 
 	qglDisable (GL_ALPHA_TEST);
-#endif
 	GL_TexEnv( GU_TFX_REPLACE );
 
-#ifndef PSP
 	if ( alpha != 1.0F )
 		qglDisable( GU_BLEND );
 
@@ -1008,28 +1004,6 @@ R_Init
 ===============
 */
 
-#define BUF_WIDTH 512
-
-typedef struct
-{
-	ScePspRGB565 fb1[BUF_WIDTH * GU_SCR_HEIGHT];
-	ScePspRGB565 fb2[BUF_WIDTH * GU_SCR_HEIGHT];
-	u16 depth[BUF_WIDTH * GU_SCR_HEIGHT];
-} vram_t;
-
-struct Vertex
-{
-   unsigned int color;
-   float x, y, z;
-};
-
-struct Vertex __attribute__((aligned(16))) vertices[1*3] =
-{
-       {0xFF0000FF, 0.0f, -50.0f, 0.0f}, // Top, red
-       {0xFF00FF00, 50.0f, 50.0f, 0.0f}, // Right, green
-       {0xFFFF0000, -50.0f, 50.0f, 0.0f}, // Left, blue
-};
-
 int R_Init( void *hinstance, void *hWnd )
 {	
 	int		j;
@@ -1052,17 +1026,12 @@ int R_Init( void *hinstance, void *hWnd )
 
 	sceGuInit();
 	GU_StartDisplayList();
-	sceGuDrawBuffer(GU_PSM_5650, vram->fb1, BUF_WIDTH);
-	sceGuDispBuffer(GU_SCR_WIDTH, GU_SCR_HEIGHT, vram->fb2, BUF_WIDTH);
-	sceGuDepthBuffer(vram->depth, BUF_WIDTH);
-	sceGuOffset(2048 - (GU_SCR_WIDTH / 2), 2048 - (GU_SCR_HEIGHT / 2));
-	sceGuViewport(2048, 2048, GU_SCR_WIDTH, GU_SCR_HEIGHT);
-	sceGuDepthRange(65535, 0);
-	sceGuScissor(0, 0, GU_SCR_WIDTH, GU_SCR_HEIGHT);
-	sceGuEnable(GU_SCISSOR_TEST);
-	sceGuFrontFace(GU_CW);
-	sceGuShadeModel(GU_SMOOTH);
-	sceGuDisable(GU_TEXTURE_2D);
+	sceGuDrawBuffer(GU_PSM_5650, vram->fb1, GU_SCR_BUF_WIDTH);
+	sceGuDispBuffer(GU_SCR_WIDTH, GU_SCR_HEIGHT, vram->fb2, GU_SCR_BUF_WIDTH);
+	sceGuDepthBuffer(vram->depth, GU_SCR_BUF_WIDTH);
+
+	GL_SetDefaultState();
+
 	GU_FinishDisplayList();
 	GU_SyncDisplayList();
 
@@ -1106,8 +1075,6 @@ int R_Init( void *hinstance, void *hWnd )
 #ifdef __linux__
 	ri.Cvar_SetValue( "gl_finish", 1 );
 #endif
-
-	GL_SetDefaultState();
 
 	/*
 	** draw our stereo patterns

@@ -39,6 +39,8 @@ PSP specifics.
 
 // Vertex type.
 typedef struct {
+	// TODO PeterM Look into using a smaller format?
+	ScePspFVector2 uv;
 	ScePspFVector3 pos;
 } gu_2d_vertex_t;
 
@@ -59,6 +61,20 @@ typedef struct {
 void GU_StartDisplayList(void);
 void GU_FinishDisplayList(void);
 void GU_SyncDisplayList(void);
+
+// VRAM.
+#define GU_SCR_BUF_WIDTH 512
+
+typedef struct
+{
+	ScePspRGB565 fb1[GU_SCR_BUF_WIDTH * GU_SCR_HEIGHT];
+	ScePspRGB565 fb2[GU_SCR_BUF_WIDTH * GU_SCR_HEIGHT];
+	u16 depth[GU_SCR_BUF_WIDTH * GU_SCR_HEIGHT];
+	char hunk[1]; // Variable size, up to the end of VRAM.
+} vram_t;
+
+void *GU_AllocateVRAM(int size);
+void GU_FreeVRAM(void);
 
 /*
 ====================================================================
@@ -109,19 +125,10 @@ typedef struct image_s
 	char	name[MAX_QPATH];			// game path, including extension
 	imagetype_t	type;
 	int		width, height;				// source image
-	int		upload_width, upload_height;	// after power of two and picmip
 	struct msurface_s	*texturechain;	// for sort-by-texture world drawing
-	int		texnum;						// gl texture binding
-	float	sl, tl, sh, th;				// 0,0 - 1,1 unless part of the scrap
-	qboolean	scrap;
+	void *texnum;						// texture address in VRAM.
 	qboolean	has_alpha;
-
-	qboolean paletted;
 } image_t;
-
-#define	TEXNUM_LIGHTMAPS	1024
-#define	TEXNUM_SCRAPS		1152
-#define	TEXNUM_IMAGES		1153
 
 #define		MAX_GLTEXTURES	1024
 
@@ -235,8 +242,8 @@ extern	int		c_visible_textures;
 extern	float	r_world_matrix[16];
 
 void R_TranslatePlayerSkin (int playernum);
-void GL_Bind (int texnum);
-void GL_MBind( int target, int texnum );
+void GL_Bind (const image_t *texnum);
+void GL_MBind( int target, const image_t *texnum );
 void GL_TexEnv( int value );
 void GL_EnableMultitexture( qboolean enable );
 void GL_SelectTexture( int texture );
@@ -339,7 +346,7 @@ typedef struct
 
 	int lightmap_textures;
 
-	int	currenttextures[2];
+	const image_t *currenttextures[2];
 	int currenttmu;
 
 	float camera_separation;

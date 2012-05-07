@@ -498,26 +498,28 @@ void R_RenderBrushPoly (msurface_t *fa)
 
 	if (fa->flags & SURF_DRAWTURB)
 	{	
+#ifndef PSP
 		GL_Bind( image->texnum );
 
 		// warp texture, no lightmaps
 		GL_TexEnv( GU_TFX_MODULATE );
-#ifndef PSP
 		qglColor4f( gl_state.inverse_intensity, 
 			        gl_state.inverse_intensity,
 					gl_state.inverse_intensity,
 					1.0F );
-#endif
 		EmitWaterPolys (fa);
 		GL_TexEnv( GU_TFX_REPLACE );
+#endif
 
 		return;
 	}
 	else
 	{
+#ifndef PSP
 		GL_Bind( image->texnum );
 
 		GL_TexEnv( GU_TFX_REPLACE );
+#endif
 	}
 
 //======
@@ -564,9 +566,9 @@ dynamic:
 			R_BuildLightMap( fa, (void *)temp, smax*4 );
 			R_SetCacheState( fa );
 
+#ifndef PSP
 			GL_Bind( gl_state.lightmap_textures + fa->lightmaptexturenum );
 
-#ifndef PSP
 			qglTexSubImage2D( GL_TEXTURE_2D, 0,
 							  fa->light_s, fa->light_t, 
 							  smax, tmax, 
@@ -612,8 +614,8 @@ void R_DrawAlphaSurfaces (void)
     qglLoadMatrixf (r_world_matrix);
 
 	qglEnable (GU_BLEND);
-#endif
 	GL_TexEnv( GU_TFX_MODULATE );
+#endif
 
 	// the textures are prescaled up for a better lighting range,
 	// so scale it back down
@@ -639,8 +641,8 @@ void R_DrawAlphaSurfaces (void)
 			DrawGLPoly (s->polys);
 	}
 
-	GL_TexEnv( GU_TFX_REPLACE );
 #ifndef PSP
+	GL_TexEnv( GU_TFX_REPLACE );
 	qglColor4f (1,1,1,1);
 	qglDisable (GU_BLEND);
 #endif
@@ -713,9 +715,9 @@ void DrawTextureChains (void)
 		}
 //		GL_EnableMultitexture( true );
 	}
-#endif
 
 	GL_TexEnv( GU_TFX_REPLACE );
+#endif
 }
 
 
@@ -922,8 +924,8 @@ void R_DrawInlineBModel (void)
 #ifndef PSP
 		qglEnable (GU_BLEND);
 		qglColor4f (1,1,1,0.25);
-#endif
 		GL_TexEnv( GU_TFX_MODULATE );
+#endif
 	}
 
 	//
@@ -974,8 +976,8 @@ void R_DrawInlineBModel (void)
 #ifndef PSP
 		qglDisable (GU_BLEND);
 		qglColor4f (1,1,1,1);
-#endif
 		GL_TexEnv( GU_TFX_REPLACE );
+#endif
 	}
 }
 
@@ -994,7 +996,7 @@ void R_DrawBrushModel (entity_t *e)
 		return;
 
 	currententity = e;
-	gl_state.currenttextures[0] = gl_state.currenttextures[1] = -1;
+	gl_state.currenttextures[0] = gl_state.currenttextures[1] = NULL;
 
 	if (e->angles[0] || e->angles[1] || e->angles[2])
 	{
@@ -1042,11 +1044,13 @@ e->angles[2] = -e->angles[2];	// stupid quake bug
 e->angles[0] = -e->angles[0];	// stupid quake bug
 e->angles[2] = -e->angles[2];	// stupid quake bug
 
+#ifndef PSP
 	GL_EnableMultitexture( true );
 	GL_SelectTexture( GL_TEXTURE0);
 	GL_TexEnv( GU_TFX_REPLACE );
 	GL_SelectTexture( GL_TEXTURE1);
 	GL_TexEnv( GU_TFX_MODULATE );
+#endif
 
 	R_DrawInlineBModel ();
 	GL_EnableMultitexture( false );
@@ -1251,7 +1255,7 @@ void R_DrawWorld (void)
 	ent.frame = (int)(r_newrefdef.time*2);
 	currententity = &ent;
 
-	gl_state.currenttextures[0] = gl_state.currenttextures[1] = -1;
+	gl_state.currenttextures[0] = gl_state.currenttextures[1] = NULL;
 
 #ifndef PSP
 	qglColor3f (1,1,1);
@@ -1412,8 +1416,8 @@ static void LM_UploadBlock( qboolean dynamic )
 		texture = gl_lms.current_lightmap_texture;
 	}
 
-	GL_Bind( gl_state.lightmap_textures + texture );
 #ifndef PSP
+	GL_Bind( gl_state.lightmap_textures + texture );
 	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 #endif
@@ -1636,12 +1640,14 @@ void GL_BeginBuildingLightmaps (model_t *m)
 	}
 	r_newrefdef.lightstyles = lightstyles;
 
+#ifndef PSP
 	if (!gl_state.lightmap_textures)
 	{
 		gl_state.lightmap_textures	= TEXNUM_LIGHTMAPS;
 //		gl_state.lightmap_textures	= gl_state.texture_extension_number;
 //		gl_state.texture_extension_number = gl_state.lightmap_textures + MAX_LIGHTMAPS;
 	}
+#endif
 
 	gl_lms.current_lightmap_texture = 1;
 
@@ -1687,8 +1693,8 @@ void GL_BeginBuildingLightmaps (model_t *m)
 	/*
 	** initialize the dynamic lightmap texture
 	*/
-	GL_Bind( gl_state.lightmap_textures + 0 );
 #ifndef PSP
+	GL_Bind( gl_state.lightmap_textures + 0 );
 	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	qglTexImage2D( GL_TEXTURE_2D, 
