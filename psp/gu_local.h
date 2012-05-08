@@ -131,6 +131,7 @@ typedef struct image_s
 	
 	void *texnum;						// texture address in VRAM.
 	int buffer_width;
+	int buffer_height;
 
 	struct msurface_s *texturechain;	// for sort-by-texture world drawing
 	qboolean has_alpha;

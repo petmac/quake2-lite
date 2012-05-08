@@ -839,7 +839,7 @@ void	R_SetGL2D (void)
 	sceGumUpdateMatrix();
 	sceGuDisable(GU_DEPTH_TEST);
 	sceGuDisable(GU_CULL_FACE);
-	sceGuDisable(GU_BLEND);
+	sceGuEnable(GU_BLEND);
 	//sceGuEnable(GU_ALPHA_TEST);
 	sceGuColor(GU_COLOR(1, 1, 1, 1));
 }

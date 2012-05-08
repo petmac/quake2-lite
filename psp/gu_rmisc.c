@@ -171,6 +171,7 @@ void GL_SetDefaultState( void )
 	sceGuViewport(2048, 2048, GU_SCR_WIDTH, GU_SCR_HEIGHT);
 	sceGuScissor(0, 0, GU_SCR_WIDTH, GU_SCR_HEIGHT);
 	sceGuEnable(GU_SCISSOR_TEST);
+	sceGuEnable(GU_CLIP_PLANES);
 
 	// Depth.
 	sceGuDepthRange(65535, 0);

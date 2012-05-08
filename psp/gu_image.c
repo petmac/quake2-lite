@@ -131,7 +131,7 @@ void GL_Bind (const image_t *texnum)
 #endif
 	if (texnum && texnum->texnum)
 	{
-		sceGuTexImage(0, texnum->width, texnum->height, texnum->buffer_width, texnum->texnum);
+		sceGuTexImage(0, texnum->buffer_width, texnum->buffer_height, texnum->buffer_width, texnum->texnum);
 	}
 }
 
@@ -552,6 +552,7 @@ typedef struct
 
 void R_FloodFillSkin( byte *skin, int skinwidth, int skinheight )
 {
+#ifndef PSP
 	byte				fillcolor = *skin; // assume this is the pixel to fill
 	floodfill_t			fifo[FLOODFILL_FIFO_SIZE];
 	int					inpt = 0, outpt = 0;
@@ -594,6 +595,7 @@ void R_FloodFillSkin( byte *skin, int skinwidth, int skinheight )
 		if (y < skinheight - 1)	FLOODFILL_STEP( skinwidth, 0, 1 );
 		skin[x + skinwidth * y] = fdc;
 	}
+#endif
 }
 
 //=======================================================
@@ -1029,11 +1031,25 @@ GL_LoadPic
 This is also used as an entry point for the generated r_notexture
 ================
 */
+static u32 next_power_of_two(u32 x)
+{
+	x--;
+	x |= x >> 1;  // handle  2 bit numbers
+	x |= x >> 2;  // handle  4 bit numbers
+	x |= x >> 4;  // handle  8 bit numbers
+	x |= x >> 8;  // handle 16 bit numbers
+	x |= x >> 16; // handle 32 bit numbers
+	x++;
+
+	return x;
+}
+
 image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t type, int bits)
 {
 	int i;
 	image_t *image;
 	int buffer_width;
+	int buffer_height;
 
 	// find a free image_t
 	for (i=0, image=gltextures ; i<numgltextures ; i++,image++)
@@ -1055,7 +1071,15 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 		R_FloodFillSkin(pic, width, height);
 
 	// Calculate buffer width.
-	buffer_width = (width + 15) & ~15;
+	if (width <= 16)
+	{
+		buffer_width = 16;
+	}
+	else
+	{
+		buffer_width = next_power_of_two(width);
+	}
+	buffer_height = next_power_of_two(height);
 
 #if 0
 	Com_DPrintf("Texture %s, %d x %d.\n", name, width, height);
@@ -1064,10 +1088,12 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 	memset(image, 0, sizeof(*image));
 
 	image->texnum = GU_AllocateVRAM(buffer_width * height);
+#if 0
 	if (image->texnum == NULL)
 	{
 		image->texnum = Hunk_AllocAllowFail(&hunk_ref, buffer_width * height);
 	}
+#endif
 
 	if (image->texnum != NULL)
 	{
@@ -1085,6 +1111,7 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 	image->width = width;
 	image->height = height;
 	image->buffer_width = buffer_width;
+	image->buffer_height = buffer_height;
 	image->type = type;
 	image->has_alpha = false;
 
