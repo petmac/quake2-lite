@@ -34,7 +34,7 @@ struct hunk_s
 
 #define GAME_HUNK_CAPACITY (1 * 1024 * 1024)
 #define LEVEL_HUNK_CAPACITY (32 * 1024)
-#define REF_HUNK_CAPACITY (7 * 1024 * 1024)
+#define REF_HUNK_CAPACITY (8 * 1024 * 1024)
 #ifdef PSP
 #define SND_HUNK_CAPACITY (1 * 1024 * 1024)
 #else
@@ -85,12 +85,24 @@ void Mem_Init (void)
 
 void *Hunk_Alloc (hunk_t *hunk, int size)
 {
+	void *const mem = Hunk_AllocAllowFail(hunk, size);
+	if (!mem)
+	{
+		Sys_Error("%s: Hunk \"%s\" overflowed allocating %d bytes.", __FUNCTION__, hunk->name, size);
+		return NULL;
+	}
+
+	return mem;
+}
+
+void *Hunk_AllocAllowFail (hunk_t *hunk, int size)
+{
 	// round to size of double
 	size = (size+HUNK_ALIGNMENT-1)&~(HUNK_ALIGNMENT-1);
 
 	hunk->cursize += size;
 	if (hunk->cursize > hunk->capacity)
-		Sys_Error ("Mem_Alloc overflow");
+		return NULL;
 
 	if (hunk->cursize > hunk->tidemark)
 	{

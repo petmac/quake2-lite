@@ -113,14 +113,26 @@ void GL_Bind (const image_t *texnum)
 {
 	extern	image_t	*draw_chars;
 
+	// TODO Handle unloaded textures.
+	if (!texnum || !texnum->texnum)
+	{
+		texnum = draw_chars;
+	}
+
 	if (gl_nobind->value && draw_chars)		// performance evaluation option
-		texnum = draw_chars->texnum;
+		texnum = draw_chars;
+#ifndef PSP
 	if ( gl_state.currenttextures[gl_state.currenttmu] == texnum)
 		return;
+#endif
 	gl_state.currenttextures[gl_state.currenttmu] = texnum;
 #ifndef PSP
 	qglBindTexture (GL_TEXTURE_2D, texnum);
 #endif
+	if (texnum && texnum->texnum)
+	{
+		sceGuTexImage(0, texnum->width, texnum->height, texnum->buffer_width, texnum->texnum);
+	}
 }
 
 void GL_MBind( int target, const image_t *texnum )
@@ -1052,6 +1064,11 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 	memset(image, 0, sizeof(*image));
 
 	image->texnum = GU_AllocateVRAM(buffer_width * height);
+	if (image->texnum == NULL)
+	{
+		image->texnum = Hunk_AllocAllowFail(&hunk_ref, buffer_width * height);
+	}
+
 	if (image->texnum != NULL)
 	{
 		for (i = 0; i < height; ++i)

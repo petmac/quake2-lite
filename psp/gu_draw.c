@@ -33,8 +33,8 @@ void Draw_InitLocal (void)
 {
 	// load console characters (don't bilerp characters)
 	draw_chars = GL_FindImage ("pics/conchars.pcx", it_pic);
-	GL_Bind( draw_chars->texnum );
 #ifndef PSP
+	GL_Bind( draw_chars->texnum );
 	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 #endif
@@ -81,7 +81,7 @@ void Draw_Char (int x, int y, int num)
 	v = (num >> 4) << 3;
 
 	// Set the texture image.
-	sceGuTexImage(0, draw_chars->width, draw_chars->height, draw_chars->buffer_width, draw_chars->texnum);
+	GL_Bind(draw_chars);
 
 	// Fill the vertices.
 	vertices = sceGuGetMemory(sizeof(gu_2d_vertex_t) * 2);
@@ -176,7 +176,7 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 	}
 
 	// Set the texture image.
-	sceGuTexImage(0, gl->width, gl->height, gl->buffer_width, gl->texnum);
+	GL_Bind(gl);
 
 	// Fill the vertices.
 	vertices = sceGuGetMemory(sizeof(gu_2d_vertex_t) * 2);
@@ -221,7 +221,7 @@ void Draw_Pic (int x, int y, char *pic)
 	}
 
 	// Set the texture image.
-	sceGuTexImage(0, gl->width, gl->height, gl->buffer_width, gl->texnum);
+	GL_Bind(gl);
 
 	// Fill the vertices.
 	vertices = sceGuGetMemory(sizeof(gu_2d_vertex_t) * 2);

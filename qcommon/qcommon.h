@@ -839,4 +839,5 @@ extern hunk_t hunk_snd;
 
 void Mem_Init (void);
 void *Hunk_Alloc (hunk_t *hunk, int size);
+void *Hunk_AllocAllowFail (hunk_t *hunk, int size);
 void Hunk_Free (hunk_t *hunk);
