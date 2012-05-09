@@ -577,9 +577,7 @@ void R_SetFrustum (void)
 
 	for (i=0 ; i<4 ; i++)
 	{
-		frustum[i].type = PLANE_ANYZ;
 		frustum[i].dist = DotProduct (r_origin, frustum[i].normal);
-		frustum[i].signbits = SignbitsForPlane (&frustum[i]);
 	}
 }
 

@@ -313,55 +313,77 @@ int BoxOnPlaneSide (vec3_t emins, vec3_t emaxs, struct cplane_s *p)
 	float	dist1, dist2;
 	int		sides;
 
-// fast axial cases
-	if (p->type < 3)
+	if (p->normal[0] >= 0)
 	{
-		if (p->dist <= emins[p->type])
-			return 1;
-		if (p->dist >= emaxs[p->type])
-			return 2;
-		return 3;
+		// +X
+		if (p->normal[1] >= 0)
+		{
+			// +X+Y
+			if (p->normal[2] >= 0)
+			{
+				// +X+Y+Z
+				dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
+				dist2 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
+			}
+			else
+			{
+				// +X+Y-Z
+				dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
+				dist2 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
+			}
+		}
+		else
+		{
+			// +X-Y
+			if (p->normal[2] >= 0)
+			{
+				// +X-Y+Z
+				dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
+				dist2 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
+			}
+			else
+			{
+				// +X-Y-Z
+				dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
+				dist2 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
+			}
+		}
 	}
-	
-// general case
-	switch (p->signbits)
+	else
 	{
-	case 0:
-dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
-dist2 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
-		break;
-	case 1:
-dist1 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
-dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
-		break;
-	case 2:
-dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
-dist2 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
-		break;
-	case 3:
-dist1 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
-dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
-		break;
-	case 4:
-dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
-dist2 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
-		break;
-	case 5:
-dist1 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
-dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
-		break;
-	case 6:
-dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
-dist2 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
-		break;
-	case 7:
-dist1 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
-dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
-		break;
-	default:
-		dist1 = dist2 = 0;		// shut up compiler
-		assert( 0 );
-		break;
+		// -X
+		if (p->normal[1] >= 0)
+		{
+			// -X+Y
+			if (p->normal[2] >= 0)
+			{
+				// -X+Y+Z
+				dist1 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
+				dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
+			}
+			else
+			{
+				// -X+Y-Z
+				dist1 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
+				dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
+			}
+		}
+		else
+		{
+			// -X-Y
+			if (p->normal[2] >= 0)
+			{
+				// -X-Y+Z
+				dist1 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
+				dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
+			}
+			else
+			{
+				// -X-Y-Z
+				dist1 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
+				dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
+			}
+		}
 	}
 
 	sides = 0;

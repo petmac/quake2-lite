@@ -338,7 +338,6 @@ void CMod_LoadPlanes (lump_t *l)
 	cplane_t	*out;
 	dplane_t 	*in;
 	int			count;
-	int			bits;
 	
 	in = (void *)(cmod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
@@ -356,17 +355,12 @@ void CMod_LoadPlanes (lump_t *l)
 
 	for ( i=0 ; i<count ; i++, in++, out++)
 	{
-		bits = 0;
 		for (j=0 ; j<3 ; j++)
 		{
 			out->normal[j] = LittleFloat (in->normal[j]);
-			if (out->normal[j] < 0)
-				bits |= 1<<j;
 		}
 
 		out->dist = LittleFloat (in->dist);
-		out->type = LittleLong (in->type);
-		out->signbits = bits;
 	}
 }
 
@@ -750,14 +744,10 @@ void CM_InitBoxHull (void)
 
 		// planes
 		p = &box_planes[i*2];
-		p->type = i>>1;
-		p->signbits = 0;
 		VectorClear (p->normal);
 		p->normal[i>>1] = 1;
 
 		p = &box_planes[i*2+1];
-		p->type = 3 + (i>>1);
-		p->signbits = 0;
 		VectorClear (p->normal);
 		p->normal[i>>1] = -1;
 	}	
@@ -808,10 +798,7 @@ int CM_PointLeafnum_r (vec3_t p, int num)
 		node = map_nodes + num;
 		plane = node->plane;
 		
-		if (plane->type < 3)
-			d = p[plane->type] - plane->dist;
-		else
-			d = DotProduct (plane->normal, p) - plane->dist;
+		d = DotProduct (plane->normal, p) - plane->dist;
 		if (d < 0)
 			num = node->children[1];
 		else
@@ -1253,24 +1240,14 @@ void CM_RecursiveHullCheck (int num, float p1f, float p2f, vec3_t p1, vec3_t p2)
 	node = map_nodes + num;
 	plane = node->plane;
 
-	if (plane->type < 3)
-	{
-		t1 = p1[plane->type] - plane->dist;
-		t2 = p2[plane->type] - plane->dist;
-		offset = trace_extents[plane->type];
-	}
+	t1 = DotProduct (plane->normal, p1) - plane->dist;
+	t2 = DotProduct (plane->normal, p2) - plane->dist;
+	if (trace_ispoint)
+		offset = 0;
 	else
-	{
-		t1 = DotProduct (plane->normal, p1) - plane->dist;
-		t2 = DotProduct (plane->normal, p2) - plane->dist;
-		if (trace_ispoint)
-			offset = 0;
-		else
-			offset = fabs(trace_extents[0]*plane->normal[0]) +
-				fabs(trace_extents[1]*plane->normal[1]) +
-				fabs(trace_extents[2]*plane->normal[2]);
-	}
-
+		offset = fabs(trace_extents[0]*plane->normal[0]) +
+			fabs(trace_extents[1]*plane->normal[1]) +
+			fabs(trace_extents[2]*plane->normal[2]);
 
 #if 0
 CM_RecursiveHullCheck (node->children[0], p1f, p2f, p1, p2);
