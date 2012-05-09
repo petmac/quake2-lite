@@ -66,10 +66,12 @@ void GU_SyncDisplayList(void);
 // VRAM.
 #define GU_SCR_BUF_WIDTH 512
 
+typedef ScePspRGB565 gu_pixel_t;
+
 typedef struct
 {
-	ScePspRGB565 fb1[GU_SCR_BUF_WIDTH * GU_SCR_HEIGHT];
-	ScePspRGB565 fb2[GU_SCR_BUF_WIDTH * GU_SCR_HEIGHT];
+	gu_pixel_t fb1[GU_SCR_BUF_WIDTH * GU_SCR_HEIGHT];
+	gu_pixel_t fb2[GU_SCR_BUF_WIDTH * GU_SCR_HEIGHT];
 	u16 depth[GU_SCR_BUF_WIDTH * GU_SCR_HEIGHT];
 	char hunk[1]; // Variable size, up to the end of VRAM.
 } vram_t;
@@ -77,7 +79,7 @@ typedef struct
 void *GU_AllocateVRAM(int size);
 void GU_FreeVRAM(void);
 
-extern ScePspRGB565 *gu_back_buffer;
+extern gu_pixel_t *gu_back_buffer;
 
 /*
 ====================================================================

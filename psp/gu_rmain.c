@@ -58,7 +58,7 @@ vec3_t	r_origin;
 float	r_world_matrix[16];
 float	r_base_world_matrix[16];
 
-ScePspRGB565 *gu_back_buffer;
+gu_pixel_t *gu_back_buffer;
 
 //
 // screen size info
@@ -1026,7 +1026,7 @@ int R_Init( void *hinstance, void *hWnd )
 
 	R_Register();
 
-	gu_back_buffer = (ScePspRGB565 *)sceGeEdramGetAddr();
+	gu_back_buffer = (gu_pixel_t *)sceGeEdramGetAddr();
 
 	sceGuInit();
 	GU_StartDisplayList();
@@ -1174,7 +1174,7 @@ void R_BeginFrame( float camera_separation )
 R_SetPalette
 =============
 */
-ScePspRGB565 r_rawpalette[256];
+gu_pixel_t r_rawpalette[256];
 
 void R_SetPalette ( const unsigned char *palette)
 {
@@ -1300,7 +1300,7 @@ static void R_EndFrame (void)
 	GU_SyncDisplayList();
 
 	sceDisplayWaitVblankStart();
-	gu_back_buffer = (ScePspRGB565 *)((u32)sceGeEdramGetAddr() + (u32)sceGuSwapBuffers());
+	gu_back_buffer = (gu_pixel_t *)((u32)sceGeEdramGetAddr() + (u32)sceGuSwapBuffers());
 }
 
 static void R_AppActivate (qboolean activate)

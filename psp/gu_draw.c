@@ -374,124 +374,45 @@ void Draw_FadeScreen (void)
 Draw_StretchRaw
 =============
 */
-extern ScePspRGB565 r_rawpalette[256];
+extern gu_pixel_t r_rawpalette[256];
 
 void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data)
 {
-	int row;
-	int col;
+	const int src_row_step = (rows << 8) / h;
+	const int src_col_step = (cols << 8) / w;
+	int dst_row;
+	int src_row;
 
 	LOG_FUNCTION_ENTRY;
-
-#ifndef PSP
-	unsigned	image32[256*256];
-	unsigned char image8[256*256];
-	int			i, j, trows;
-	byte		*source;
-	int			frac, fracstep;
-	float		hscale;
-	int			row;
-	float		t;
-
-	GL_Bind (0);
-
-	if (rows<=256)
-	{
-		hscale = 1;
-		trows = rows;
-	}
-	else
-	{
-		hscale = rows/256.0;
-		trows = 256;
-	}
-	t = rows*hscale / 256;
-
-	if ( !qglColorTableEXT )
-	{
-		unsigned *dest;
-
-		for (i=0 ; i<trows ; i++)
-		{
-			row = (int)(i*hscale);
-			if (row > rows)
-				break;
-			source = data + cols*row;
-			dest = &image32[i*256];
-			fracstep = cols*0x10000/256;
-			frac = fracstep >> 1;
-			for (j=0 ; j<256 ; j++)
-			{
-				dest[j] = r_rawpalette[source[frac>>16]];
-				frac += fracstep;
-			}
-		}
-
-		qglTexImage2D (GL_TEXTURE_2D, 0, gl_tex_solid_format, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, image32);
-	}
-	else
-	{
-		unsigned char *dest;
-
-		for (i=0 ; i<trows ; i++)
-		{
-			row = (int)(i*hscale);
-			if (row > rows)
-				break;
-			source = data + cols*row;
-			dest = &image8[i*256];
-			fracstep = cols*0x10000/256;
-			frac = fracstep >> 1;
-			for (j=0 ; j<256 ; j++)
-			{
-				dest[j] = source[frac>>16];
-				frac += fracstep;
-			}
-		}
-
-		qglTexImage2D( GL_TEXTURE_2D, 
-			           0, 
-					   GL_COLOR_INDEX8_EXT, 
-					   256, 256, 
-					   0, 
-					   GL_COLOR_INDEX, 
-					   GL_UNSIGNED_BYTE, 
-					   image8 );
-	}
-	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	if ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) 
-		qglDisable (GL_ALPHA_TEST);
-
-	qglBegin (GL_QUADS);
-	qglTexCoord2f (0, 0);
-	qglVertex2f (x, y);
-	qglTexCoord2f (1, 0);
-	qglVertex2f (x+w, y);
-	qglTexCoord2f (1, t);
-	qglVertex2f (x+w, y+h);
-	qglTexCoord2f (0, t);
-	qglVertex2f (x, y+h);
-	qglEnd ();
-
-	if ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) 
-		qglEnable (GL_ALPHA_TEST);
-#endif
 
 	// Finish up any previous drawing commands.
 	GU_FinishDisplayList();
 	GU_SyncDisplayList();
 
-	// Get the back buffer.
-	for (row = 0; row < h; ++row)
+	// For each row...
+	src_row = 0;
+	dst_row = 0;
+	while (dst_row < h)
 	{
-		ScePspRGB565 *const dst = &gu_back_buffer[((row + y) * GU_SCR_BUF_WIDTH) + x];
+		const byte *const src = &data[(src_row >> 8) * cols];
+		gu_pixel_t *dst = &gu_back_buffer[((dst_row + y) * GU_SCR_BUF_WIDTH) + x];
+		const gu_pixel_t *const dst_end = dst + w;
 
-		for (col = 0; col < w; ++col)
+		int src_col = 0;
+
+		while (dst < dst_end)
 		{
-			dst[col] = col;
+			const int index = src[src_col >> 8];
+			const gu_pixel_t pixel = r_rawpalette[index];
+
+			*dst = pixel;
+
+			src_col += src_col_step;
+			++dst;
 		}
+
+		src_row += src_row_step;
+		++dst_row;
 	}
 
 	// Write back the cache.
