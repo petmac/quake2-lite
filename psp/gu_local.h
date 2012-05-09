@@ -77,6 +77,8 @@ typedef struct
 void *GU_AllocateVRAM(int size);
 void GU_FreeVRAM(void);
 
+extern ScePspRGB565 *gu_back_buffer;
+
 /*
 ====================================================================
 

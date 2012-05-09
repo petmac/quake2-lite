@@ -374,10 +374,13 @@ void Draw_FadeScreen (void)
 Draw_StretchRaw
 =============
 */
-extern unsigned	r_rawpalette[256];
+extern ScePspRGB565 r_rawpalette[256];
 
 void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data)
 {
+	int row;
+	int col;
+
 	LOG_FUNCTION_ENTRY;
 
 #ifndef PSP
@@ -475,6 +478,27 @@ void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 	if ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) ) 
 		qglEnable (GL_ALPHA_TEST);
 #endif
+
+	// Finish up any previous drawing commands.
+	GU_FinishDisplayList();
+	GU_SyncDisplayList();
+
+	// Get the back buffer.
+	for (row = 0; row < h; ++row)
+	{
+		ScePspRGB565 *const dst = &gu_back_buffer[((row + y) * GU_SCR_BUF_WIDTH) + x];
+
+		for (col = 0; col < w; ++col)
+		{
+			dst[col] = col;
+		}
+	}
+
+	// Write back the cache.
+	sceKernelDcacheWritebackAll();
+
+	// Start a new display list.
+	GU_StartDisplayList();
 
 	LOG_FUNCTION_EXIT;
 }

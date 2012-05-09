@@ -58,6 +58,8 @@ vec3_t	r_origin;
 float	r_world_matrix[16];
 float	r_base_world_matrix[16];
 
+ScePspRGB565 *gu_back_buffer;
+
 //
 // screen size info
 //
@@ -1024,6 +1026,8 @@ int R_Init( void *hinstance, void *hWnd )
 
 	R_Register();
 
+	gu_back_buffer = (ScePspRGB565 *)sceGeEdramGetAddr();
+
 	sceGuInit();
 	GU_StartDisplayList();
 	sceGuDrawBuffer(GU_PSM_5650, vram->fb1, GU_SCR_BUF_WIDTH);
@@ -1170,7 +1174,7 @@ void R_BeginFrame( float camera_separation )
 R_SetPalette
 =============
 */
-static ScePspRGBA8888 __attribute__((aligned(16))) r_rawpalette[256];
+ScePspRGB565 r_rawpalette[256];
 
 void R_SetPalette ( const unsigned char *palette)
 {
@@ -1182,20 +1186,12 @@ void R_SetPalette ( const unsigned char *palette)
 	{
 		for ( i = 0; i < 256; i++ )
 		{
-			r_rawpalette[i] = GU_RGBA(palette[i*3+0], palette[i*3+1], palette[i*3+2], 0xff);
+			const int r = *palette++;
+			const int g = *palette++;
+			const int b = *palette++;
+			r_rawpalette[i] = (r >> 3) | ((g >> 2) << 5) | ((b >> 3) << 11);
 		}
-		GL_SetTexturePalette(r_rawpalette);
 	}
-	else
-	{
-		GL_SetTexturePalette(d_8to24table);
-	}
-
-#ifndef PSP
-	qglClearColor (0,0,0,0);
-	qglClear (GL_COLOR_BUFFER_BIT);
-	qglClearColor (1,0, 0.5 , 0.5);
-#endif
 
 	LOG_FUNCTION_EXIT;
 }
@@ -1304,7 +1300,7 @@ static void R_EndFrame (void)
 	GU_SyncDisplayList();
 
 	sceDisplayWaitVblankStart();
-	sceGuSwapBuffers();
+	gu_back_buffer = (ScePspRGB565 *)((u32)sceGeEdramGetAddr() + (u32)sceGuSwapBuffers());
 }
 
 static void R_AppActivate (qboolean activate)
