@@ -112,7 +112,7 @@ OBJS = \
 	../server/sv_world.o
 
 INCDIR = 
-CFLAGS = -O2 -G0 -DGAME_HARD_LINKED -DREF_HARD_LINKED
+CFLAGS = -O2 -G0 -DGAME_HARD_LINKED -DREF_HARD_LINKED -Werror
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS = $(CFLAGS)
 
