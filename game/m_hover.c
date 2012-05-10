@@ -422,7 +422,7 @@ void hover_reattack (edict_t *self)
 {
 	if (self->enemy->health > 0 )
 		if (visible (self, self->enemy) )
-			if (random() <= 0.6)		
+			if (random() <= 0.6f)		
 			{
 				self->monsterinfo.currentmove = &hover_move_attack1;
 				return;

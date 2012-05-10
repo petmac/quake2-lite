@@ -40,7 +40,7 @@ qboolean CanDamage (edict_t *targ, edict_t *inflictor)
 		VectorAdd (targ->absmin, targ->absmax, dest);
 		VectorScale (dest, 0.5, dest);
 		trace = gi.trace (inflictor->s.origin, vec3_origin, vec3_origin, dest, inflictor, MASK_SOLID);
-		if (trace.fraction == 1.0)
+		if (trace.fraction == 1.0f)
 			return true;
 		if (trace.ent == targ)
 			return true;
@@ -48,35 +48,35 @@ qboolean CanDamage (edict_t *targ, edict_t *inflictor)
 	}
 	
 	trace = gi.trace (inflictor->s.origin, vec3_origin, vec3_origin, targ->s.origin, inflictor, MASK_SOLID);
-	if (trace.fraction == 1.0)
+	if (trace.fraction == 1.0f)
 		return true;
 
 	VectorCopy (targ->s.origin, dest);
 	dest[0] += 15.0;
 	dest[1] += 15.0;
 	trace = gi.trace (inflictor->s.origin, vec3_origin, vec3_origin, dest, inflictor, MASK_SOLID);
-	if (trace.fraction == 1.0)
+	if (trace.fraction == 1.0f)
 		return true;
 
 	VectorCopy (targ->s.origin, dest);
 	dest[0] += 15.0;
 	dest[1] -= 15.0;
 	trace = gi.trace (inflictor->s.origin, vec3_origin, vec3_origin, dest, inflictor, MASK_SOLID);
-	if (trace.fraction == 1.0)
+	if (trace.fraction == 1.0f)
 		return true;
 
 	VectorCopy (targ->s.origin, dest);
 	dest[0] -= 15.0;
 	dest[1] += 15.0;
 	trace = gi.trace (inflictor->s.origin, vec3_origin, vec3_origin, dest, inflictor, MASK_SOLID);
-	if (trace.fraction == 1.0)
+	if (trace.fraction == 1.0f)
 		return true;
 
 	VectorCopy (targ->s.origin, dest);
 	dest[0] -= 15.0;
 	dest[1] -= 15.0;
 	trace = gi.trace (inflictor->s.origin, vec3_origin, vec3_origin, dest, inflictor, MASK_SOLID);
-	if (trace.fraction == 1.0)
+	if (trace.fraction == 1.0f)
 		return true;
 
 
@@ -220,7 +220,7 @@ static int CheckPowerArmor (edict_t *ent, vec3_t point, vec3_t normal, int damag
 		VectorSubtract (point, ent->s.origin, vec);
 		VectorNormalize (vec);
 		dot = DotProduct (vec, forward);
-		if (dot <= 0.3)
+		if (dot <= 0.3f)
 			return 0;
 
 		damagePerCell = 1;
@@ -241,7 +241,7 @@ static int CheckPowerArmor (edict_t *ent, vec3_t point, vec3_t normal, int damag
 		save = damage;
 
 	SpawnDamage (pa_te_type, point, normal, save);
-	ent->powerarmor_time = level.time + 0.2;
+	ent->powerarmor_time = level.time + 0.2f;
 
 	power_used = save / damagePerCell;
 

@@ -102,7 +102,7 @@ void boss2_firebullet_right (edict_t *self)
 	AngleVectors (self->s.angles, forward, right, NULL);
 	G_ProjectSource (self->s.origin, monster_flash_offset[MZ2_BOSS2_MACHINEGUN_R1], forward, right, start);
 
-	VectorMA (self->enemy->s.origin, -0.2, self->enemy->velocity, target);
+	VectorMA (self->enemy->s.origin, -0.2f, self->enemy->velocity, target);
 	target[2] += self->enemy->viewheight;
 	VectorSubtract (target, start, forward);
 	VectorNormalize (forward);
@@ -118,7 +118,7 @@ void boss2_firebullet_left (edict_t *self)
 	AngleVectors (self->s.angles, forward, right, NULL);
 	G_ProjectSource (self->s.origin, monster_flash_offset[MZ2_BOSS2_MACHINEGUN_L1], forward, right, start);
 
-	VectorMA (self->enemy->s.origin, -0.2, self->enemy->velocity, target);
+	VectorMA (self->enemy->s.origin, -0.2f, self->enemy->velocity, target);
 
 	target[2] += self->enemy->viewheight;
 	VectorSubtract (target, start, forward);
@@ -443,7 +443,7 @@ void boss2_attack (edict_t *self)
 	}
 	else 
 	{
-		if (random() <= 0.6)
+		if (random() <= 0.6f)
 			self->monsterinfo.currentmove = &boss2_move_attack_pre_mg;
 		else
 			self->monsterinfo.currentmove = &boss2_move_attack_rocket;
@@ -458,7 +458,7 @@ void boss2_attack_mg (edict_t *self)
 void boss2_reattack_mg (edict_t *self)
 {
 	if ( infront(self, self->enemy) )
-		if (random() <= 0.7)
+		if (random() <= 0.7f)
 			self->monsterinfo.currentmove = &boss2_move_attack_mg;
 		else
 			self->monsterinfo.currentmove = &boss2_move_attack_post_mg;
@@ -592,19 +592,19 @@ qboolean Boss2_CheckAttack (edict_t *self)
 
 	if (self->monsterinfo.aiflags & AI_STAND_GROUND)
 	{
-		chance = 0.4;
+		chance = 0.4f;
 	}
 	else if (enemy_range == RANGE_MELEE)
 	{
-		chance = 0.8;
+		chance = 0.8f;
 	}
 	else if (enemy_range == RANGE_NEAR)
 	{
-		chance = 0.8;
+		chance = 0.8f;
 	}
 	else if (enemy_range == RANGE_MID)
 	{
-		chance = 0.8;
+		chance = 0.8f;
 	}
 	else
 	{
@@ -620,7 +620,7 @@ qboolean Boss2_CheckAttack (edict_t *self)
 
 	if (self->flags & FL_FLY)
 	{
-		if (random() < 0.3)
+		if (random() < 0.3f)
 			self->monsterinfo.attack_state = AS_SLIDING;
 		else
 			self->monsterinfo.attack_state = AS_STRAIGHT;

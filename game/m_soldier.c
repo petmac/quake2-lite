@@ -43,7 +43,7 @@ static int	sound_cock;
 
 void soldier_idle (edict_t *self)
 {
-	if (random() > 0.8)
+	if (random() > 0.8f)
 		gi.sound (self, CHAN_VOICE, sound_idle, 1, ATTN_IDLE, 0);
 }
 
@@ -210,7 +210,7 @@ mmove_t soldier_move_stand4 = {FRAME_stand401, FRAME_stand452, soldier_frames_st
 
 void soldier_stand (edict_t *self)
 {
-	if ((self->monsterinfo.currentmove == &soldier_move_stand3) || (random() < 0.8))
+	if ((self->monsterinfo.currentmove == &soldier_move_stand3) || (random() < 0.8f))
 		self->monsterinfo.currentmove = &soldier_move_stand1;
 	else
 		self->monsterinfo.currentmove = &soldier_move_stand3;
@@ -223,7 +223,7 @@ void soldier_stand (edict_t *self)
 
 void soldier_walk1_random (edict_t *self)
 {
-	if (random() > 0.1)
+	if (random() > 0.1f)
 		self->monsterinfo.nextframe = FRAME_walk101;
 }
 
@@ -442,9 +442,9 @@ void soldier_pain (edict_t *self, edict_t *other, float kick, int damage)
 
 	r = random();
 
-	if (r < 0.33)
+	if (r < 0.33f)
 		self->monsterinfo.currentmove = &soldier_move_pain1;
-	else if (r < 0.66)
+	else if (r < 0.66f)
 		self->monsterinfo.currentmove = &soldier_move_pain2;
 	else
 		self->monsterinfo.currentmove = &soldier_move_pain3;
@@ -658,7 +658,7 @@ void soldier_fire3 (edict_t *self)
 
 void soldier_attack3_refire (edict_t *self)
 {
-	if ((level.time + 0.4) < self->monsterinfo.pausetime)
+	if ((level.time + 0.4f) < self->monsterinfo.pausetime)
 		self->monsterinfo.nextframe = FRAME_attak303;
 }
 
@@ -842,12 +842,12 @@ void soldier_dodge (edict_t *self, edict_t *attacker, float eta)
 		return;
 	}
 
-	self->monsterinfo.pausetime = level.time + eta + 0.3;
+	self->monsterinfo.pausetime = level.time + eta + 0.3f;
 	r = random();
 
 	if (skill->value == 1)
 	{
-		if (r > 0.33)
+		if (r > 0.33f)
 			self->monsterinfo.currentmove = &soldier_move_duck;
 		else
 			self->monsterinfo.currentmove = &soldier_move_attack3;
@@ -856,7 +856,7 @@ void soldier_dodge (edict_t *self, edict_t *attacker, float eta)
 
 	if (skill->value >= 2)
 	{
-		if (r > 0.66)
+		if (r > 0.66f)
 			self->monsterinfo.currentmove = &soldier_move_duck;
 		else
 			self->monsterinfo.currentmove = &soldier_move_attack3;

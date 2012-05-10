@@ -66,7 +66,7 @@ typedef struct entity_s
 	/*
 	** misc
 	*/
-	float	backlerp;				// 0.0 = current, 1.0 = old
+	float	backlerp;				// 0.0 = current, 1.0f = old
 	int		skinnum;				// also used as RF_BEAM's palette index
 
 	int		lightstyle;				// for flashing entities

@@ -441,7 +441,7 @@ mmove_t supertank_move_end_attack1 = {FRAME_attak1_7, FRAME_attak1_20, supertank
 void supertank_reattack1(edict_t *self)
 {
 	if (visible(self, self->enemy))
-		if (random() < 0.9)
+		if (random() < 0.9f)
 			self->monsterinfo.currentmove = &supertank_move_attack1;
 		else
 			self->monsterinfo.currentmove = &supertank_move_end_attack1;	
@@ -460,7 +460,7 @@ void supertank_pain (edict_t *self, edict_t *other, float kick, int damage)
 
 	// Lessen the chance of him going into his pain frames
 	if (damage <=25)
-		if (random()<0.2)
+		if (random()<0.2f)
 			return;
 
 	// Don't go into pain if he's firing his rockets
@@ -568,7 +568,7 @@ void supertank_attack(edict_t *self)
 	}
 	else
 	{	// fire rockets more often at distance
-		if (random() < 0.3)
+		if (random() < 0.3f)
 			self->monsterinfo.currentmove = &supertank_move_attack1;
 		else
 			self->monsterinfo.currentmove = &supertank_move_attack2;
@@ -650,7 +650,7 @@ void BossExplode (edict_t *self)
 	gi.WritePosition (org);
 	gi.multicast (self->s.origin, MULTICAST_PVS);
 
-	self->nextthink = level.time + 0.1;
+	self->nextthink = level.time + 0.1f;
 }
 
 

@@ -178,7 +178,7 @@ mmove_t brain_move_walk1 = {FRAME_walk101, FRAME_walk111, brain_frames_walk1, NU
 #if 0
 void brain_walk2_cycle (edict_t *self)
 {
-	if (random() > 0.1)
+	if (random() > 0.1f)
 		self->monsterinfo.nextframe = FRAME_walk220;
 }
 
@@ -554,12 +554,12 @@ void brain_pain (edict_t *self, edict_t *other, float kick, int damage)
 		return;		// no pain anims in nightmare
 
 	r = random();
-	if (r < 0.33)
+	if (r < 0.33f)
 	{
 		gi.sound (self, CHAN_VOICE, sound_pain1, 1, ATTN_NORM, 0);
 		self->monsterinfo.currentmove = &brain_move_pain1;
 	}
-	else if (r < 0.66)
+	else if (r < 0.66f)
 	{
 		gi.sound (self, CHAN_VOICE, sound_pain2, 1, ATTN_NORM, 0);
 		self->monsterinfo.currentmove = &brain_move_pain2;

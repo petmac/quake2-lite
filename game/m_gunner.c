@@ -125,7 +125,7 @@ void gunner_fidget (edict_t *self)
 {
 	if (self->monsterinfo.aiflags & AI_STAND_GROUND)
 		return;
-	if (random() <= 0.05)
+	if (random() <= 0.05f)
 		self->monsterinfo.currentmove = &gunner_move_fidget;
 }
 
@@ -438,7 +438,7 @@ void GunnerFire (edict_t *self)
 
 	// project enemy back a bit and target there
 	VectorCopy (self->enemy->s.origin, target);
-	VectorMA (target, -0.2, self->enemy->velocity, target);
+	VectorMA (target, -0.2f, self->enemy->velocity, target);
 	target[2] += self->enemy->viewheight;
 
 	VectorSubtract (target, start, aim);

@@ -1706,11 +1706,11 @@ void CL_Frame (int msec)
 
 	extratime = 0;
 #if 0
-	if (cls.frametime > (1.0 / cl_minfps->value))
-		cls.frametime = (1.0 / cl_minfps->value);
+	if (cls.frametime > (1.0f / cl_minfps->value))
+		cls.frametime = (1.0f / cl_minfps->value);
 #else
-	if (cls.frametime > (1.0 / 5))
-		cls.frametime = (1.0 / 5);
+	if (cls.frametime > 0.2f)
+		cls.frametime = 0.2f;
 #endif
 
 	// if in the debugger last frame, don't timeout

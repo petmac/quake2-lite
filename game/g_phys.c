@@ -140,7 +140,7 @@ Slide off of the impacting object
 returns the blocked flags (1 = floor, 2 = step / wall)
 ==================
 */
-#define	STOP_EPSILON	0.1
+#define	STOP_EPSILON	0.1f
 
 int ClipVelocity (vec3_t in, vec3_t normal, vec3_t out, float overbounce)
 {
@@ -230,7 +230,7 @@ int SV_FlyMove (edict_t *ent, float time, int mask)
 
 		hit = trace.ent;
 
-		if (trace.plane.normal[2] > 0.7)
+		if (trace.plane.normal[2] > 0.7f)
 		{
 			blocked |= 1;		// floor
 			if ( hit->solid == SOLID_BSP)
@@ -360,7 +360,7 @@ retry:
 	VectorCopy (trace.endpos, ent->s.origin);
 	gi.linkentity (ent);
 
-	if (trace.fraction != 1.0)
+	if (trace.fraction != 1.0f)
 	{
 		SV_Impact (ent, &trace);
 
@@ -724,7 +724,7 @@ void SV_Physics_Toss (edict_t *ent)
 		ClipVelocity (ent->velocity, trace.plane.normal, ent->velocity, backoff);
 
 	// stop if on ground
-		if (trace.plane.normal[2] > 0.7)
+		if (trace.plane.normal[2] > 0.7f)
 		{		
 			if (ent->velocity[2] < 60 || ent->movetype != MOVETYPE_BOUNCE )
 			{
@@ -845,7 +845,7 @@ void SV_Physics_Step (edict_t *ent)
 		if (!(ent->flags & FL_FLY))
 			if (!((ent->flags & FL_SWIM) && (ent->waterlevel > 2)))
 			{
-				if (ent->velocity[2] < sv_gravity->value*-0.1)
+				if (ent->velocity[2] < sv_gravity->value*-0.1f)
 					hitsound = true;
 				if (ent->waterlevel == 0)
 					SV_AddGravity (ent);

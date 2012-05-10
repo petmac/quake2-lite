@@ -144,7 +144,7 @@ void SubdividePolygon (int numverts, float *verts)
 		poly->verts[i+1][4] = t;
 	}
 
-	VectorScale (total, (1.0/numverts), poly->verts[0]);
+	VectorScale (total, (1.0f/numverts), poly->verts[0]);
 	poly->verts[0][3] = total_s/numverts;
 	poly->verts[0][4] = total_t/numverts;
 
@@ -199,7 +199,7 @@ float	r_turbsin[] =
 {
 	#include "warpsin.h"
 };
-#define TURBSCALE (256.0 / (2 * M_PI))
+#define TURBSCALE (256.0 / (2 * Q_PI))
 
 /*
 =============
@@ -233,11 +233,11 @@ void EmitWaterPolys (msurface_t *fa)
 
 			s = os + r_turbsin[(int)((ot*0.125+r_newrefdef.time) * TURBSCALE) & 255];
 			s += scroll;
-			s *= (1.0/64);
+			s *= (1.0f/64);
 
 			t = ot + r_turbsin[(int)((os*0.125+rdt) * TURBSCALE) & 255];
 
-			t *= (1.0/64);
+			t *= (1.0f/64);
 
 			qglTexCoord2f (s, t);
 			qglVertex3fv (v);
@@ -377,7 +377,7 @@ return;
 	}
 }
 
-#define	ON_EPSILON		0.1			// point on plane side epsilon
+#define	ON_EPSILON		0.1f			// point on plane side epsilon
 #define	MAX_CLIP_VERTS	64
 void ClipSkyPolygon (int nump, vec3_t vecs, int stage)
 {
@@ -541,7 +541,7 @@ void MakeSkyVec (float s, float t, int axis)
 	else if (t > sky_max)
 		t = sky_max;
 
-	t = 1.0 - t;
+	t = 1.0f - t;
 	qglTexCoord2f (s, t);
 	qglVertex3fv (v);
 }
@@ -643,12 +643,12 @@ void R_SetSky (char *name, float rotate, vec3_t axis)
 		if (gl_skymip->value || skyrotate)
 		{	// take less memory
 			gl_picmip->value--;
-			sky_min = 1.0/256;
-			sky_max = 255.0/256;
+			sky_min = 1.0f/256;
+			sky_max = 255.0f/256;
 		}
 		else	
 		{
-			sky_min = 1.0/512;
+			sky_min = 1.0f/512;
 			sky_max = 511.0/512;
 		}
 	}

@@ -75,7 +75,7 @@ Slide off of the impacting object
 returns the blocked flags (1 = floor, 2 = step / wall)
 ==================
 */
-#define	STOP_EPSILON	0.1
+#define	STOP_EPSILON	0.1f
 
 void PM_ClipVelocity (vec3_t in, vec3_t normal, vec3_t out, float overbounce)
 {
@@ -108,7 +108,7 @@ Returns a new origin, velocity, and contact entity
 Does not modify any world state?
 ==================
 */
-#define	MIN_STEP_NORMAL	0.7		// can't step up onto very steep slopes
+#define	MIN_STEP_NORMAL	0.7f		// can't step up onto very steep slopes
 #define	MAX_CLIP_PLANES	5
 void PM_StepSlideMove_ (void)
 {
@@ -181,10 +181,10 @@ void PM_StepSlideMove_ (void)
 		{	// go along this plane
 			VectorCopy (pml.velocity, dir);
 			VectorNormalize (dir);
-			rub = 1.0 + 0.5 * DotProduct (dir, planes[0]);
+			rub = 1.0f + 0.5 * DotProduct (dir, planes[0]);
 
 			// slide along the plane
-			PM_ClipVelocity (pml.velocity, planes[0], pml.velocity, 1.01);
+			PM_ClipVelocity (pml.velocity, planes[0], pml.velocity, 1.01f);
 			// rub some extra speed off on xy axis
 			// not on Z, or you can scrub down walls
 			pml.velocity[0] *= rub;
@@ -195,7 +195,7 @@ void PM_StepSlideMove_ (void)
 		{	// go along the crease
 			VectorCopy (pml.velocity, dir);
 			VectorNormalize (dir);
-			rub = 1.0 + 0.5 * DotProduct (dir, planes[0]);
+			rub = 1.0f + 0.5 * DotProduct (dir, planes[0]);
 
 			// slide along the plane
 			CrossProduct (planes[0], planes[1], dir);
@@ -218,7 +218,7 @@ void PM_StepSlideMove_ (void)
 //
 		for (i=0 ; i<numplanes ; i++)
 		{
-			PM_ClipVelocity (pml.velocity, planes[i], pml.velocity, 1.01);
+			PM_ClipVelocity (pml.velocity, planes[i], pml.velocity, 1.01f);
 			for (j=0 ; j<numplanes ; j++)
 				if (j != i)
 				{
@@ -695,7 +695,7 @@ void PM_CatagorizePosition (void)
 		pml.groundsurface = trace.surface;
 		pml.groundcontents = trace.contents;
 
-		if (!trace.ent || (trace.plane.normal[2] < 0.7 && !trace.startsolid) )
+		if (!trace.ent || (trace.plane.normal[2] < 0.7f && !trace.startsolid) )
 		{
 			pm->groundentity = NULL;
 			pm->s.pm_flags &= ~PMF_ON_GROUND;
@@ -728,7 +728,7 @@ void PM_CatagorizePosition (void)
 		}
 
 #if 0
-		if (trace.fraction < 1.0 && trace.ent && pml.velocity[2] < 0)
+		if (trace.fraction < 1.0f && trace.ent && pml.velocity[2] < 0)
 			pml.velocity[2] = 0;
 #endif
 

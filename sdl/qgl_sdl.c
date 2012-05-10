@@ -805,7 +805,7 @@ qboolean QGL_Init( const char *dllname )
 		char envbuffer[1024];
 		float g;
 
-		g = 2.00 * ( 0.8 - ( vid_gamma->value - 0.5 ) ) + 1.0F;
+		g = 2.00 * ( 0.8f - ( vid_gamma->value - 0.5 ) ) + 1.0F;
 		Com_sprintf( envbuffer, sizeof(envbuffer), "SSTV2_GAMMA=%f", g );
 		_putenv( envbuffer );
 		Com_sprintf( envbuffer, sizeof(envbuffer), "SST_GAMMA=%f", g );

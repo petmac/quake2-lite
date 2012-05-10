@@ -50,7 +50,7 @@ void vectoangles2 (vec3_t value1, vec3_t angles)
 	{
 	// PMM - fixed to correct for pitch of 0
 		if (value1[0])
-			yaw = (atan2(value1[1], value1[0]) * 180 / M_PI);
+			yaw = (atan2(value1[1], value1[0]) * 180 / Q_PI);
 		else if (value1[1] > 0)
 			yaw = 90;
 		else
@@ -60,7 +60,7 @@ void vectoangles2 (vec3_t value1, vec3_t angles)
 			yaw += 360;
 
 		forward = sqrt (value1[0]*value1[0] + value1[1]*value1[1]);
-		pitch = (atan2(value1[2], forward) * 180 / M_PI);
+		pitch = (atan2(value1[2], forward) * 180 / Q_PI);
 		if (pitch < 0)
 			pitch += 360;
 	}
@@ -140,8 +140,8 @@ void CL_DebugTrail (vec3_t start, vec3_t end)
 
 //	VectorScale(vec, RT2_SKIP, vec);
 
-//	dec = 1.0;
-//	dec = 0.75;
+//	dec = 1.0f;
+//	dec = 0.75f;
 	dec = 3;
 	VectorScale (vec, dec, vec);
 	VectorCopy (start, move);
@@ -160,8 +160,8 @@ void CL_DebugTrail (vec3_t start, vec3_t end)
 		p->time = cl.time;
 		VectorClear (p->accel);
 		VectorClear (p->vel);
-		p->alpha = 1.0;
-		p->alphavel = -0.1;
+		p->alpha = 1.0f;
+		p->alphavel = -0.1f;
 //		p->alphavel = 0;
 		p->color = 0x74 + (rand()&7);
 		VectorCopy (move, p->org);
@@ -212,8 +212,8 @@ void CL_SmokeTrail (vec3_t start, vec3_t end, int colorStart, int colorRun, int 
 		
 		p->time = cl.time;
 
-		p->alpha = 1.0;
-		p->alphavel = -1.0 / (1+frand()*0.5);
+		p->alpha = 1.0f;
+		p->alphavel = -1.0f / (1+frand()*0.5);
 		p->color = colorStart + (rand() % colorRun);
 		for (j=0 ; j<3 ; j++)
 		{
@@ -248,7 +248,7 @@ void CL_ForceWall (vec3_t start, vec3_t end, int color)
 		if (!free_particles)
 			return;
 		
-		if (frand() > 0.3)
+		if (frand() > 0.3f)
 		{
 			p = free_particles;
 			free_particles = p->next;
@@ -258,8 +258,8 @@ void CL_ForceWall (vec3_t start, vec3_t end, int color)
 			
 			p->time = cl.time;
 
-			p->alpha = 1.0;
-			p->alphavel =  -1.0 / (3.0+frand()*0.5);
+			p->alpha = 1.0f;
+			p->alphavel =  -1.0f / (3.0+frand()*0.5);
 			p->color = color;
 			for (j=0 ; j<3 ; j++)
 			{
@@ -296,8 +296,8 @@ void CL_FlameEffects (centity_t *ent, vec3_t origin)
 		VectorClear (p->accel);
 		p->time = cl.time;
 
-		p->alpha = 1.0;
-		p->alphavel = -1.0 / (1+frand()*0.2);
+		p->alpha = 1.0f;
+		p->alphavel = -1.0f / (1+frand()*0.2f);
 		p->color = 226 + (rand() % 4);
 		for (j=0 ; j<3 ; j++)
 		{
@@ -322,8 +322,8 @@ void CL_FlameEffects (centity_t *ent, vec3_t origin)
 		
 		p->time = cl.time;
 
-		p->alpha = 1.0;
-		p->alphavel = -1.0 / (1+frand()*0.5);
+		p->alpha = 1.0f;
+		p->alphavel = -1.0f / (1+frand()*0.5);
 		p->color = 0 + (rand() % 4);
 		for (j=0 ; j<3 ; j++)
 		{
@@ -371,9 +371,9 @@ void CL_GenericParticleEffect (vec3_t org, vec3_t dir, int color, int count, int
 		p->accel[0] = p->accel[1] = 0;
 		p->accel[2] = -PARTICLE_GRAVITY;
 //		VectorCopy (accel, p->accel);
-		p->alpha = 1.0;
+		p->alpha = 1.0f;
 
-		p->alphavel = -1.0 / (0.5 + frand()*alphavel);
+		p->alphavel = -1.0f / (0.5 + frand()*alphavel);
 //		p->alphavel = alphavel;
 	}
 }
@@ -413,8 +413,8 @@ void CL_BubbleTrail2 (vec3_t start, vec3_t end, int dist)
 		VectorClear (p->accel);
 		p->time = cl.time;
 
-		p->alpha = 1.0;
-		p->alphavel = -1.0 / (1+frand()*0.1);
+		p->alpha = 1.0f;
+		p->alphavel = -1.0f / (1+frand()*0.1f);
 		p->color = 4 + (rand()&7);
 		for (j=0 ; j<3 ; j++)
 		{
@@ -465,7 +465,7 @@ void CL_Heatbeam (vec3_t start, vec3_t end)
 //	for (i=0 ; i<len ; i++)
 	for (i=0 ; i<len ; i+=step)
 	{
-		d = i * 0.1 - fmod(ltime,16.0)*M_PI;
+		d = i * 0.1f - fmod(ltime,16.0)*Q_PI;
 		c = cos(d)/1.75;
 		s = sin(d)/1.75;
 #ifdef DOUBLE_SCREW		
@@ -486,7 +486,7 @@ void CL_Heatbeam (vec3_t start, vec3_t end)
 			VectorClear (p->accel);
 
 			p->alpha = 0.5;
-	//		p->alphavel = -1.0 / (1+frand()*0.2);
+	//		p->alphavel = -1.0f / (1+frand()*0.2f);
 			// only last one frame!
 			p->alphavel = INSTANT_PARTICLE;
 	//		p->color = 0x74 + (rand()&7);
@@ -497,8 +497,8 @@ void CL_Heatbeam (vec3_t start, vec3_t end)
 			// trim it so it looks like it's starting at the origin
 			if (i < 10)
 			{
-				VectorScale (right, c*(i/10.0)*k, dir);
-				VectorMA (dir, s*(i/10.0)*k, up, dir);
+				VectorScale (right, c*(i/10.0f)*k, dir);
+				VectorMA (dir, s*(i/10.0f)*k, up, dir);
 			}
 			else
 			{
@@ -563,13 +563,13 @@ void CL_Heatbeam (vec3_t start, vec3_t forward)
 	VectorScale (vec, step, vec);
 
 //	Com_Printf ("%f\n", ltime);
-	rstep = M_PI/10.0;
+	rstep = Q_PI/10.0f;
 	for (i=start_pt ; i<len ; i+=step)
 	{
 		if (i>step*5) // don't bother after the 5th ring
 			break;
 
-		for (rot = 0; rot < M_PI*2; rot += rstep)
+		for (rot = 0; rot < Q_PI*2; rot += rstep)
 		{
 
 			if (!free_particles)
@@ -582,10 +582,10 @@ void CL_Heatbeam (vec3_t start, vec3_t forward)
 			
 			p->time = cl.time;
 			VectorClear (p->accel);
-//			rot+= fmod(ltime, 12.0)*M_PI;
+//			rot+= fmod(ltime, 12.0)*Q_PI;
 //			c = cos(rot)/2.0;
 //			s = sin(rot)/2.0;
-//			variance = 0.4 + ((float)rand()/(float)RAND_MAX) *0.2;
+//			variance = 0.4f + ((float)rand()/(float)RAND_MAX) *0.2f;
 			variance = 0.5;
 			c = cos(rot)*variance;
 			s = sin(rot)*variance;
@@ -593,8 +593,8 @@ void CL_Heatbeam (vec3_t start, vec3_t forward)
 			// trim it so it looks like it's starting at the origin
 			if (i < 10)
 			{
-				VectorScale (right, c*(i/10.0), dir);
-				VectorMA (dir, s*(i/10.0), up, dir);
+				VectorScale (right, c*(i/10.0f), dir);
+				VectorMA (dir, s*(i/10.0f), up, dir);
 			}
 			else
 			{
@@ -603,7 +603,7 @@ void CL_Heatbeam (vec3_t start, vec3_t forward)
 			}
 		
 			p->alpha = 0.5;
-	//		p->alphavel = -1.0 / (1+frand()*0.2);
+	//		p->alphavel = -1.0f / (1+frand()*0.2f);
 			p->alphavel = -1000.0;
 	//		p->color = 0x74 + (rand()&7);
 			p->color = 223 - (rand()&7);
@@ -659,11 +659,11 @@ void CL_Heatbeam (vec3_t start, vec3_t end)
 		p->time = cl.time;
 		VectorClear (p->accel);
 		
-		d = crand()*M_PI;
+		d = crand()*Q_PI;
 		c = cos(d)*30;
 		s = sin(d)*30;
 
-		p->alpha = 1.0;
+		p->alpha = 1.0f;
 		p->alphavel = -5.0 / (1+frand());
 		p->color = 223 - (rand()&7);
 
@@ -684,13 +684,13 @@ void CL_Heatbeam (vec3_t start, vec3_t end)
 	VectorScale (vec, step, vec);
 
 //	Com_Printf ("%f\n", ltime);
-	rstep = M_PI/12.0;
+	rstep = Q_PI/12.0;
 	for (i=start_pt ; i<len ; i+=step)
 	{
 		if (i>step*5) // don't bother after the 5th ring
 			break;
 
-		for (rot = 0; rot < M_PI*2; rot += rstep)
+		for (rot = 0; rot < Q_PI*2; rot += rstep)
 		{
 			if (!free_particles)
 				return;
@@ -702,7 +702,7 @@ void CL_Heatbeam (vec3_t start, vec3_t end)
 			
 			p->time = cl.time;
 			VectorClear (p->accel);
-//			rot+= fmod(ltime, 12.0)*M_PI;
+//			rot+= fmod(ltime, 12.0)*Q_PI;
 //			c = cos(rot)/2.0;
 //			s = sin(rot)/2.0;
 			c = cos(rot)/1.5;
@@ -711,8 +711,8 @@ void CL_Heatbeam (vec3_t start, vec3_t end)
 			// trim it so it looks like it's starting at the origin
 			if (i < 10)
 			{
-				VectorScale (right, c*(i/10.0), dir);
-				VectorMA (dir, s*(i/10.0), up, dir);
+				VectorScale (right, c*(i/10.0f), dir);
+				VectorMA (dir, s*(i/10.0f), up, dir);
 			}
 			else
 			{
@@ -721,7 +721,7 @@ void CL_Heatbeam (vec3_t start, vec3_t end)
 			}
 		
 			p->alpha = 0.5;
-	//		p->alphavel = -1.0 / (1+frand()*0.2);
+	//		p->alphavel = -1.0f / (1+frand()*0.2f);
 			p->alphavel = -1000.0;
 	//		p->color = 0x74 + (rand()&7);
 			p->color = 223 - (rand()&7);
@@ -771,7 +771,7 @@ void CL_ParticleSteamEffect (vec3_t org, vec3_t dir, int color, int count, int m
 
 		for (j=0 ; j<3 ; j++)
 		{
-			p->org[j] = org[j] + magnitude*0.1*crand();
+			p->org[j] = org[j] + magnitude*0.1f*crand();
 //			p->vel[j] = dir[j]*magnitude;
 		}
 		VectorScale (dir, magnitude, p->vel);
@@ -782,9 +782,9 @@ void CL_ParticleSteamEffect (vec3_t org, vec3_t dir, int color, int count, int m
 
 		p->accel[0] = p->accel[1] = 0;
 		p->accel[2] = -PARTICLE_GRAVITY/2;
-		p->alpha = 1.0;
+		p->alpha = 1.0f;
 
-		p->alphavel = -1.0 / (0.5 + frand()*0.3);
+		p->alphavel = -1.0f / (0.5 + frand()*0.3f);
 	}
 }
 
@@ -817,7 +817,7 @@ void CL_ParticleSteamEffect2 (cl_sustain_t *self)
 
 		for (j=0 ; j<3 ; j++)
 		{
-			p->org[j] = self->org[j] + self->magnitude*0.1*crand();
+			p->org[j] = self->org[j] + self->magnitude*0.1f*crand();
 //			p->vel[j] = dir[j]*magnitude;
 		}
 		VectorScale (dir, self->magnitude, p->vel);
@@ -828,9 +828,9 @@ void CL_ParticleSteamEffect2 (cl_sustain_t *self)
 
 		p->accel[0] = p->accel[1] = 0;
 		p->accel[2] = -PARTICLE_GRAVITY/2;
-		p->alpha = 1.0;
+		p->alpha = 1.0f;
 
-		p->alphavel = -1.0 / (0.5 + frand()*0.3);
+		p->alphavel = -1.0f / (0.5 + frand()*0.3f);
 	}
 	self->nextthink += self->thinkinterval;
 }
@@ -877,7 +877,7 @@ void CL_TrackerTrail (vec3_t start, vec3_t end, int particleColor)
 		
 		p->time = cl.time;
 
-		p->alpha = 1.0;
+		p->alpha = 1.0f;
 		p->alphavel = -2.0;
 		p->color = particleColor;
 		dist = DotProduct(move, forward);
@@ -912,7 +912,7 @@ void CL_Tracker_Shell(vec3_t origin)
 		
 		p->time = cl.time;
 
-		p->alpha = 1.0;
+		p->alpha = 1.0f;
 		p->alphavel = INSTANT_PARTICLE;
 		p->color = 0;
 
@@ -943,7 +943,7 @@ void CL_MonsterPlasma_Shell(vec3_t origin)
 		
 		p->time = cl.time;
 
-		p->alpha = 1.0;
+		p->alpha = 1.0f;
 		p->alphavel = INSTANT_PARTICLE;
 		p->color = 0xe0;
 
@@ -965,7 +965,7 @@ void CL_Widowbeamout (cl_sustain_t *self)
 	static int colortable[4] = {2*8,13*8,21*8,18*8};
 	float			ratio;
 
-	ratio = 1.0 - (((float)self->endtime - (float)cl.time)/2100.0);
+	ratio = 1.0f - (((float)self->endtime - (float)cl.time)/2100.0);
 
 	for(i=0;i<300;i++)
 	{
@@ -979,7 +979,7 @@ void CL_Widowbeamout (cl_sustain_t *self)
 		
 		p->time = cl.time;
 
-		p->alpha = 1.0;
+		p->alpha = 1.0f;
 		p->alphavel = INSTANT_PARTICLE;
 		p->color = colortable[rand()&3];
 
@@ -1001,7 +1001,7 @@ void CL_Nukeblast (cl_sustain_t *self)
 	static int colortable[4] = {110, 112, 114, 116};
 	float			ratio;
 
-	ratio = 1.0 - (((float)self->endtime - (float)cl.time)/1000.0);
+	ratio = 1.0f - (((float)self->endtime - (float)cl.time)/1000.0);
 
 	for(i=0;i<700;i++)
 	{
@@ -1015,7 +1015,7 @@ void CL_Nukeblast (cl_sustain_t *self)
 		
 		p->time = cl.time;
 
-		p->alpha = 1.0;
+		p->alpha = 1.0f;
 		p->alphavel = INSTANT_PARTICLE;
 		p->color = colortable[rand()&3];
 
@@ -1056,9 +1056,9 @@ void CL_WidowSplash (vec3_t org)
 		VectorMA(vec3_origin, 40.0, dir, p->vel);
 
 		p->accel[0] = p->accel[1] = 0;
-		p->alpha = 1.0;
+		p->alpha = 1.0f;
 
-		p->alphavel = -0.8 / (0.5 + frand()*0.3);
+		p->alphavel = -0.8f / (0.5 + frand()*0.3f);
 	}
 
 }
@@ -1081,8 +1081,8 @@ void CL_Tracker_Explode(vec3_t	origin)
 		
 		p->time = cl.time;
 
-		p->alpha = 1.0;
-		p->alphavel = -1.0;
+		p->alpha = 1.0f;
+		p->alphavel = -1.0f;
 		p->color = 0;
 
 		dir[0] = crand();
@@ -1133,8 +1133,8 @@ void CL_TagTrail (vec3_t start, vec3_t end, float color)
 		
 		p->time = cl.time;
 
-		p->alpha = 1.0;
-		p->alphavel = -1.0 / (0.8+frand()*0.2);
+		p->alpha = 1.0f;
+		p->alphavel = -1.0f / (0.8f+frand()*0.2f);
 		p->color = color;
 		for (j=0 ; j<3 ; j++)
 		{
@@ -1177,9 +1177,9 @@ void CL_ColorExplosionParticles (vec3_t org, int color, int run)
 
 		p->accel[0] = p->accel[1] = 0;
 		p->accel[2] = -PARTICLE_GRAVITY;
-		p->alpha = 1.0;
+		p->alpha = 1.0f;
 
-		p->alphavel = -0.4 / (0.6 + frand()*0.2);
+		p->alphavel = -0.4f / (0.6f + frand()*0.2f);
 	}
 }
 
@@ -1211,7 +1211,7 @@ void CL_ParticleSmokeEffect (vec3_t org, vec3_t dir, int color, int count, int m
 
 		for (j=0 ; j<3 ; j++)
 		{
-			p->org[j] = org[j] + magnitude*0.1*crand();
+			p->org[j] = org[j] + magnitude*0.1f*crand();
 //			p->vel[j] = dir[j]*magnitude;
 		}
 		VectorScale (dir, magnitude, p->vel);
@@ -1221,9 +1221,9 @@ void CL_ParticleSmokeEffect (vec3_t org, vec3_t dir, int color, int count, int m
 		VectorMA (p->vel, d, u, p->vel);
 
 		p->accel[0] = p->accel[1] = p->accel[2] = 0;
-		p->alpha = 1.0;
+		p->alpha = 1.0f;
 
-		p->alphavel = -1.0 / (0.5 + frand()*0.3);
+		p->alphavel = -1.0f / (0.5 + frand()*0.3f);
 	}
 }
 
@@ -1263,9 +1263,9 @@ void CL_BlasterParticles2 (vec3_t org, vec3_t dir, unsigned int color)
 
 		p->accel[0] = p->accel[1] = 0;
 		p->accel[2] = -PARTICLE_GRAVITY;
-		p->alpha = 1.0;
+		p->alpha = 1.0f;
 
-		p->alphavel = -1.0 / (0.5 + frand()*0.3);
+		p->alphavel = -1.0f / (0.5 + frand()*0.3f);
 	}
 }
 
@@ -1307,8 +1307,8 @@ void CL_BlasterTrail2 (vec3_t start, vec3_t end)
 		
 		p->time = cl.time;
 
-		p->alpha = 1.0;
-		p->alphavel = -1.0 / (0.3+frand()*0.2);
+		p->alpha = 1.0f;
+		p->alphavel = -1.0f / (0.3f+frand()*0.2f);
 		p->color = 0xd0;
 		for (j=0 ; j<3 ; j++)
 		{

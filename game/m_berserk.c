@@ -102,18 +102,18 @@ void berserk_fidget (edict_t *self)
 
 mframe_t berserk_frames_walk [] =
 {
-	ai_walk, 9.1, NULL,
-	ai_walk, 6.3, NULL,
-	ai_walk, 4.9, NULL,
-	ai_walk, 6.7, NULL,
+	ai_walk, 9.1f, NULL,
+	ai_walk, 6.3f, NULL,
+	ai_walk, 4.9f, NULL,
+	ai_walk, 6.7f, NULL,
 	ai_walk, 6.0, NULL,
-	ai_walk, 8.2, NULL,
-	ai_walk, 7.2, NULL,
-	ai_walk, 6.1, NULL,
-	ai_walk, 4.9, NULL,
-	ai_walk, 4.7, NULL,
-	ai_walk, 4.7, NULL,
-	ai_walk, 4.8, NULL
+	ai_walk, 8.2f, NULL,
+	ai_walk, 7.2f, NULL,
+	ai_walk, 6.1f, NULL,
+	ai_walk, 4.9f, NULL,
+	ai_walk, 4.7f, NULL,
+	ai_walk, 4.7f, NULL,
+	ai_walk, 4.8f, NULL
 };
 mmove_t berserk_move_walk = {FRAME_walkc1, FRAME_walkc11, berserk_frames_walk, NULL};
 
@@ -239,8 +239,8 @@ mframe_t berserk_frames_attack_strike [] =
 	ai_move, 0, NULL,
 	ai_move, 0, NULL,
 	ai_move, 0, NULL,
-	ai_move, 9.7, NULL,
-	ai_move, 13.6, NULL
+	ai_move, 9.7f, NULL,
+	ai_move, 13.6f, NULL
 };
 	
 mmove_t berserk_move_attack_strike = {FRAME_att_c21, FRAME_att_c34, berserk_frames_attack_strike, berserk_run};
@@ -269,7 +269,7 @@ void() 	berserk_atke10	=[	$r_attb10,	berserk_atke11	] {ai_run(17);};
 void() 	berserk_atke11	=[	$r_attb11,	berserk_atke12	] {ai_run(9);};
 void() 	berserk_atke12	=[	$r_attb12,	berserk_atke13	] {ai_run(25);};
 void() 	berserk_atke13	=[	$r_attb13,	berserk_atke14	] {ai_run(3.7);};
-void() 	berserk_atke14	=[	$r_attb14,	berserk_atke15	] {ai_run(2.6);};
+void() 	berserk_atke14	=[	$r_attb14,	berserk_atke15	] {ai_run(2.6f);};
 void() 	berserk_atke15	=[	$r_attb15,	berserk_atke16	] {ai_run(19);};
 void() 	berserk_atke16	=[	$r_attb16,	berserk_atke17	] {ai_run(25);};
 void() 	berserk_atke17	=[	$r_attb17,	berserk_atke18	] {ai_run(19.6);};

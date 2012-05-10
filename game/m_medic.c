@@ -223,18 +223,18 @@ void medic_stand (edict_t *self)
 
 mframe_t medic_frames_walk [] =
 {
-	ai_walk, 6.2,	NULL,
-	ai_walk, 18.1,  NULL,
+	ai_walk, 6.2f,	NULL,
+	ai_walk, 18.1f,  NULL,
 	ai_walk, 1,		NULL,
 	ai_walk, 9,		NULL,
 	ai_walk, 10,	NULL,
 	ai_walk, 9,		NULL,
 	ai_walk, 11,	NULL,
-	ai_walk, 11.6,  NULL,
+	ai_walk, 11.6f,  NULL,
 	ai_walk, 2,		NULL,
-	ai_walk, 9.9,	NULL,
+	ai_walk, 9.9f,	NULL,
 	ai_walk, 14,	NULL,
-	ai_walk, 9.3,	NULL
+	ai_walk, 9.3f,	NULL
 };
 mmove_t medic_move_walk = {FRAME_walk1, FRAME_walk12, medic_frames_walk, NULL};
 
@@ -248,10 +248,10 @@ mframe_t medic_frames_run [] =
 {
 	ai_run, 18,		NULL,
 	ai_run, 22.5,	NULL,
-	ai_run, 25.4,	NULL,
-	ai_run, 23.4,	NULL,
+	ai_run, 25.4f,	NULL,
+	ai_run, 23.4f,	NULL,
 	ai_run, 24,		NULL,
-	ai_run, 35.6,	NULL
+	ai_run, 35.6f,	NULL
 	
 };
 mmove_t medic_move_run = {FRAME_run1, FRAME_run6, medic_frames_run, NULL};
@@ -561,16 +561,16 @@ void ED_CallSpawn (edict_t *ent);
 
 static vec3_t	medic_cable_offsets[] =
 {
-	45.0,  -9.2, 15.5,
-	48.4,  -9.7, 15.2,
-	47.8,  -9.8, 15.8,
-	47.3,  -9.3, 14.3,
-	45.4, -10.1, 13.1,
-	41.9, -12.7, 12.0,
-	37.8, -15.8, 11.2,
-	34.3, -18.4, 10.7,
-	32.7, -19.7, 10.4,
-	32.7, -19.7, 10.4
+	45.0f,  -9.2f, 15.5f,
+	48.4f,  -9.7f, 15.2f,
+	47.8f,  -9.8f, 15.8f,
+	47.3f,  -9.3f, 14.3f,
+	45.4f, -10.1f, 13.1f,
+	41.9f, -12.7f, 12.0f,
+	37.8f, -15.8f, 11.2f,
+	34.3f, -18.4f, 10.7f,
+	32.7f, -19.7f, 10.4f,
+	32.7f, -19.7f, 10.4f
 };
 
 void medic_cable_attack (edict_t *self)
@@ -601,7 +601,7 @@ void medic_cable_attack (edict_t *self)
 		return;
 
 	tr = gi.trace (start, NULL, NULL, self->enemy->s.origin, self, MASK_SHOT);
-	if (tr.fraction != 1.0 && tr.ent != self->enemy)
+	if (tr.fraction != 1.0f && tr.ent != self->enemy)
 		return;
 
 	if (self->s.frame == FRAME_attack43)
@@ -664,8 +664,8 @@ mframe_t medic_frames_attackCable [] =
 	ai_move, 2,		NULL,
 	ai_move, 3,		NULL,
 	ai_move, 5,		NULL,
-	ai_move, 4.4,	NULL,
-	ai_charge, 4.7,	NULL,
+	ai_move, 4.4f,	NULL,
+	ai_charge, 4.7f,	NULL,
 	ai_charge, 5,	NULL,
 	ai_charge, 6,	NULL,
 	ai_charge, 4,	NULL,
@@ -682,13 +682,13 @@ mframe_t medic_frames_attackCable [] =
 	ai_move, 0,		medic_cable_attack,
 	ai_move, -15,	medic_hook_retract,
 	ai_move, -1.5,	NULL,
-	ai_move, -1.2,	NULL,
+	ai_move, -1.2f,	NULL,
 	ai_move, -3,	NULL,
 	ai_move, -2,	NULL,
-	ai_move, 0.3,	NULL,
-	ai_move, 0.7,	NULL,
-	ai_move, 1.2,	NULL,
-	ai_move, 1.3,	NULL
+	ai_move, 0.3f,	NULL,
+	ai_move, 0.7f,	NULL,
+	ai_move, 1.2f,	NULL,
+	ai_move, 1.3f,	NULL
 };
 mmove_t medic_move_attackCable = {FRAME_attack33, FRAME_attack60, medic_frames_attackCable, medic_run};
 

@@ -542,7 +542,7 @@ void CL_ParseLaser (int colors)
 			l->ent.flags = RF_TRANSLUCENT | RF_BEAM;
 			VectorCopy (start, l->ent.origin);
 			VectorCopy (end, l->ent.oldorigin);
-			l->ent.alpha = 0.30;
+			l->ent.alpha = 0.30f;
 			l->ent.skinnum = (colors >> ((rand() % 4)*8)) & 0xff;
 			l->ent.model = NULL;
 			l->ent.frame = 4;
@@ -802,10 +802,10 @@ void CL_ParseTEnt (void)
 
 		ex = CL_AllocExplosion ();
 		VectorCopy (pos, ex->ent.origin);
-		ex->ent.angles[0] = acos(dir[2])/M_PI*180;
+		ex->ent.angles[0] = acos(dir[2])/Q_PI*180;
 	// PMM - fixed to correct for pitch of 0
 		if (dir[0])
-			ex->ent.angles[1] = atan2(dir[1], dir[0])/M_PI*180;
+			ex->ent.angles[1] = atan2(dir[1], dir[0])/Q_PI*180;
 		else if (dir[1] > 0)
 			ex->ent.angles[1] = 90;
 		else if (dir[1] < 0)
@@ -842,7 +842,7 @@ void CL_ParseTEnt (void)
 		ex->ent.flags = RF_FULLBRIGHT;
 		ex->start = cl.frame.servertime - 100;
 		ex->light = 350;
-		ex->lightcolor[0] = 1.0;
+		ex->lightcolor[0] = 1.0f;
 		ex->lightcolor[1] = 0.5;
 		ex->lightcolor[2] = 0.5;
 		ex->ent.model = cl_mod_explo4;
@@ -865,7 +865,7 @@ void CL_ParseTEnt (void)
 		ex->ent.flags = RF_FULLBRIGHT;
 		ex->start = cl.frame.servertime - 100;
 		ex->light = 350;
-		ex->lightcolor[0] = 1.0; 
+		ex->lightcolor[0] = 1.0f; 
 		ex->lightcolor[1] = 0.5;
 		ex->lightcolor[2] = 0.5;
 		ex->ent.angles[1] = rand() % 360;
@@ -890,7 +890,7 @@ void CL_ParseTEnt (void)
 		ex->ent.flags = RF_FULLBRIGHT;
 		ex->start = cl.frame.servertime - 100;
 		ex->light = 350;
-		ex->lightcolor[0] = 1.0;
+		ex->lightcolor[0] = 1.0f;
 		ex->lightcolor[1] = 0.5;
 		ex->lightcolor[2] = 0.5;
 		ex->ent.angles[1] = rand() % 360;
@@ -918,11 +918,11 @@ void CL_ParseTEnt (void)
 		ex->start = cl.frame.servertime - 100;
 		ex->light = 350;
 		ex->lightcolor[0] = 0.0;
-		ex->lightcolor[1] = 1.0;
+		ex->lightcolor[1] = 1.0f;
 		ex->lightcolor[2] = 0.0;
 		ex->ent.model = cl_mod_bfg_explo;
 		ex->ent.flags |= RF_TRANSLUCENT;
-		ex->ent.alpha = 0.30;
+		ex->ent.alpha = 0.30f;
 		ex->frames = 4;
 		break;
 
@@ -970,11 +970,11 @@ void CL_ParseTEnt (void)
 		// note to self
 		// we need a better no draw flag
 		ex->ent.flags = RF_BEAM;
-		ex->start = cl.frame.servertime - 0.1;
+		ex->start = cl.frame.servertime - 0.1f;
 		ex->light = 100 + (rand()%75);
-		ex->lightcolor[0] = 1.0;
-		ex->lightcolor[1] = 1.0;
-		ex->lightcolor[2] = 0.3;
+		ex->lightcolor[0] = 1.0f;
+		ex->lightcolor[1] = 1.0f;
+		ex->lightcolor[2] = 0.3f;
 		ex->ent.model = cl_mod_flash;
 		ex->frames = 2;
 		break;
@@ -1010,10 +1010,10 @@ void CL_ParseTEnt (void)
 
 		ex = CL_AllocExplosion ();
 		VectorCopy (pos, ex->ent.origin);
-		ex->ent.angles[0] = acos(dir[2])/M_PI*180;
+		ex->ent.angles[0] = acos(dir[2])/Q_PI*180;
 	// PMM - fixed to correct for pitch of 0
 		if (dir[0])
-			ex->ent.angles[1] = atan2(dir[1], dir[0])/M_PI*180;
+			ex->ent.angles[1] = atan2(dir[1], dir[0])/Q_PI*180;
 		else if (dir[1] > 0)
 			ex->ent.angles[1] = 90;
 		else if (dir[1] < 0)
@@ -1037,9 +1037,9 @@ void CL_ParseTEnt (void)
 			ex->lightcolor[1] = 1;
 		else // flechette
 		{
-			ex->lightcolor[0] = 0.19;
-			ex->lightcolor[1] = 0.41;
-			ex->lightcolor[2] = 0.75;
+			ex->lightcolor[0] = 0.19f;
+			ex->lightcolor[1] = 0.41f;
+			ex->lightcolor[2] = 0.75f;
 		}
 		ex->ent.model = cl_mod_explode;
 		ex->frames = 4;
@@ -1067,7 +1067,7 @@ void CL_ParseTEnt (void)
 		ex->ent.flags = RF_FULLBRIGHT;
 		ex->start = cl.frame.servertime - 100;
 		ex->light = 350;
-		ex->lightcolor[0] = 1.0;
+		ex->lightcolor[0] = 1.0f;
 		ex->lightcolor[1] = 0.5;
 		ex->lightcolor[2] = 0.5;
 		ex->ent.angles[1] = rand() % 360;
@@ -1244,7 +1244,7 @@ void CL_AddBeams (void)
 		{
 	// PMM - fixed to correct for pitch of 0
 			if (dist[0])
-				yaw = (atan2(dist[1], dist[0]) * 180 / M_PI);
+				yaw = (atan2(dist[1], dist[0]) * 180 / Q_PI);
 			else if (dist[1] > 0)
 				yaw = 90;
 			else
@@ -1253,7 +1253,7 @@ void CL_AddBeams (void)
 				yaw += 360;
 	
 			forward = sqrt (dist[0]*dist[0] + dist[1]*dist[1]);
-			pitch = (atan2(dist[2], forward) * -180.0 / M_PI);
+			pitch = (atan2(dist[2], forward) * -180.0 / Q_PI);
 			if (pitch < 0)
 				pitch += 360.0;
 		}
@@ -1284,7 +1284,7 @@ void CL_AddBeams (void)
 			// offset to push beam outside of tesla model (negative because dist is from end to start
 			// for this beam)
 //			for (j=0 ; j<3 ; j++)
-//				ent.origin[j] -= dist[j]*10.0;
+//				ent.origin[j] -= dist[j]*10.0f;
 			ent.model = b->model;
 			ent.flags = RF_FULLBRIGHT;
 			ent.angles[0] = pitch;
@@ -1459,7 +1459,7 @@ void CL_AddPlayerBeams (void)
 		{
 	// PMM - fixed to correct for pitch of 0
 			if (dist[0])
-				yaw = (atan2(dist[1], dist[0]) * 180 / M_PI);
+				yaw = (atan2(dist[1], dist[0]) * 180 / Q_PI);
 			else if (dist[1] > 0)
 				yaw = 90;
 			else
@@ -1468,7 +1468,7 @@ void CL_AddPlayerBeams (void)
 				yaw += 360;
 	
 			forward = sqrt (dist[0]*dist[0] + dist[1]*dist[1]);
-			pitch = (atan2(dist[2], forward) * -180.0 / M_PI);
+			pitch = (atan2(dist[2], forward) * -180.0 / Q_PI);
 			if (pitch < 0)
 				pitch += 360.0;
 		}
@@ -1540,7 +1540,7 @@ void CL_AddPlayerBeams (void)
 			// offset to push beam outside of tesla model (negative because dist is from end to start
 			// for this beam)
 //			for (j=0 ; j<3 ; j++)
-//				ent.origin[j] -= dist[j]*10.0;
+//				ent.origin[j] -= dist[j]*10.0f;
 			ent.model = b->model;
 			ent.flags = RF_FULLBRIGHT;
 			ent.angles[0] = pitch;
@@ -1556,7 +1556,7 @@ void CL_AddPlayerBeams (void)
 			if(cl_mod_heatbeam && (b->model == cl_mod_heatbeam))
 			{
 //				ent.flags = RF_FULLBRIGHT|RF_TRANSLUCENT;
-//				ent.alpha = 0.3;
+//				ent.alpha = 0.3f;
 				ent.flags = RF_FULLBRIGHT;
 				ent.angles[0] = -pitch;
 				ent.angles[1] = yaw + 180.0;
@@ -1624,7 +1624,7 @@ void CL_AddExplosions (void)
 				ex->type = ex_free;
 				break;
 			}
-			ent->alpha = 1.0 - frac/(ex->frames-1);
+			ent->alpha = 1.0f - frac/(ex->frames-1);
 			break;
 		case ex_flash:
 			if (f >= 1)
@@ -1632,7 +1632,7 @@ void CL_AddExplosions (void)
 				ex->type = ex_free;
 				break;
 			}
-			ent->alpha = 1.0;
+			ent->alpha = 1.0f;
 			break;
 		case ex_poly:
 			if (f >= ex->frames-1)
@@ -1685,7 +1685,7 @@ void CL_AddExplosions (void)
 			f = 0;
 		ent->frame = ex->baseframe + f + 1;
 		ent->oldframe = ex->baseframe + f;
-		ent->backlerp = 1.0 - cl.lerpfrac;
+		ent->backlerp = 1.0f - cl.lerpfrac;
 
 		V_AddEntity (ent);
 	}

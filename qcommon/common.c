@@ -806,14 +806,14 @@ char *MSG_ReadStringLine (sizebuf_t *msg_read)
 
 float MSG_ReadCoord (sizebuf_t *msg_read)
 {
-	return MSG_ReadShort(msg_read) * (1.0/8);
+	return MSG_ReadShort(msg_read) * (1.0f/8);
 }
 
 void MSG_ReadPos (sizebuf_t *msg_read, vec3_t pos)
 {
-	pos[0] = MSG_ReadShort(msg_read) * (1.0/8);
-	pos[1] = MSG_ReadShort(msg_read) * (1.0/8);
-	pos[2] = MSG_ReadShort(msg_read) * (1.0/8);
+	pos[0] = MSG_ReadShort(msg_read) * (1.0f/8);
+	pos[1] = MSG_ReadShort(msg_read) * (1.0f/8);
+	pos[2] = MSG_ReadShort(msg_read) * (1.0f/8);
 }
 
 float MSG_ReadAngle (sizebuf_t *msg_read)
@@ -1341,7 +1341,7 @@ byte	COM_BlockSequenceCRCByte (byte *base, int length, int sequence)
 
 float	frand(void)
 {
-	return (rand()&32767)* (1.0/32767);
+	return (rand()&32767)* (1.0f/32767);
 }
 
 float	crand(void)

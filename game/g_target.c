@@ -48,7 +48,7 @@ void SP_target_temp_entity (edict_t *ent)
 1 = normal fighting sounds
 2 = idle sound level
 3 = ambient sound level
-"volume"	0.0 to 1.0
+"volume"	0.0 to 1.0f
 
 Normal sounds play each time the target is used.  The reliable flag can be set for crucial voiceovers.
 
@@ -94,10 +94,10 @@ void SP_target_speaker (edict_t *ent)
 	ent->noise_index = gi.soundindex (buffer);
 
 	if (!ent->volume)
-		ent->volume = 1.0;
+		ent->volume = 1.0f;
 
 	if (!ent->attenuation)
-		ent->attenuation = 1.0;
+		ent->attenuation = 1.0f;
 	else if (ent->attenuation == -1)	// use -1 so 0 defaults to 1
 		ent->attenuation = 0;
 
@@ -759,7 +759,7 @@ void target_earthquake_think (edict_t *self)
 
 	if (self->last_move_time < level.time)
 	{
-		gi.positioned_sound (self->s.origin, self, CHAN_AUTO, self->noise_index, 1.0, ATTN_NONE, 0);
+		gi.positioned_sound (self->s.origin, self, CHAN_AUTO, self->noise_index, 1.0f, ATTN_NONE, 0);
 		self->last_move_time = level.time + 0.5;
 	}
 

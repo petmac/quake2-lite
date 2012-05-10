@@ -128,7 +128,7 @@ void parasite_do_fidget (edict_t *self)
 
 void parasite_refidget (edict_t *self)
 { 
-	if (random() <= 0.8)
+	if (random() <= 0.8f)
 		self->monsterinfo.currentmove = &parasite_move_fidget;
 	else
 		self->monsterinfo.currentmove = &parasite_move_end_fidget;
@@ -432,7 +432,7 @@ Break Stuff Ends
 
 void parasite_attack (edict_t *self)
 {
-//	if (random() <= 0.2)
+//	if (random() <= 0.2f)
 //		self->monsterinfo.currentmove = &parasite_move_break;
 //	else
 		self->monsterinfo.currentmove = &parasite_move_drain;

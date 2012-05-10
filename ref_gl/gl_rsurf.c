@@ -120,8 +120,8 @@ glpoly_t *WaterWarpPolyVerts (glpoly_t *p)
 	nv = out->verts[0];
 	for (i=0 ; i<p->numverts ; i++, v+= VERTEXSIZE, nv+=VERTEXSIZE)
 	{
-		nv[0] = v[0] + 4*sin(v[1]*0.05+r_newrefdef.time)*sin(v[2]*0.05+r_newrefdef.time);
-		nv[1] = v[1] + 4*sin(v[0]*0.05+r_newrefdef.time)*sin(v[2]*0.05+r_newrefdef.time);
+		nv[0] = v[0] + 4*sin(v[1]*0.05f+r_newrefdef.time)*sin(v[2]*0.05f+r_newrefdef.time);
+		nv[1] = v[1] + 4*sin(v[0]*0.05f+r_newrefdef.time)*sin(v[2]*0.05f+r_newrefdef.time);
 
 		nv[2] = v[2];
 		nv[3] = v[3];
@@ -426,8 +426,8 @@ void R_BlendLightmaps (void)
 				{
 					if ( drawsurf->polys )
 						DrawGLPolyChain( drawsurf->polys, 
-							              ( drawsurf->light_s - drawsurf->dlight_s ) * ( 1.0 / 128.0 ), 
-										( drawsurf->light_t - drawsurf->dlight_t ) * ( 1.0 / 128.0 ) );
+							              ( drawsurf->light_s - drawsurf->dlight_s ) * ( 1.0f / 128.0 ), 
+										( drawsurf->light_t - drawsurf->dlight_t ) * ( 1.0f / 128.0 ) );
 				}
 
 				newdrawsurf = drawsurf;
@@ -457,7 +457,7 @@ void R_BlendLightmaps (void)
 		for ( surf = newdrawsurf; surf != 0; surf = surf->lightmapchain )
 		{
 			if ( surf->polys )
-				DrawGLPolyChain( surf->polys, ( surf->light_s - surf->dlight_s ) * ( 1.0 / 128.0 ), ( surf->light_t - surf->dlight_t ) * ( 1.0 / 128.0 ) );
+				DrawGLPolyChain( surf->polys, ( surf->light_s - surf->dlight_s ) * ( 1.0f / 128.0 ), ( surf->light_t - surf->dlight_t ) * ( 1.0f / 128.0 ) );
 		}
 	}
 
@@ -606,9 +606,9 @@ void R_DrawAlphaSurfaces (void)
 		GL_Bind(s->texinfo->image->texnum);
 		c_brush_polys++;
 		if (s->texinfo->flags & SURF_TRANS33)
-			qglColor4f (intens,intens,intens,0.33);
+			qglColor4f (intens,intens,intens,0.33f);
 		else if (s->texinfo->flags & SURF_TRANS66)
-			qglColor4f (intens,intens,intens,0.66);
+			qglColor4f (intens,intens,intens,0.66f);
 		else
 			qglColor4f (intens,intens,intens,1);
 		if (s->flags & SURF_DRAWTURB)

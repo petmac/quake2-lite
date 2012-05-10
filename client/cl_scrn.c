@@ -35,7 +35,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "client.h"
 
 float		scr_con_current;	// aproaches scr_conlines at scr_conspeed
-float		scr_conlines;		// 0.0 to 1.0 lines of console to display
+float		scr_conlines;		// 0.0 to 1.0f lines of console to display
 
 qboolean	scr_initialized;		// ready to draw
 
@@ -263,7 +263,7 @@ void SCR_DrawCenterString (void)
 	start = scr_centerstring;
 
 	if (scr_center_lines <= 4)
-		y = viddef.height*0.35;
+		y = viddef.height*0.35f;
 	else
 		y = 48;
 
@@ -528,7 +528,7 @@ void SCR_DrawConsole (void)
 	
 	if (cls.state == ca_disconnected || cls.state == ca_connecting)
 	{	// forced full screen console
-		Con_DrawConsole (1.0);
+		Con_DrawConsole (1.0f);
 		return;
 	}
 
@@ -697,7 +697,7 @@ void SCR_TileClear (void)
 	if (scr_drawall->value)
 		SCR_DirtyScreen ();	// for power vr or broken page flippers...
 
-	if (scr_con_current == 1.0)
+	if (scr_con_current == 1.0f)
 		return;		// full screen console
 	if (scr_viewsize->value == 100)
 		return;		// full screen rendering
@@ -1289,8 +1289,8 @@ void SCR_UpdateScreen (void)
 	** range check cl_camera_separation so we don't inadvertently fry someone's
 	** brain
 	*/
-	if ( cl_stereo_separation->value > 1.0 )
-		Cvar_SetValue( "cl_stereo_separation", 1.0 );
+	if ( cl_stereo_separation->value > 1.0f )
+		Cvar_SetValue( "cl_stereo_separation", 1.0f );
 	else if ( cl_stereo_separation->value < 0 )
 		Cvar_SetValue( "cl_stereo_separation", 0.0 );
 

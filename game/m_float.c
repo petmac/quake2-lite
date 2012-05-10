@@ -530,7 +530,7 @@ void floater_zap (edict_t *self)
 
 	AngleVectors (self->s.angles, forward, right, NULL);
 	//FIXME use a flash and replace these two lines with the commented one
-	VectorSet (offset, 18.5, -0.9, 10);
+	VectorSet (offset, 18.5, -0.9f, 10);
 	G_ProjectSource (self->s.origin, offset, forward, right, origin);
 //	G_ProjectSource (self->s.origin, monster_flash_offset[flash_number], forward, right, origin);
 

@@ -100,7 +100,7 @@ void chick_fidget (edict_t *self)
 {
 	if (self->monsterinfo.aiflags & AI_STAND_GROUND)
 		return;
-	if (random() <= 0.3)
+	if (random() <= 0.3f)
 		self->monsterinfo.currentmove = &chick_move_fidget;
 }
 
@@ -276,9 +276,9 @@ void chick_pain (edict_t *self, edict_t *other, float kick, int damage)
 	self->pain_debounce_time = level.time + 3;
 
 	r = random();
-	if (r < 0.33)
+	if (r < 0.33f)
 		gi.sound (self, CHAN_VOICE, sound_pain1, 1, ATTN_NORM, 0);
-	else if (r < 0.66)
+	else if (r < 0.66f)
 		gi.sound (self, CHAN_VOICE, sound_pain2, 1, ATTN_NORM, 0);
 	else
 		gi.sound (self, CHAN_VOICE, sound_pain3, 1, ATTN_NORM, 0);
@@ -532,7 +532,7 @@ void chick_rerocket(edict_t *self)
 	{
 		if (range (self, self->enemy) > RANGE_MELEE)
 			if ( visible (self, self->enemy) )
-				if (random() <= 0.6)
+				if (random() <= 0.6f)
 				{
 					self->monsterinfo.currentmove = &chick_move_attack1;
 					return;
@@ -575,7 +575,7 @@ void chick_reslash(edict_t *self)
 	if (self->enemy->health > 0)
 	{
 		if (range (self, self->enemy) == RANGE_MELEE)
-			if (random() <= 0.9)
+			if (random() <= 0.9f)
 			{				
 				self->monsterinfo.currentmove = &chick_move_slash;
 				return;

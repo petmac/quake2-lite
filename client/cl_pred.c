@@ -151,7 +151,7 @@ trace_t		CL_PMTrace (vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end)
 
 	// check against world
 	t = CM_BoxTrace (start, end, mins, maxs, 0, MASK_PLAYERSOLID);
-	if (t.fraction < 1.0)
+	if (t.fraction < 1.0f)
 		t.ent = (struct edict_s *)1;
 
 	// check all other solid models

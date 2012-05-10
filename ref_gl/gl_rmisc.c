@@ -180,7 +180,7 @@ void GL_SetDefaultState( void )
 	qglEnable(GL_TEXTURE_2D);
 
 	qglEnable(GL_ALPHA_TEST);
-	qglAlphaFunc(GL_GREATER, 0.666);
+	qglAlphaFunc(GL_GREATER, 0.666f);
 
 	qglDisable (GL_DEPTH_TEST);
 	qglDisable (GL_CULL_FACE);

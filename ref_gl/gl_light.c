@@ -40,7 +40,7 @@ void R_RenderDlight (dlight_t *light)
 	vec3_t	v;
 	float	rad;
 
-	rad = light->intensity * 0.35;
+	rad = light->intensity * 0.35f;
 
 	VectorSubtract (light->origin, r_origin, v);
 #if 0
@@ -53,14 +53,14 @@ void R_RenderDlight (dlight_t *light)
 #endif
 
 	qglBegin (GL_TRIANGLE_FAN);
-	qglColor3f (light->color[0]*0.2, light->color[1]*0.2, light->color[2]*0.2);
+	qglColor3f (light->color[0]*0.2f, light->color[1]*0.2f, light->color[2]*0.2f);
 	for (i=0 ; i<3 ; i++)
 		v[i] = light->origin[i] - vpn[i]*rad;
 	qglVertex3fv (v);
 	qglColor3f (0,0,0);
 	for (i=16 ; i>=0 ; i--)
 	{
-		a = i/16.0 * M_PI*2;
+		a = i/16.0 * Q_PI*2;
 		for (j=0 ; j<3 ; j++)
 			v[j] = light->origin[j] + vright[j]*cos(a)*rad
 				+ vup[j]*sin(a)*rad;
@@ -275,9 +275,9 @@ int RecursiveLightPoint (mnode_t *node, vec3_t start, vec3_t end)
 				for (i=0 ; i<3 ; i++)
 					scale[i] = gl_modulate->value*r_newrefdef.lightstyles[surf->styles[maps]].rgb[i];
 
-				pointcolor[0] += lightmap[0] * scale[0] * (1.0/255);
-				pointcolor[1] += lightmap[1] * scale[1] * (1.0/255);
-				pointcolor[2] += lightmap[2] * scale[2] * (1.0/255);
+				pointcolor[0] += lightmap[0] * scale[0] * (1.0f/255);
+				pointcolor[1] += lightmap[1] * scale[1] * (1.0f/255);
+				pointcolor[2] += lightmap[2] * scale[2] * (1.0f/255);
 				lightmap += 3*((surf->extents[0]>>4)+1) *
 						((surf->extents[1]>>4)+1);
 			}
@@ -307,7 +307,7 @@ void R_LightPoint (vec3_t p, vec3_t color)
 	
 	if (!r_worldmodel->lightdata)
 	{
-		color[0] = color[1] = color[2] = 1.0;
+		color[0] = color[1] = color[2] = 1.0f;
 		return;
 	}
 	
@@ -337,7 +337,7 @@ void R_LightPoint (vec3_t p, vec3_t color)
 						dl->origin,
 						dist);
 		add = dl->intensity - VectorLength(dist);
-		add *= (1.0/256);
+		add *= (1.0f/256);
 		if (add > 0)
 		{
 			VectorMA (color, add, dl->color, color);
@@ -618,7 +618,7 @@ store:
 
 				/*
 				** rescale all the color components if the intensity of the greatest
-				** channel exceeds 1.0
+				** channel exceeds 1.0f
 				*/
 				if (max > 255)
 				{
@@ -678,7 +678,7 @@ store:
 
 				/*
 				** rescale all the color components if the intensity of the greatest
-				** channel exceeds 1.0
+				** channel exceeds 1.0f
 				*/
 				if (max > 255)
 				{
@@ -704,9 +704,9 @@ store:
 				case 'C':
 					// try faking colored lighting
 					a = 255 - ((r+g+b)/3);
-					r *= a/255.0;
-					g *= a/255.0;
-					b *= a/255.0;
+					r *= a/255.0f;
+					g *= a/255.0f;
+					b *= a/255.0f;
 					break;
 				case 'A':
 				default:

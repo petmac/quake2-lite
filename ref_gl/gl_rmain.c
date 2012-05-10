@@ -232,7 +232,7 @@ void R_DrawSpriteModel (entity_t *e)
 
 	GL_TexEnv( GL_MODULATE );
 
-	if ( alpha == 1.0 )
+	if ( alpha == 1.0f )
 		qglEnable (GL_ALPHA_TEST);
 	else
 		qglDisable( GL_ALPHA_TEST );
@@ -296,13 +296,13 @@ void R_DrawNullModel (void)
 	qglBegin (GL_TRIANGLE_FAN);
 	qglVertex3f (0, 0, -16);
 	for (i=0 ; i<=4 ; i++)
-		qglVertex3f (16*cos(i*M_PI/2), 16*sin(i*M_PI/2), 0);
+		qglVertex3f (16*cos(i*Q_PI/2), 16*sin(i*Q_PI/2), 0);
 	qglEnd ();
 
 	qglBegin (GL_TRIANGLE_FAN);
 	qglVertex3f (0, 0, 16);
 	for (i=4 ; i>=0 ; i--)
-		qglVertex3f (16*cos(i*M_PI/2), 16*sin(i*M_PI/2), 0);
+		qglVertex3f (16*cos(i*Q_PI/2), 16*sin(i*Q_PI/2), 0);
 	qglEnd ();
 
 	qglColor3f (1,1,1);
@@ -662,7 +662,7 @@ void R_SetupFrame (void)
 	if ( r_newrefdef.rdflags & RDF_NOWORLDMODEL )
 	{
 		qglEnable( GL_SCISSOR_TEST );
-		qglClearColor( 0.3, 0.3, 0.3, 1 );
+		qglClearColor( 0.3f, 0.3f, 0.3f, 1 );
 		qglScissor( r_newrefdef.x, vid.height - r_newrefdef.height - r_newrefdef.y, r_newrefdef.width, r_newrefdef.height );
 		qglClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		qglClearColor( 1, 0, 0.5, 0.5 );
@@ -676,7 +676,7 @@ void MYgluPerspective( GLdouble fovy, GLdouble aspect,
 {
    GLdouble xmin, xmax, ymin, ymax;
 
-   ymax = zNear * tan( fovy * M_PI / 360.0 );
+   ymax = zNear * tan( fovy * Q_PI / 360.0 );
    ymin = -ymax;
 
    xmin = ymin * aspect;
@@ -717,7 +717,7 @@ void R_SetupGL (void)
 	// set up projection matrix
 	//
     screenaspect = (float)r_newrefdef.width/r_newrefdef.height;
-//	yfov = 2*atan((float)r_newrefdef.height/r_newrefdef.width)*180/M_PI;
+//	yfov = 2*atan((float)r_newrefdef.height/r_newrefdef.width)*180/Q_PI;
 	qglMatrixMode(GL_PROJECTION);
     qglLoadIdentity ();
     MYgluPerspective (r_newrefdef.fov_y,  screenaspect,  4,  4096);
@@ -770,7 +770,7 @@ void R_Clear (void)
 		if (trickframe & 1)
 		{
 			gldepthmin = 0;
-			gldepthmax = 0.49999;
+			gldepthmax = 0.49999f;
 			qglDepthFunc (GL_LEQUAL);
 		}
 		else
@@ -1468,7 +1468,7 @@ void R_BeginFrame( float camera_separation )
 			char envbuffer[1024];
 			float g;
 
-			g = 2.00 * ( 0.8 - ( vid_gamma->value - 0.5 ) ) + 1.0F;
+			g = 2.00 * ( 0.8f - ( vid_gamma->value - 0.5 ) ) + 1.0F;
 			Com_sprintf( envbuffer, sizeof(envbuffer), "SSTV2_GAMMA=%f", g );
 			_putenv( envbuffer );
 			Com_sprintf( envbuffer, sizeof(envbuffer), "SST_GAMMA=%f", g );

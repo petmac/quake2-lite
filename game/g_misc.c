@@ -62,9 +62,9 @@ void VelocityForDamage (int damage, vec3_t v)
 	v[2] = 200.0 + 100.0 * random();
 
 	if (damage < 50)
-		VectorScale (v, 0.7, v);
+		VectorScale (v, 0.7f, v);
 	else 
-		VectorScale (v, 1.2, v);
+		VectorScale (v, 1.2f, v);
 }
 
 void ClipGibVelocity (edict_t *ent)
@@ -164,7 +164,7 @@ void ThrowGib (edict_t *self, char *gibname, int damage, int type)
 	else
 	{
 		gib->movetype = MOVETYPE_BOUNCE;
-		vscale = 1.0;
+		vscale = 1.0f;
 	}
 
 	VelocityForDamage (damage, vd);
@@ -210,7 +210,7 @@ void ThrowHead (edict_t *self, char *gibname, int damage, int type)
 	else
 	{
 		self->movetype = MOVETYPE_BOUNCE;
-		vscale = 1.0;
+		vscale = 1.0f;
 	}
 
 	VelocityForDamage (damage, vd);
@@ -414,7 +414,7 @@ void SP_path_corner (edict_t *self)
 }
 
 
-/*QUAKED point_combat (0.5 0.3 0) (-8 -8 -8) (8 8 8) Hold
+/*QUAKED point_combat (0.5 0.3f 0) (-8 -8 -8) (8 8 8) Hold
 Makes this the target of a monster and it will head here
 when first activated before going after the activator.  If
 hold is selected, it will stay here.
@@ -667,7 +667,7 @@ void func_object_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface
 	// only squash thing we fall on top of
 	if (!plane)
 		return;
-	if (plane->normal[2] < 1.0)
+	if (plane->normal[2] < 1.0f)
 		return;
 	if (other->takedamage == DAMAGE_NO)
 		return;
@@ -1344,10 +1344,10 @@ void misc_viper_bomb_prethink (edict_t *self)
 	self->groundentity = NULL;
 
 	diff = self->timestamp - level.time;
-	if (diff < -1.0)
-		diff = -1.0;
+	if (diff < -1.0f)
+		diff = -1.0f;
 
-	VectorScale (self->moveinfo.dir, 1.0 + diff, v);
+	VectorScale (self->moveinfo.dir, 1.0f + diff, v);
 	v[2] = diff;
 
 	diff = self->s.angles[2];

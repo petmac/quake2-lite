@@ -83,9 +83,9 @@ static void ApplyChanges( void *unused )
 	float gamma;
 
 	/*
-	** invert sense so greater = brighter, and scale to a range of 0.5 to 1.3
+	** invert sense so greater = brighter, and scale to a range of 0.5 to 1.3f
 	*/
-	gamma = ( 0.8 - ( s_brightness_slider.curvalue/10.0 - 0.5 ) ) + 0.5;
+	gamma = ( 0.8f - ( s_brightness_slider.curvalue/10.0f - 0.5 ) ) + 0.5;
 
 	Cvar_SetValue( "vid_gamma", gamma );
 	Cvar_SetValue( "sw_stipplealpha", s_stipple_box.curvalue );
@@ -182,7 +182,7 @@ void VID_MenuInit( void )
 	s_brightness_slider.generic.callback = BrightnessCallback;
 	s_brightness_slider.minvalue = 5;
 	s_brightness_slider.maxvalue = 13;
-	s_brightness_slider.curvalue = ( 1.3 - vid_gamma->value + 0.5 ) * 10;
+	s_brightness_slider.curvalue = ( 1.3f - vid_gamma->value + 0.5 ) * 10;
 
 	s_fs_box.generic.type = MTYPE_SPINCONTROL;
 	s_fs_box.generic.x	= 0;

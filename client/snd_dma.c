@@ -35,7 +35,7 @@ void S_StopAllSounds(void);
 // only begin attenuating sound volumes when outside the FULLVOLUME range
 #define		SOUND_FULLVOLUME	80
 
-#define		SOUND_LOOPATTENUATE	0.003
+#define		SOUND_LOOPATTENUATE	0.003f
 
 channel_t   channels[MAX_CHANNELS];
 
@@ -431,22 +431,22 @@ void S_SpatializeOrigin (vec3_t origin, float master_vol, float dist_mult, int *
 
 	if (dma.channels == 1 || !dist_mult)
 	{ // no attenuation = no spatialization
-		rscale = 1.0;
-		lscale = 1.0;
+		rscale = 1.0f;
+		lscale = 1.0f;
 	}
 	else
 	{
-		rscale = 0.5 * (1.0 + dot);
-		lscale = 0.5*(1.0 - dot);
+		rscale = 0.5 * (1.0f + dot);
+		lscale = 0.5*(1.0f - dot);
 	}
 
 	// add in distance effect
-	scale = (1.0 - dist) * rscale;
+	scale = (1.0f - dist) * rscale;
 	*right_vol = (int) (master_vol * scale);
 	if (*right_vol < 0)
 		*right_vol = 0;
 
-	scale = (1.0 - dist) * lscale;
+	scale = (1.0f - dist) * lscale;
 	*left_vol = (int) (master_vol * scale);
 	if (*left_vol < 0)
 		*left_vol = 0;
@@ -684,9 +684,9 @@ void S_StartSound(vec3_t origin, int entnum, int entchannel, sfx_t *sfx, float f
 		start = paintedtime;
 		s_beginofs = start - (cl.frame.servertime * 0.001 * dma.speed);
 	}
-	else if (start > paintedtime + 0.3 * dma.speed)
+	else if (start > paintedtime + 0.3f * dma.speed)
 	{
-		start = paintedtime + 0.1 * dma.speed;
+		start = paintedtime + 0.1f * dma.speed;
 		s_beginofs = start - (cl.frame.servertime * 0.001 * dma.speed);
 	}
 	else
@@ -843,7 +843,7 @@ void S_AddLoopSounds (void)
 		ent = &cl_parse_entities[num];
 
 		// find the total contribution of all sounds of this type
-		S_SpatializeOrigin (ent->origin, 255.0, SOUND_LOOPATTENUATE,
+		S_SpatializeOrigin (ent->origin, 255.0f, SOUND_LOOPATTENUATE,
 			&left_total, &right_total);
 		for (j=i+1 ; j<cl.frame.num_entities ; j++)
 		{
@@ -854,7 +854,7 @@ void S_AddLoopSounds (void)
 			num = (cl.frame.parse_entities + j)&(MAX_PARSE_ENTITIES-1);
 			ent = &cl_parse_entities[num];
 
-			S_SpatializeOrigin (ent->origin, 255.0, SOUND_LOOPATTENUATE, 
+			S_SpatializeOrigin (ent->origin, 255.0f, SOUND_LOOPATTENUATE, 
 				&left, &right);
 			left_total += left;
 			right_total += right;
@@ -906,7 +906,7 @@ void S_RawSamples (int samples, int rate, int width, int channels, byte *data)
 //Com_Printf ("%i < %i < %i\n", soundtime, paintedtime, s_rawend);
 	if (channels == 2 && width == 2)
 	{
-		if (scale == 1.0)
+		if (scale == 1.0f)
 		{	// optimized case
 			for (i=0 ; i<samples ; i++)
 			{
@@ -1156,7 +1156,7 @@ void S_Play(void)
 		else
 			strcpy(name, Cmd_Argv(i));
 		sfx = S_RegisterSound(name);
-		S_StartSound(NULL, cl.playernum+1, 0, sfx, 1.0, 1.0, 0);
+		S_StartSound(NULL, cl.playernum+1, 0, sfx, 1.0f, 1.0f, 0);
 		i++;
 	}
 }

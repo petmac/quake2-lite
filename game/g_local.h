@@ -42,7 +42,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // view pitching times
 #define DAMAGE_TIME		0.5
-#define	FALL_TIME		0.3
+#define	FALL_TIME		0.3f
 
 
 // edict->spawnflags
@@ -70,7 +70,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define FL_RESPAWN				0x80000000	// used for item respawning
 
 
-#define	FRAMETIME		0.1
+#define	FRAMETIME		0.1f
 
 
 #define MELEE_DISTANCE	80
@@ -1020,7 +1020,7 @@ struct edict_s
 	vec3_t		avelocity;
 	int			mass;
 	float		air_finished;
-	float		gravity;		// per entity gravity multiplier (1.0 is normal)
+	float		gravity;		// per entity gravity multiplier (1.0f is normal)
 								// use for lowgrav artifact, flares
 
 	edict_t		*goalentity;

@@ -296,7 +296,7 @@ qboolean visible (edict_t *self, edict_t *other)
 	spot2[2] += other->viewheight;
 	trace = gi.trace (spot1, vec3_origin, vec3_origin, spot2, self, MASK_OPAQUE);
 	
-	if (trace.fraction == 1.0)
+	if (trace.fraction == 1.0f)
 		return true;
 	return false;
 }
@@ -320,7 +320,7 @@ qboolean infront (edict_t *self, edict_t *other)
 	VectorNormalize (vec);
 	dot = DotProduct (vec, forward);
 	
-	if (dot > 0.3)
+	if (dot > 0.3f)
 		return true;
 	return false;
 }
@@ -650,19 +650,19 @@ qboolean M_CheckAttack (edict_t *self)
 
 	if (self->monsterinfo.aiflags & AI_STAND_GROUND)
 	{
-		chance = 0.4;
+		chance = 0.4f;
 	}
 	else if (enemy_range == RANGE_MELEE)
 	{
-		chance = 0.2;
+		chance = 0.2f;
 	}
 	else if (enemy_range == RANGE_NEAR)
 	{
-		chance = 0.1;
+		chance = 0.1f;
 	}
 	else if (enemy_range == RANGE_MID)
 	{
-		chance = 0.02;
+		chance = 0.02f;
 	}
 	else
 	{
@@ -683,7 +683,7 @@ qboolean M_CheckAttack (edict_t *self)
 
 	if (self->flags & FL_FLY)
 	{
-		if (random() < 0.3)
+		if (random() < 0.3f)
 			self->monsterinfo.attack_state = AS_SLIDING;
 		else
 			self->monsterinfo.attack_state = AS_STRAIGHT;

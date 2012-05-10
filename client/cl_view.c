@@ -368,11 +368,11 @@ float CalcFov (float fov_x, float width, float height)
 	if (fov_x < 1 || fov_x > 179)
 		Com_Error (ERR_DROP, "Bad fov: %f", fov_x);
 
-	x = width/tan(fov_x/360*M_PI);
+	x = width/tan(fov_x/360*Q_PI);
 
 	a = atan (height/x);
 
-	a = a*360/M_PI;
+	a = a*360/Q_PI;
 
 	return a;
 }
@@ -495,9 +495,9 @@ void V_RenderView( float stereo_separation )
 		// never let it sit exactly on a node line, because a water plane can
 		// dissapear when viewed with the eye exactly on it.
 		// the server protocol only specifies to 1/8 pixel, so add 1/16 in each axis
-		cl.refdef.vieworg[0] += 1.0/16;
-		cl.refdef.vieworg[1] += 1.0/16;
-		cl.refdef.vieworg[2] += 1.0/16;
+		cl.refdef.vieworg[0] += 1.0f/16;
+		cl.refdef.vieworg[1] += 1.0f/16;
+		cl.refdef.vieworg[2] += 1.0f/16;
 
 		cl.refdef.x = scr_vrect.x;
 		cl.refdef.y = scr_vrect.y;

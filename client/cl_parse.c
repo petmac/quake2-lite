@@ -598,7 +598,7 @@ void CL_ParseStartSoundPacket(void)
 	sound_num = MSG_ReadByte (&net_message);
 
     if (flags & SND_VOLUME)
-		volume = MSG_ReadByte (&net_message) / 255.0;
+		volume = MSG_ReadByte (&net_message) / 255.0f;
 	else
 		volume = DEFAULT_SOUND_PACKET_VOLUME;
 	
