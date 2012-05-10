@@ -248,7 +248,7 @@ explosion_t *CL_AllocExplosion (void)
 	for (i=0 ; i<MAX_EXPLOSIONS ; i++)
 		if (cl_explosions[i].start < time)
 		{
-			time = (int)(cl_explosions[i].start);
+			time = cl_explosions[i].start;
 			index = i;
 		}
 	memset (&cl_explosions[index], 0, sizeof (cl_explosions[index]));
@@ -269,7 +269,7 @@ void CL_SmokeAndFlash(vec3_t origin)
 	ex->type = ex_misc;
 	ex->frames = 4;
 	ex->ent.flags = RF_TRANSLUCENT;
-	ex->start = (float)(cl.frame.servertime - 100);
+	ex->start = cl.frame.servertime - 100;
 	ex->ent.model = cl_mod_smoke;
 
 	ex = CL_AllocExplosion ();
@@ -277,7 +277,7 @@ void CL_SmokeAndFlash(vec3_t origin)
 	ex->type = ex_flash;
 	ex->ent.flags = RF_FULLBRIGHT;
 	ex->frames = 2;
-	ex->start = (float)(cl.frame.servertime - 100);
+	ex->start = cl.frame.servertime - 100;
 	ex->ent.model = cl_mod_flash;
 }
 
@@ -542,7 +542,7 @@ void CL_ParseLaser (int colors)
 			l->ent.flags = RF_TRANSLUCENT | RF_BEAM;
 			VectorCopy (start, l->ent.origin);
 			VectorCopy (end, l->ent.oldorigin);
-			l->ent.alpha = 0.30f;
+			l->ent.alpha = 0.30;
 			l->ent.skinnum = (colors >> ((rand() % 4)*8)) & 0xff;
 			l->ent.model = NULL;
 			l->ent.frame = 4;
@@ -802,10 +802,10 @@ void CL_ParseTEnt (void)
 
 		ex = CL_AllocExplosion ();
 		VectorCopy (pos, ex->ent.origin);
-		ex->ent.angles[0] = acosf(dir[2])/M_PI*180;
+		ex->ent.angles[0] = acos(dir[2])/M_PI*180;
 	// PMM - fixed to correct for pitch of 0
 		if (dir[0])
-			ex->ent.angles[1] = atan2f(dir[1], dir[0])/M_PI*180;
+			ex->ent.angles[1] = atan2(dir[1], dir[0])/M_PI*180;
 		else if (dir[1] > 0)
 			ex->ent.angles[1] = 90;
 		else if (dir[1] < 0)
@@ -815,7 +815,7 @@ void CL_ParseTEnt (void)
 
 		ex->type = ex_misc;
 		ex->ent.flags = RF_FULLBRIGHT|RF_TRANSLUCENT;
-		ex->start = (float)(cl.frame.servertime - 100);
+		ex->start = cl.frame.servertime - 100;
 		ex->light = 150;
 		ex->lightcolor[0] = 1;
 		ex->lightcolor[1] = 1;
@@ -840,7 +840,7 @@ void CL_ParseTEnt (void)
 		VectorCopy (pos, ex->ent.origin);
 		ex->type = ex_poly;
 		ex->ent.flags = RF_FULLBRIGHT;
-		ex->start = (float)(cl.frame.servertime - 100);
+		ex->start = cl.frame.servertime - 100;
 		ex->light = 350;
 		ex->lightcolor[0] = 1.0;
 		ex->lightcolor[1] = 0.5;
@@ -848,7 +848,7 @@ void CL_ParseTEnt (void)
 		ex->ent.model = cl_mod_explo4;
 		ex->frames = 19;
 		ex->baseframe = 30;
-		ex->ent.angles[1] = (float)(rand() % 360);
+		ex->ent.angles[1] = rand() % 360;
 		CL_ExplosionParticles (pos);
 		if (type == TE_GRENADE_EXPLOSION_WATER)
 			S_StartSound (pos, 0, 0, cl_sfx_watrexp, 1, ATTN_NORM, 0);
@@ -863,12 +863,12 @@ void CL_ParseTEnt (void)
 		VectorCopy (pos, ex->ent.origin);
 		ex->type = ex_poly;
 		ex->ent.flags = RF_FULLBRIGHT;
-		ex->start = (float)(cl.frame.servertime - 100);
+		ex->start = cl.frame.servertime - 100;
 		ex->light = 350;
 		ex->lightcolor[0] = 1.0; 
 		ex->lightcolor[1] = 0.5;
 		ex->lightcolor[2] = 0.5;
-		ex->ent.angles[1] = (float)(rand() % 360);
+		ex->ent.angles[1] = rand() % 360;
 		ex->ent.model = cl_mod_explo4;
 		if (frand() < 0.5)
 			ex->baseframe = 15;
@@ -888,12 +888,12 @@ void CL_ParseTEnt (void)
 		VectorCopy (pos, ex->ent.origin);
 		ex->type = ex_poly;
 		ex->ent.flags = RF_FULLBRIGHT;
-		ex->start = (float)(cl.frame.servertime - 100);
+		ex->start = cl.frame.servertime - 100;
 		ex->light = 350;
 		ex->lightcolor[0] = 1.0;
 		ex->lightcolor[1] = 0.5;
 		ex->lightcolor[2] = 0.5;
-		ex->ent.angles[1] = (float)(rand() % 360);
+		ex->ent.angles[1] = rand() % 360;
 		if (type != TE_EXPLOSION1_BIG)				// PMM
 			ex->ent.model = cl_mod_explo4;			// PMM
 		else
@@ -915,14 +915,14 @@ void CL_ParseTEnt (void)
 		VectorCopy (pos, ex->ent.origin);
 		ex->type = ex_poly;
 		ex->ent.flags = RF_FULLBRIGHT;
-		ex->start = (float)(cl.frame.servertime - 100);
+		ex->start = cl.frame.servertime - 100;
 		ex->light = 350;
 		ex->lightcolor[0] = 0.0;
 		ex->lightcolor[1] = 1.0;
 		ex->lightcolor[2] = 0.0;
 		ex->ent.model = cl_mod_bfg_explo;
 		ex->ent.flags |= RF_TRANSLUCENT;
-		ex->ent.alpha = 0.30f;
+		ex->ent.alpha = 0.30;
 		ex->frames = 4;
 		break;
 
@@ -970,11 +970,11 @@ void CL_ParseTEnt (void)
 		// note to self
 		// we need a better no draw flag
 		ex->ent.flags = RF_BEAM;
-		ex->start = cl.frame.servertime - 0.1f;
-		ex->light = (float)(100 + (rand()%75));
+		ex->start = cl.frame.servertime - 0.1;
+		ex->light = 100 + (rand()%75);
 		ex->lightcolor[0] = 1.0;
 		ex->lightcolor[1] = 1.0;
-		ex->lightcolor[2] = 0.3f;
+		ex->lightcolor[2] = 0.3;
 		ex->ent.model = cl_mod_flash;
 		ex->frames = 2;
 		break;
@@ -1010,10 +1010,10 @@ void CL_ParseTEnt (void)
 
 		ex = CL_AllocExplosion ();
 		VectorCopy (pos, ex->ent.origin);
-		ex->ent.angles[0] = acosf(dir[2])/M_PI*180;
+		ex->ent.angles[0] = acos(dir[2])/M_PI*180;
 	// PMM - fixed to correct for pitch of 0
 		if (dir[0])
-			ex->ent.angles[1] = atan2f(dir[1], dir[0])/M_PI*180;
+			ex->ent.angles[1] = atan2(dir[1], dir[0])/M_PI*180;
 		else if (dir[1] > 0)
 			ex->ent.angles[1] = 90;
 		else if (dir[1] < 0)
@@ -1030,16 +1030,16 @@ void CL_ParseTEnt (void)
 		else // flechette
 			ex->ent.skinnum = 2;
 
-		ex->start = (float)(cl.frame.servertime - 100);
+		ex->start = cl.frame.servertime - 100;
 		ex->light = 150;
 		// PMM
 		if (type == TE_BLASTER2)
 			ex->lightcolor[1] = 1;
 		else // flechette
 		{
-			ex->lightcolor[0] = 0.19f;
-			ex->lightcolor[1] = 0.41f;
-			ex->lightcolor[2] = 0.75f;
+			ex->lightcolor[0] = 0.19;
+			ex->lightcolor[1] = 0.41;
+			ex->lightcolor[2] = 0.75;
 		}
 		ex->ent.model = cl_mod_explode;
 		ex->frames = 4;
@@ -1065,12 +1065,12 @@ void CL_ParseTEnt (void)
 		VectorCopy (pos, ex->ent.origin);
 		ex->type = ex_poly;
 		ex->ent.flags = RF_FULLBRIGHT;
-		ex->start = (float)(cl.frame.servertime - 100);
+		ex->start = cl.frame.servertime - 100;
 		ex->light = 350;
 		ex->lightcolor[0] = 1.0;
 		ex->lightcolor[1] = 0.5;
 		ex->lightcolor[2] = 0.5;
-		ex->ent.angles[1] = (float)(rand() % 360);
+		ex->ent.angles[1] = rand() % 360;
 		ex->ent.model = cl_mod_explo4;
 		if (frand() < 0.5)
 			ex->baseframe = 15;
@@ -1244,7 +1244,7 @@ void CL_AddBeams (void)
 		{
 	// PMM - fixed to correct for pitch of 0
 			if (dist[0])
-				yaw = (atan2f(dist[1], dist[0]) * 180 / M_PI);
+				yaw = (atan2(dist[1], dist[0]) * 180 / M_PI);
 			else if (dist[1] > 0)
 				yaw = 90;
 			else
@@ -1252,8 +1252,8 @@ void CL_AddBeams (void)
 			if (yaw < 0)
 				yaw += 360;
 	
-			forward = sqrtf (dist[0]*dist[0] + dist[1]*dist[1]);
-			pitch = (atan2f(dist[2], forward) * -180.0f / M_PI);
+			forward = sqrt (dist[0]*dist[0] + dist[1]*dist[1]);
+			pitch = (atan2(dist[2], forward) * -180.0 / M_PI);
 			if (pitch < 0)
 				pitch += 360.0;
 		}
@@ -1271,7 +1271,7 @@ void CL_AddBeams (void)
 		{
 			model_length = 30.0;
 		}
-		steps = ceilf(d/model_length);
+		steps = ceil(d/model_length);
 		len = (d-model_length)/(steps-1);
 
 		// PMM - special case for lightning model .. if the real length is shorter than the model,
@@ -1289,7 +1289,7 @@ void CL_AddBeams (void)
 			ent.flags = RF_FULLBRIGHT;
 			ent.angles[0] = pitch;
 			ent.angles[1] = yaw;
-			ent.angles[2] = (float)(rand() % 360);
+			ent.angles[2] = rand()%360;
 			V_AddEntity (&ent);			
 			return;
 		}
@@ -1301,14 +1301,14 @@ void CL_AddBeams (void)
 			{
 				ent.flags = RF_FULLBRIGHT;
 				ent.angles[0] = -pitch;
-				ent.angles[1] = yaw + 180.0f;
-				ent.angles[2] = (float)(rand() % 360);
+				ent.angles[1] = yaw + 180.0;
+				ent.angles[2] = rand()%360;
 			}
 			else
 			{
 				ent.angles[0] = pitch;
 				ent.angles[1] = yaw;
-				ent.angles[2] = (float)(rand() % 360);
+				ent.angles[2] = rand()%360;
 			}
 			
 //			Com_Printf("B: %d -> %d\n", b->entity, b->dest_entity);
@@ -1328,7 +1328,7 @@ void CL_AddBeams (void)
 //				Com_Printf ("Act View Angles: %f %f %f\n", cl.refdef.viewangles[0], cl.refdef.viewangles[1], cl.refdef.viewangles[2]);
 //				VectorCopy (cl.predicted_origin, b->start);
 //				b->start[2] += 22;	// adjust for view height
-//				if (fabsf(cl.refdef.vieworg[2] - b->start[2]) >= 10) {
+//				if (fabs(cl.refdef.vieworg[2] - b->start[2]) >= 10) {
 //					b->start[2] = cl.refdef.vieworg[2];
 //				}
 
@@ -1459,7 +1459,7 @@ void CL_AddPlayerBeams (void)
 		{
 	// PMM - fixed to correct for pitch of 0
 			if (dist[0])
-				yaw = (atan2f(dist[1], dist[0]) * 180 / M_PI);
+				yaw = (atan2(dist[1], dist[0]) * 180 / M_PI);
 			else if (dist[1] > 0)
 				yaw = 90;
 			else
@@ -1467,8 +1467,8 @@ void CL_AddPlayerBeams (void)
 			if (yaw < 0)
 				yaw += 360;
 	
-			forward = sqrtf (dist[0]*dist[0] + dist[1]*dist[1]);
-			pitch = (atan2f(dist[2], forward) * -180.0f / M_PI);
+			forward = sqrt (dist[0]*dist[0] + dist[1]*dist[1]);
+			pitch = (atan2(dist[2], forward) * -180.0 / M_PI);
 			if (pitch < 0)
 				pitch += 360.0;
 		}
@@ -1480,7 +1480,7 @@ void CL_AddPlayerBeams (void)
 				framenum = 2;
 //				Com_Printf ("Third person\n");
 				ent.angles[0] = -pitch;
-				ent.angles[1] = yaw + 180.0f;
+				ent.angles[1] = yaw + 180.0;
 				ent.angles[2] = 0;
 //				Com_Printf ("%f %f - %f %f %f\n", -pitch, yaw+180.0, b->offset[0], b->offset[1], b->offset[2]);
 				AngleVectors(ent.angles, f, r, u);
@@ -1527,7 +1527,7 @@ void CL_AddPlayerBeams (void)
 		{
 			model_length = 30.0;
 		}
-		steps = ceilf(d/model_length);
+		steps = ceil(d/model_length);
 		len = (d-model_length)/(steps-1);
 
 		// PMM - special case for lightning model .. if the real length is shorter than the model,
@@ -1545,7 +1545,7 @@ void CL_AddPlayerBeams (void)
 			ent.flags = RF_FULLBRIGHT;
 			ent.angles[0] = pitch;
 			ent.angles[1] = yaw;
-			ent.angles[2] = (float)(rand() % 360);
+			ent.angles[2] = rand()%360;
 			V_AddEntity (&ent);			
 			return;
 		}
@@ -1559,23 +1559,23 @@ void CL_AddPlayerBeams (void)
 //				ent.alpha = 0.3;
 				ent.flags = RF_FULLBRIGHT;
 				ent.angles[0] = -pitch;
-				ent.angles[1] = yaw + 180.0f;
-				ent.angles[2] = (float)((cl.time) % 360);
-//				ent.angles[2] = (float)(rand() % 360);
+				ent.angles[1] = yaw + 180.0;
+				ent.angles[2] = (cl.time) % 360;
+//				ent.angles[2] = rand()%360;
 				ent.frame = framenum;
 			}
 			else if (b->model == cl_mod_lightning)
 			{
 				ent.flags = RF_FULLBRIGHT;
 				ent.angles[0] = -pitch;
-				ent.angles[1] = yaw + 180.0f;
-				ent.angles[2] = (float)(rand() % 360);
+				ent.angles[1] = yaw + 180.0;
+				ent.angles[2] = rand()%360;
 			}
 			else
 			{
 				ent.angles[0] = pitch;
 				ent.angles[1] = yaw;
-				ent.angles[2] = (float)(rand() % 360);
+				ent.angles[2] = rand()%360;
 			}
 			
 //			Com_Printf("B: %d -> %d\n", b->entity, b->dest_entity);
@@ -1607,8 +1607,8 @@ void CL_AddExplosions (void)
 	{
 		if (ex->type == ex_free)
 			continue;
-		frac = (cl.time - ex->start)/100.0f;
-		f = (int)floorf(frac);
+		frac = (cl.time - ex->start)/100.0;
+		f = floor(frac);
 
 		ent = &ex->ent;
 
@@ -1624,7 +1624,7 @@ void CL_AddExplosions (void)
 				ex->type = ex_free;
 				break;
 			}
-			ent->alpha = 1.0f - frac/(ex->frames-1);
+			ent->alpha = 1.0 - frac/(ex->frames-1);
 			break;
 		case ex_flash:
 			if (f >= 1)
@@ -1641,7 +1641,7 @@ void CL_AddExplosions (void)
 				break;
 			}
 
-			ent->alpha = (16.0f - (float)f)/16.0f;
+			ent->alpha = (16.0 - (float)f)/16.0;
 
 			if (f < 10)
 			{
@@ -1665,7 +1665,7 @@ void CL_AddExplosions (void)
 				break;
 			}
 
-			ent->alpha = (5.0f - (float)f)/5.0f;
+			ent->alpha = (5.0 - (float)f)/5.0;
 			ent->skinnum = 0;
 			ent->flags |= RF_TRANSLUCENT;
 			break;
@@ -1685,7 +1685,7 @@ void CL_AddExplosions (void)
 			f = 0;
 		ent->frame = ex->baseframe + f + 1;
 		ent->oldframe = ex->baseframe + f;
-		ent->backlerp = 1.0f - cl.lerpfrac;
+		ent->backlerp = 1.0 - cl.lerpfrac;
 
 		V_AddEntity (ent);
 	}

@@ -386,10 +386,10 @@ void ED_ParseField (char *key, char *value, edict_t *ent)
 				*(int *)(b+f->ofs) = atoi(value);
 				break;
 			case F_FLOAT:
-				*(float *)(b+f->ofs) = (float)atof(value);
+				*(float *)(b+f->ofs) = atof(value);
 				break;
 			case F_ANGLEHACK:
-				v = (float)atof(value);
+				v = atof(value);
 				((float *)(b+f->ofs))[0] = 0;
 				((float *)(b+f->ofs))[1] = v;
 				((float *)(b+f->ofs))[2] = 0;
@@ -525,7 +525,7 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	int			i;
 	float		skill_level;
 
-	skill_level = floorf (skill->value);
+	skill_level = floor (skill->value);
 	if (skill_level < 0)
 		skill_level = 0;
 	if (skill_level > 3)

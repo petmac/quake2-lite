@@ -66,10 +66,10 @@ void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point, 
 	memset( zrot, 0, sizeof( zrot ) );
 	zrot[0][0] = zrot[1][1] = zrot[2][2] = 1.0F;
 
-	zrot[0][0] = cosf( DEG2RAD( degrees ) );
-	zrot[0][1] = sinf( DEG2RAD( degrees ) );
-	zrot[1][0] = -sinf( DEG2RAD( degrees ) );
-	zrot[1][1] = cosf( DEG2RAD( degrees ) );
+	zrot[0][0] = cos( DEG2RAD( degrees ) );
+	zrot[0][1] = sin( DEG2RAD( degrees ) );
+	zrot[1][0] = -sin( DEG2RAD( degrees ) );
+	zrot[1][1] = cos( DEG2RAD( degrees ) );
 
 	R_ConcatRotations( m, zrot, tmpmat );
 	R_ConcatRotations( tmpmat, im, rot );
@@ -87,14 +87,14 @@ void AngleVectors (vec3_t angles, vec3_t forward, vec3_t right, vec3_t up)
 	// static to help MS compiler fp bugs
 
 	angle = angles[YAW] * (M_PI*2 / 360);
-	sy = sinf(angle);
-	cy = cosf(angle);
+	sy = sin(angle);
+	cy = cos(angle);
 	angle = angles[PITCH] * (M_PI*2 / 360);
-	sp = sinf(angle);
-	cp = cosf(angle);
+	sp = sin(angle);
+	cp = cos(angle);
 	angle = angles[ROLL] * (M_PI*2 / 360);
-	sr = sinf(angle);
-	cr = cosf(angle);
+	sr = sin(angle);
+	cr = cos(angle);
 
 	if (forward)
 	{
@@ -151,10 +151,10 @@ void PerpendicularVector( vec3_t dst, const vec3_t src )
 	*/
 	for ( pos = 0, i = 0; i < 3; i++ )
 	{
-		if ( fabsf( src[i] ) < minelem )
+		if ( fabs( src[i] ) < minelem )
 		{
 			pos = i;
-			minelem = fabsf( src[i] );
+			minelem = fabs( src[i] );
 		}
 	}
 	tempvec[0] = tempvec[1] = tempvec[2] = 0.0F;
@@ -433,7 +433,7 @@ vec_t VectorNormalize (vec3_t v)
 	float	length, ilength;
 
 	length = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
-	length = sqrtf (length);		// FIXME
+	length = sqrt (length);		// FIXME
 
 	if (length)
 	{
@@ -452,7 +452,7 @@ vec_t VectorNormalize2 (vec3_t v, vec3_t out)
 	float	length, ilength;
 
 	length = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
-	length = sqrtf (length);		// FIXME
+	length = sqrt (length);		// FIXME
 
 	if (length)
 	{
@@ -507,6 +507,8 @@ void CrossProduct (vec3_t v1, vec3_t v2, vec3_t cross)
 	cross[2] = v1[0]*v2[1] - v1[1]*v2[0];
 }
 
+double sqrt(double x);
+
 vec_t VectorLength(vec3_t v)
 {
 	int		i;
@@ -515,7 +517,7 @@ vec_t VectorLength(vec3_t v)
 	length = 0;
 	for (i=0 ; i< 3 ; i++)
 		length += v[i]*v[i];
-	length = sqrtf (length);		// FIXME
+	length = sqrt (length);		// FIXME
 
 	return length;
 }

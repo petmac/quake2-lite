@@ -390,7 +390,7 @@ void Key_Console (int key)
 
 qboolean	chat_team;
 char		chat_buffer[MAXCMDLINE];
-unsigned int chat_bufferlen = 0;
+int			chat_bufferlen = 0;
 
 void Key_Message (int key)
 {

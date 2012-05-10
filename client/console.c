@@ -392,7 +392,7 @@ void Con_Print (char *txt)
 			Con_Linefeed ();
 		// mark time for transparent overlay
 			if (con.current >= 0)
-				con.times[con.current % NUM_CON_TIMES] = (float)cls.realtime;
+				con.times[con.current % NUM_CON_TIMES] = cls.realtime;
 		}
 
 		switch (c)
@@ -511,7 +511,7 @@ void Con_DrawNotify (void)
 	{
 		if (i < 0)
 			continue;
-		time = (int)(con.times[i % NUM_CON_TIMES]);
+		time = con.times[i % NUM_CON_TIMES];
 		if (time == 0)
 			continue;
 		time = cls.realtime - time;
@@ -576,12 +576,12 @@ void Con_DrawConsole (float frac)
 	char			version[64];
 	char			dlbar[1024];
 
-	lines = (int)(viddef.height * frac);
+	lines = viddef.height * frac;
 	if (lines <= 0)
 		return;
 
-	if (lines > (int)viddef.height)
-		lines = (int)viddef.height;
+	if (lines > viddef.height)
+		lines = viddef.height;
 
 // draw the background
 	re.DrawStretchPic (0, lines-viddef.height, viddef.width, viddef.height, "conback");
@@ -642,7 +642,7 @@ void Con_DrawConsole (float frac)
 		x = con.linewidth - ((con.linewidth * 7) / 40);
 		y = x - strlen(text) - 8;
 		i = con.linewidth/3;
-		if ((int)strlen(text) > i) {
+		if (strlen(text) > i) {
 			y = x - i - 11;
 			strncpy(dlbar, text, i);
 			dlbar[i] = 0;
@@ -670,7 +670,7 @@ void Con_DrawConsole (float frac)
 
 		// draw it
 		y = con.vislines-12;
-		for (i = 0; i < (int)strlen(dlbar); i++)
+		for (i = 0; i < strlen(dlbar); i++)
 			re.DrawChar ( (i+1)<<3, y, dlbar[i]);
 	}
 //ZOID

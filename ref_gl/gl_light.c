@@ -62,8 +62,8 @@ void R_RenderDlight (dlight_t *light)
 	{
 		a = i/16.0 * M_PI*2;
 		for (j=0 ; j<3 ; j++)
-			v[j] = light->origin[j] + vright[j]*cosf(a)*rad
-				+ vup[j]*sinf(a)*rad;
+			v[j] = light->origin[j] + vright[j]*cos(a)*rad
+				+ vup[j]*sin(a)*rad;
 		qglVertex3fv (v);
 	}
 	qglEnd ();
@@ -383,7 +383,7 @@ void R_AddDynamicLights (msurface_t *surf)
 		frad = dl->intensity;
 		fdist = DotProduct (dl->origin, surf->plane->normal) -
 				surf->plane->dist;
-		frad -= fabsf(fdist);
+		frad -= fabs(fdist);
 		// rad is now the highest intensity on the plane
 
 		fminlight = DLIGHT_CUTOFF;	// FIXME: make configurable?
