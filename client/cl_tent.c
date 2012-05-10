@@ -1271,7 +1271,7 @@ void CL_AddBeams (void)
 		{
 			model_length = 30.0;
 		}
-		steps = ceil(d/model_length);
+		steps = ceilf(d/model_length);
 		len = (d-model_length)/(steps-1);
 
 		// PMM - special case for lightning model .. if the real length is shorter than the model,
@@ -1328,7 +1328,7 @@ void CL_AddBeams (void)
 //				Com_Printf ("Act View Angles: %f %f %f\n", cl.refdef.viewangles[0], cl.refdef.viewangles[1], cl.refdef.viewangles[2]);
 //				VectorCopy (cl.predicted_origin, b->start);
 //				b->start[2] += 22;	// adjust for view height
-//				if (fabs(cl.refdef.vieworg[2] - b->start[2]) >= 10) {
+//				if (fabsf(cl.refdef.vieworg[2] - b->start[2]) >= 10) {
 //					b->start[2] = cl.refdef.vieworg[2];
 //				}
 
@@ -1527,7 +1527,7 @@ void CL_AddPlayerBeams (void)
 		{
 			model_length = 30.0;
 		}
-		steps = ceil(d/model_length);
+		steps = ceilf(d/model_length);
 		len = (d-model_length)/(steps-1);
 
 		// PMM - special case for lightning model .. if the real length is shorter than the model,
@@ -1608,7 +1608,7 @@ void CL_AddExplosions (void)
 		if (ex->type == ex_free)
 			continue;
 		frac = (cl.time - ex->start)/100.0;
-		f = floor(frac);
+		f = floorf(frac);
 
 		ent = &ex->ent;
 

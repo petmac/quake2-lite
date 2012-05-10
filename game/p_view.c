@@ -31,7 +31,7 @@ float	xyspeed;
 
 float	bobmove;
 int		bobcycle;		// odd cycles are right foot going forward
-float	bobfracsin;		// sin(bobfrac*Q_PI)
+float	bobfracsin;		// sinf(bobfrac*Q_PI)
 
 /*
 ===============
@@ -47,7 +47,7 @@ float SV_CalcRoll (vec3_t angles, vec3_t velocity)
 	
 	side = DotProduct (velocity, right);
 	sign = side < 0 ? -1 : 1;
-	side = fabs(side);
+	side = fabsf(side);
 	
 	value = sv_rollangle->value;
 
@@ -1034,7 +1034,7 @@ void ClientEndServerFrame (edict_t *ent)
 		bobtime *= 4;
 
 	bobcycle = (int)bobtime;
-	bobfracsin = fabs(sin(bobtime*Q_PI));
+	bobfracsin = fabsf(sinf(bobtime*Q_PI));
 
 	// detect hitting the floor
 	P_FallingDamage (ent);

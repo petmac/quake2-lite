@@ -120,8 +120,8 @@ glpoly_t *WaterWarpPolyVerts (glpoly_t *p)
 	nv = out->verts[0];
 	for (i=0 ; i<p->numverts ; i++, v+= VERTEXSIZE, nv+=VERTEXSIZE)
 	{
-		nv[0] = v[0] + 4*sin(v[1]*0.05f+r_newrefdef.time)*sin(v[2]*0.05f+r_newrefdef.time);
-		nv[1] = v[1] + 4*sin(v[0]*0.05f+r_newrefdef.time)*sin(v[2]*0.05f+r_newrefdef.time);
+		nv[0] = v[0] + 4*sinf(v[1]*0.05f+r_newrefdef.time)*sinf(v[2]*0.05f+r_newrefdef.time);
+		nv[1] = v[1] + 4*sinf(v[0]*0.05f+r_newrefdef.time)*sinf(v[2]*0.05f+r_newrefdef.time);
 
 		nv[2] = v[2];
 		nv[3] = v[3];

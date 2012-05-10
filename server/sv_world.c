@@ -226,10 +226,10 @@ void SV_LinkEdict (edict_t *ent)
 		max = 0;
 		for (i=0 ; i<3 ; i++)
 		{
-			v =fabs( ent->mins[i]);
+			v =fabsf( ent->mins[i]);
 			if (v > max)
 				max = v;
-			v =fabs( ent->maxs[i]);
+			v =fabsf( ent->maxs[i]);
 			if (v > max)
 				max = v;
 		}

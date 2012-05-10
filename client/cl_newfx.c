@@ -466,8 +466,8 @@ void CL_Heatbeam (vec3_t start, vec3_t end)
 	for (i=0 ; i<len ; i+=step)
 	{
 		d = i * 0.1f - fmod(ltime,16.0)*Q_PI;
-		c = cos(d)/1.75;
-		s = sin(d)/1.75;
+		c = cosf(d)/1.75;
+		s = sinf(d)/1.75;
 #ifdef DOUBLE_SCREW		
 		for (k=-1; k<2; k+=2)
 		{
@@ -583,12 +583,12 @@ void CL_Heatbeam (vec3_t start, vec3_t forward)
 			p->time = cl.time;
 			VectorClear (p->accel);
 //			rot+= fmod(ltime, 12.0)*Q_PI;
-//			c = cos(rot)/2.0;
-//			s = sin(rot)/2.0;
+//			c = cosf(rot)/2.0;
+//			s = sinf(rot)/2.0;
 //			variance = 0.4f + ((float)rand()/(float)RAND_MAX) *0.2f;
 			variance = 0.5;
-			c = cos(rot)*variance;
-			s = sin(rot)*variance;
+			c = cosf(rot)*variance;
+			s = sinf(rot)*variance;
 			
 			// trim it so it looks like it's starting at the origin
 			if (i < 10)
@@ -660,8 +660,8 @@ void CL_Heatbeam (vec3_t start, vec3_t end)
 		VectorClear (p->accel);
 		
 		d = crand()*Q_PI;
-		c = cos(d)*30;
-		s = sin(d)*30;
+		c = cosf(d)*30;
+		s = sinf(d)*30;
 
 		p->alpha = 1.0f;
 		p->alphavel = -5.0 / (1+frand());
@@ -703,10 +703,10 @@ void CL_Heatbeam (vec3_t start, vec3_t end)
 			p->time = cl.time;
 			VectorClear (p->accel);
 //			rot+= fmod(ltime, 12.0)*Q_PI;
-//			c = cos(rot)/2.0;
-//			s = sin(rot)/2.0;
-			c = cos(rot)/1.5;
-			s = sin(rot)/1.5;
+//			c = cosf(rot)/2.0;
+//			s = sinf(rot)/2.0;
+			c = cosf(rot)/1.5;
+			s = sinf(rot)/1.5;
 			
 			// trim it so it looks like it's starting at the origin
 			if (i < 10)
@@ -881,7 +881,7 @@ void CL_TrackerTrail (vec3_t start, vec3_t end, int particleColor)
 		p->alphavel = -2.0;
 		p->color = particleColor;
 		dist = DotProduct(move, forward);
-		VectorMA(move, 8 * cos(dist), up, p->org);
+		VectorMA(move, 8 * cosf(dist), up, p->org);
 		for (j=0 ; j<3 ; j++)
 		{
 //			p->org[j] = move[j] + crand();

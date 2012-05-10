@@ -66,10 +66,10 @@ void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point, 
 	memset( zrot, 0, sizeof( zrot ) );
 	zrot[0][0] = zrot[1][1] = zrot[2][2] = 1.0F;
 
-	zrot[0][0] = cos( DEG2RAD( degrees ) );
-	zrot[0][1] = sin( DEG2RAD( degrees ) );
-	zrot[1][0] = -sin( DEG2RAD( degrees ) );
-	zrot[1][1] = cos( DEG2RAD( degrees ) );
+	zrot[0][0] = cosf( DEG2RAD( degrees ) );
+	zrot[0][1] = sinf( DEG2RAD( degrees ) );
+	zrot[1][0] = -sinf( DEG2RAD( degrees ) );
+	zrot[1][1] = cosf( DEG2RAD( degrees ) );
 
 	R_ConcatRotations( m, zrot, tmpmat );
 	R_ConcatRotations( tmpmat, im, rot );
@@ -87,14 +87,14 @@ void AngleVectors (vec3_t angles, vec3_t forward, vec3_t right, vec3_t up)
 	// static to help MS compiler fp bugs
 
 	angle = angles[YAW] * (Q_PI*2 / 360);
-	sy = sin(angle);
-	cy = cos(angle);
+	sy = sinf(angle);
+	cy = cosf(angle);
 	angle = angles[PITCH] * (Q_PI*2 / 360);
-	sp = sin(angle);
-	cp = cos(angle);
+	sp = sinf(angle);
+	cp = cosf(angle);
 	angle = angles[ROLL] * (Q_PI*2 / 360);
-	sr = sin(angle);
-	cr = cos(angle);
+	sr = sinf(angle);
+	cr = cosf(angle);
 
 	if (forward)
 	{
@@ -151,10 +151,10 @@ void PerpendicularVector( vec3_t dst, const vec3_t src )
 	*/
 	for ( pos = 0, i = 0; i < 3; i++ )
 	{
-		if ( fabs( src[i] ) < minelem )
+		if ( fabsf( src[i] ) < minelem )
 		{
 			pos = i;
-			minelem = fabs( src[i] );
+			minelem = fabsf( src[i] );
 		}
 	}
 	tempvec[0] = tempvec[1] = tempvec[2] = 0.0F;

@@ -116,17 +116,17 @@ void turret_breach_think (edict_t *self)
 	{
 		float	dmin, dmax;
 
-		dmin = fabs(self->pos1[YAW] - self->move_angles[YAW]);
+		dmin = fabsf(self->pos1[YAW] - self->move_angles[YAW]);
 		if (dmin < -180)
 			dmin += 360;
 		else if (dmin > 180)
 			dmin -= 360;
-		dmax = fabs(self->pos2[YAW] - self->move_angles[YAW]);
+		dmax = fabsf(self->pos2[YAW] - self->move_angles[YAW]);
 		if (dmax < -180)
 			dmax += 360;
 		else if (dmax > 180)
 			dmax -= 360;
-		if (fabs(dmin) < fabs(dmax))
+		if (fabsf(dmin) < fabsf(dmax))
 			self->move_angles[YAW] = self->pos1[YAW];
 		else
 			self->move_angles[YAW] = self->pos2[YAW];
@@ -175,8 +175,8 @@ void turret_breach_think (edict_t *self)
 		// x & y
 		angle = self->s.angles[1] + self->owner->move_origin[1];
 		angle *= (Q_PI*2 / 360);
-		target[0] = SnapToEights(self->s.origin[0] + cos(angle) * self->owner->move_origin[0]);
-		target[1] = SnapToEights(self->s.origin[1] + sin(angle) * self->owner->move_origin[0]);
+		target[0] = SnapToEights(self->s.origin[0] + cosf(angle) * self->owner->move_origin[0]);
+		target[1] = SnapToEights(self->s.origin[1] + sinf(angle) * self->owner->move_origin[0]);
 		target[2] = self->owner->s.origin[2];
 
 		VectorSubtract (target, self->owner->s.origin, dir);
@@ -185,7 +185,7 @@ void turret_breach_think (edict_t *self)
 
 		// z
 		angle = self->s.angles[PITCH] * (Q_PI*2 / 360);
-		target_z = SnapToEights(self->s.origin[2] + self->owner->move_origin[0] * tan(angle) + self->owner->move_origin[2]);
+		target_z = SnapToEights(self->s.origin[2] + self->owner->move_origin[0] * tanf(angle) + self->owner->move_origin[2]);
 
 		diff = target_z - self->owner->s.origin[2];
 		self->owner->velocity[2] = diff * 1.0f / FRAMETIME;

@@ -892,9 +892,9 @@ void Weapon_HyperBlaster_Fire (edict_t *ent)
 		else
 		{
 			rotation = (ent->client->ps.gunframe - 5) * 2*Q_PI/6;
-			offset[0] = -4 * sin(rotation);
+			offset[0] = -4 * sinf(rotation);
 			offset[1] = 0;
-			offset[2] = 4 * cos(rotation);
+			offset[2] = 4 * cosf(rotation);
 
 			if ((ent->client->ps.gunframe == 6) || (ent->client->ps.gunframe == 9))
 				effect = EF_HYPERBLASTER;

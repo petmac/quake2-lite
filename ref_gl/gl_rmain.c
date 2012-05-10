@@ -296,13 +296,13 @@ void R_DrawNullModel (void)
 	qglBegin (GL_TRIANGLE_FAN);
 	qglVertex3f (0, 0, -16);
 	for (i=0 ; i<=4 ; i++)
-		qglVertex3f (16*cos(i*Q_PI/2), 16*sin(i*Q_PI/2), 0);
+		qglVertex3f (16*cosf(i*Q_PI/2), 16*sinf(i*Q_PI/2), 0);
 	qglEnd ();
 
 	qglBegin (GL_TRIANGLE_FAN);
 	qglVertex3f (0, 0, 16);
 	for (i=4 ; i>=0 ; i--)
-		qglVertex3f (16*cos(i*Q_PI/2), 16*sin(i*Q_PI/2), 0);
+		qglVertex3f (16*cosf(i*Q_PI/2), 16*sinf(i*Q_PI/2), 0);
 	qglEnd ();
 
 	qglColor3f (1,1,1);
@@ -676,7 +676,7 @@ void MYgluPerspective( GLdouble fovy, GLdouble aspect,
 {
    GLdouble xmin, xmax, ymin, ymax;
 
-   ymax = zNear * tan( fovy * Q_PI / 360.0 );
+   ymax = zNear * tanf( fovy * Q_PI / 360.0 );
    ymin = -ymax;
 
    xmin = ymin * aspect;
@@ -703,10 +703,10 @@ void R_SetupGL (void)
 	//
 	// set up viewport
 	//
-	x = floor(r_newrefdef.x * vid.width / vid.width);
-	x2 = ceil((r_newrefdef.x + r_newrefdef.width) * vid.width / vid.width);
-	y = floor(vid.height - r_newrefdef.y * vid.height / vid.height);
-	y2 = ceil(vid.height - (r_newrefdef.y + r_newrefdef.height) * vid.height / vid.height);
+	x = floorf(r_newrefdef.x * vid.width / vid.width);
+	x2 = ceilf((r_newrefdef.x + r_newrefdef.width) * vid.width / vid.width);
+	y = floorf(vid.height - r_newrefdef.y * vid.height / vid.height);
+	y2 = ceilf(vid.height - (r_newrefdef.y + r_newrefdef.height) * vid.height / vid.height);
 
 	w = x2 - x;
 	h = y - y2;
@@ -717,7 +717,7 @@ void R_SetupGL (void)
 	// set up projection matrix
 	//
     screenaspect = (float)r_newrefdef.width/r_newrefdef.height;
-//	yfov = 2*atan((float)r_newrefdef.height/r_newrefdef.width)*180/Q_PI;
+//	yfov = 2*atanf((float)r_newrefdef.height/r_newrefdef.width)*180/Q_PI;
 	qglMatrixMode(GL_PROJECTION);
     qglLoadIdentity ();
     MYgluPerspective (r_newrefdef.fov_y,  screenaspect,  4,  4096);

@@ -694,7 +694,7 @@ void R_DrawAliasModel (entity_t *e)
 		float	scale;
 		float	min;
 
-		scale = 0.1f * sin(r_newrefdef.time*7);
+		scale = 0.1f * sinf(r_newrefdef.time*7);
 		for (i=0 ; i<3 ; i++)
 		{
 			min = shadelight[i] * 0.8f;
@@ -718,8 +718,8 @@ void R_DrawAliasModel (entity_t *e)
 	shadedots = r_avertexnormal_dots[((int)(currententity->angles[1] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)];
 	
 	an = currententity->angles[1]/180*Q_PI;
-	shadevector[0] = cos(-an);
-	shadevector[1] = sin(-an);
+	shadevector[0] = cosf(-an);
+	shadevector[1] = sinf(-an);
 	shadevector[2] = 1;
 	VectorNormalize (shadevector);
 
