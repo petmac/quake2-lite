@@ -89,8 +89,6 @@ Modified gl_local.h follows.
 ====================================================================
 */
 
-extern int GL_TEXTURE0, GL_TEXTURE1;
-
 #define	REF_VERSION	"GU 0.01"
 
 // up / down
@@ -254,10 +252,7 @@ extern	float	r_world_matrix[16];
 
 void R_TranslatePlayerSkin (int playernum);
 void GL_Bind (const image_t *texnum);
-void GL_MBind( int target, const image_t *texnum );
 void GL_TexEnv( int value );
-void GL_EnableMultitexture( qboolean enable );
-void GL_SelectTexture( int texture );
 
 void R_LightPoint (vec3_t p, vec3_t color);
 void R_PushDlights (void);
@@ -357,8 +352,7 @@ typedef struct
 
 	int lightmap_textures;
 
-	const image_t *currenttextures[2];
-	int currenttmu;
+	const image_t *currenttexture;
 
 	float camera_separation;
 	qboolean stereo_enabled;

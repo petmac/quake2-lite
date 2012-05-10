@@ -39,73 +39,14 @@ void GL_SetTexturePalette(const ScePspRGBA8888 *palette)
 	sceGuClutLoad(32, palette);
 }
 
-void GL_EnableMultitexture( qboolean enable )
-{
-#ifndef PSP
-	if ( !qglSelectTextureSGIS && !qglActiveTextureARB )
-		return;
-
-	if ( enable )
-	{
-		GL_SelectTexture( GL_TEXTURE1 );
-		qglEnable( GL_TEXTURE_2D );
-		GL_TexEnv( GU_TFX_REPLACE );
-	}
-	else
-	{
-		GL_SelectTexture( GL_TEXTURE1 );
-		qglDisable( GL_TEXTURE_2D );
-		GL_TexEnv( GU_TFX_REPLACE );
-	}
-	GL_SelectTexture( GL_TEXTURE0 );
-	GL_TexEnv( GU_TFX_REPLACE );
-#endif
-}
-
-void GL_SelectTexture( int texture )
-{
-#ifndef PSP
-	int tmu;
-
-	if ( !qglSelectTextureSGIS && !qglActiveTextureARB )
-		return;
-
-	if ( texture == GL_TEXTURE0 )
-	{
-		tmu = 0;
-	}
-	else
-	{
-		tmu = 1;
-	}
-
-	if ( tmu == gl_state.currenttmu )
-	{
-		return;
-	}
-
-	gl_state.currenttmu = tmu;
-
-	if ( qglSelectTextureSGIS )
-	{
-		qglSelectTextureSGIS( texture );
-	}
-	else if ( qglActiveTextureARB )
-	{
-		qglActiveTextureARB( texture );
-		qglClientActiveTextureARB( texture );
-	}
-#endif
-}
-
 void GL_TexEnv( int mode )
 {
-	static int lastmodes[2] = { -1, -1 };
+	static int lastmode = -1;
 
-	if ( mode != lastmodes[gl_state.currenttmu] )
+	if ( mode != lastmode )
 	{
 		//sceGuTexFunc(mode, GU_TCC_RGBA);
-		lastmodes[gl_state.currenttmu] = mode;
+		lastmode = mode;
 	}
 }
 
@@ -122,10 +63,10 @@ void GL_Bind (const image_t *texnum)
 	if (gl_nobind->value && draw_chars)		// performance evaluation option
 		texnum = draw_chars;
 #ifndef PSP
-	if ( gl_state.currenttextures[gl_state.currenttmu] == texnum)
+	if ( gl_state.currenttexture == texnum)
 		return;
 #endif
-	gl_state.currenttextures[gl_state.currenttmu] = texnum;
+	gl_state.currenttexture = texnum;
 #ifndef PSP
 	qglBindTexture (GL_TEXTURE_2D, texnum);
 #endif
@@ -133,22 +74,6 @@ void GL_Bind (const image_t *texnum)
 	{
 		sceGuTexImage(0, texnum->buffer_width, texnum->buffer_height, texnum->buffer_width, texnum->texnum);
 	}
-}
-
-void GL_MBind( int target, const image_t *texnum )
-{
-	GL_SelectTexture( target );
-	if ( target == GL_TEXTURE0 )
-	{
-		if ( gl_state.currenttextures[0] == texnum )
-			return;
-	}
-	else
-	{
-		if ( gl_state.currenttextures[1] == texnum )
-			return;
-	}
-	GL_Bind( texnum );
 }
 
 /*

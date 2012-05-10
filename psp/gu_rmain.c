@@ -24,8 +24,6 @@ void R_Clear (void);
 
 refimport_t	ri;
 
-int GL_TEXTURE0, GL_TEXTURE1;
-
 model_t		*r_worldmodel;
 
 float		gldepthmin, gldepthmax;
