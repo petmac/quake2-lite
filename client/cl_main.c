@@ -223,7 +223,7 @@ void CL_Record_f (void)
 	{
 		if (cl.configstrings[i][0])
 		{
-			if (buf.cursize + strlen (cl.configstrings[i]) + 32 > buf.maxsize)
+			if (buf.cursize + (int)strlen (cl.configstrings[i]) + 32 > buf.maxsize)
 			{	// write it out
 				len = LittleLong (buf.cursize);
 				fwrite (&len, 4, 1, cls.demofile);
@@ -377,7 +377,7 @@ void CL_Pause_f (void)
 		return;
 	}
 
-	Cvar_SetValue ("paused", !cl_paused->value);
+	Cvar_SetValue ("paused", cl_paused->value ? 0.0f : 1.0f);
 }
 
 /*
@@ -435,7 +435,7 @@ void CL_SendConnectPacket (void)
 	if (adr.port == 0)
 		adr.port = BigShort (PORT_SERVER);
 
-	port = Cvar_VariableValue ("qport");
+	port = (int)Cvar_VariableValue ("qport");
 	userinfo_modified = false;
 
 	Netchan_OutOfBandPrint (NS_CLIENT, adr, "connect %i %i %i \"%s\"\n",
@@ -481,7 +481,7 @@ void CL_CheckForResend (void)
 	if (adr.port == 0)
 		adr.port = BigShort (PORT_SERVER);
 
-	cls.connect_time = cls.realtime;	// for retransmit requests
+	cls.connect_time = (float)cls.realtime;	// for retransmit requests
 
 	Com_Printf ("Connecting to %s...\n", cls.servername);
 
@@ -768,7 +768,7 @@ void CL_Reconnect_f (void)
 	if (*cls.servername) {
 		if (cls.state >= ca_connected) {
 			CL_Disconnect();
-			cls.connect_time = cls.realtime - 1500;
+			cls.connect_time = (float)(cls.realtime - 1500);
 		} else
 			cls.connect_time = -99999; // fire immediately
 
@@ -1700,7 +1700,7 @@ void CL_Frame (int msec)
 	IN_Frame ();
 
 	// decide the simulation time
-	cls.frametime = extratime/1000.0;
+	cls.frametime = extratime/1000.0f;
 	cl.time += extratime;
 	cls.realtime = curtime;
 
@@ -1709,8 +1709,8 @@ void CL_Frame (int msec)
 	if (cls.frametime > (1.0 / cl_minfps->value))
 		cls.frametime = (1.0 / cl_minfps->value);
 #else
-	if (cls.frametime > (1.0 / 5))
-		cls.frametime = (1.0 / 5);
+	if (cls.frametime > (1.0f / 5.0f))
+		cls.frametime = (1.0f / 5.0f);
 #endif
 
 	// if in the debugger last frame, don't timeout

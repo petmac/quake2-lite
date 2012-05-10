@@ -506,7 +506,7 @@ void SCR_RunCinematic (void)
 		return;
 	}
 
-	frame = (cls.realtime - cl.cinematictime)*14.0/1000;
+	frame = (int)((cls.realtime - cl.cinematictime)*14.0f/1000);
 	if (frame <= cl.cinematicframe)
 		return;
 	if (frame > cl.cinematicframe+1)
@@ -635,13 +635,13 @@ void SCR_PlayCinematic (char *arg)
 	Huff1TableInit ();
 
 	// switch up to 22 khz sound if necessary
-	old_khz = Cvar_VariableValue ("s_khz");
+	old_khz = (int)Cvar_VariableValue ("s_khz");
 	if (old_khz != cin.s_rate/1000)
 	{
 		cin.restart_sound = true;
-		Cvar_SetValue ("s_khz", cin.s_rate/1000);
+		Cvar_SetValue ("s_khz", cin.s_rate/1000.0f);
 		CL_Snd_Restart_f ();
-		Cvar_SetValue ("s_khz", old_khz);
+		Cvar_SetValue ("s_khz", (float)old_khz);
 	}
 
 	cl.cinematicframe = 0;

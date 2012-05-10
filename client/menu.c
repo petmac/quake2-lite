@@ -527,7 +527,7 @@ static void StartNetworkServerFunc( void *unused )
 
 void Multiplayer_MenuInit( void )
 {
-	s_multiplayer_menu.x = viddef.width * 0.50 - 64;
+	s_multiplayer_menu.x = (int)(viddef.width * 0.50f - 64);
 	s_multiplayer_menu.nitems = 0;
 
 	s_join_network_server_action.generic.type	= MTYPE_ACTION;
@@ -739,7 +739,7 @@ static void Keys_MenuInit( void )
 	int y = 0;
 	int i = 0;
 
-	s_keys_menu.x = viddef.width * 0.50;
+	s_keys_menu.x = (int)(viddef.width * 0.50f);
 	s_keys_menu.nitems = 0;
 	s_keys_menu.cursordraw = KeyCursorDrawFunc;
 
@@ -1035,12 +1035,12 @@ static menulist_s		s_options_console_action;
 
 static void CrosshairFunc( void *unused )
 {
-	Cvar_SetValue( "crosshair", s_options_crosshair_box.curvalue );
+	Cvar_SetValue( "crosshair", (float)s_options_crosshair_box.curvalue );
 }
 
 static void JoystickFunc( void *unused )
 {
-	Cvar_SetValue( "in_joystick", s_options_joystick_box.curvalue );
+	Cvar_SetValue( "in_joystick", (float)s_options_joystick_box.curvalue );
 }
 
 static void CustomizeControlsFunc( void *unused )
@@ -1050,12 +1050,12 @@ static void CustomizeControlsFunc( void *unused )
 
 static void AlwaysRunFunc( void *unused )
 {
-	Cvar_SetValue( "cl_run", s_options_alwaysrun_box.curvalue );
+	Cvar_SetValue( "cl_run", (float)s_options_alwaysrun_box.curvalue );
 }
 
 static void FreeLookFunc( void *unused )
 {
-	Cvar_SetValue( "freelook", s_options_freelook_box.curvalue );
+	Cvar_SetValue( "freelook", (float)s_options_freelook_box.curvalue );
 }
 
 static void MouseSpeedFunc( void *unused )
@@ -1065,7 +1065,7 @@ static void MouseSpeedFunc( void *unused )
 
 static void NoAltTabFunc( void *unused )
 {
-	Cvar_SetValue( "win_noalttab", s_options_noalttab_box.curvalue );
+	Cvar_SetValue( "win_noalttab", (float)s_options_noalttab_box.curvalue );
 }
 
 static float ClampCvar( float min, float max, float value )
@@ -1083,26 +1083,26 @@ static void ControlsSetMenuItemValues( void )
 	s_options_sensitivity_slider.curvalue	= ( sensitivity->value ) * 2;
 
 	Cvar_SetValue( "cl_run", ClampCvar( 0, 1, cl_run->value ) );
-	s_options_alwaysrun_box.curvalue		= cl_run->value;
+	s_options_alwaysrun_box.curvalue		= (int)cl_run->value;
 
 	s_options_invertmouse_box.curvalue		= m_pitch->value < 0;
 
 	Cvar_SetValue( "lookspring", ClampCvar( 0, 1, lookspring->value ) );
-	s_options_lookspring_box.curvalue		= lookspring->value;
+	s_options_lookspring_box.curvalue		= (int)lookspring->value;
 
 	Cvar_SetValue( "lookstrafe", ClampCvar( 0, 1, lookstrafe->value ) );
-	s_options_lookstrafe_box.curvalue		= lookstrafe->value;
+	s_options_lookstrafe_box.curvalue		= (int)lookstrafe->value;
 
 	Cvar_SetValue( "freelook", ClampCvar( 0, 1, freelook->value ) );
-	s_options_freelook_box.curvalue			= freelook->value;
+	s_options_freelook_box.curvalue			= (int)freelook->value;
 
 	Cvar_SetValue( "crosshair", ClampCvar( 0, 3, crosshair->value ) );
-	s_options_crosshair_box.curvalue		= crosshair->value;
+	s_options_crosshair_box.curvalue		= (int)crosshair->value;
 
 	Cvar_SetValue( "in_joystick", ClampCvar( 0, 1, in_joystick->value ) );
-	s_options_joystick_box.curvalue		= in_joystick->value;
+	s_options_joystick_box.curvalue		= (int)in_joystick->value;
 
-	s_options_noalttab_box.curvalue			= win_noalttab->value;
+	s_options_noalttab_box.curvalue			= (int)win_noalttab->value;
 }
 
 static void ControlsResetDefaultsFunc( void *unused )
@@ -1120,12 +1120,12 @@ static void InvertMouseFunc( void *unused )
 
 static void LookspringFunc( void *unused )
 {
-	Cvar_SetValue( "lookspring", !lookspring->value );
+	Cvar_SetValue( "lookspring", lookspring->value ? 0.0f : 1.0f);
 }
 
 static void LookstrafeFunc( void *unused )
 {
-	Cvar_SetValue( "lookstrafe", !lookstrafe->value );
+	Cvar_SetValue( "lookstrafe", lookstrafe->value ? 0.0f : 1.0f );
 }
 
 static void UpdateVolumeFunc( void *unused )
@@ -1135,7 +1135,7 @@ static void UpdateVolumeFunc( void *unused )
 
 static void UpdateCDVolumeFunc( void *unused )
 {
-	Cvar_SetValue( "cd_nocd", !s_options_cdvolume_box.curvalue );
+	Cvar_SetValue( "cd_nocd", s_options_cdvolume_box.curvalue ? 0.0f : 1.0f );
 }
 
 static void ConsoleFunc( void *unused )
@@ -1171,7 +1171,7 @@ static void UpdateSoundQualityFunc( void *unused )
 		Cvar_SetValue( "s_loadas8bit", true );
 	}
 	
-	Cvar_SetValue( "s_primary", s_options_compatibility_list.curvalue );
+	Cvar_SetValue( "s_primary", (float)s_options_compatibility_list.curvalue );
 
 	M_DrawTextBox( 8, 120 - 48, 36, 3 );
 	M_Print( 16 + 16, 120 - 48 + 8,  "Restarting the sound system. This" );
@@ -1258,7 +1258,7 @@ void Options_MenuInit( void )
 	s_options_compatibility_list.generic.name	= "sound compatibility";
 	s_options_compatibility_list.generic.callback = UpdateSoundQualityFunc;
 	s_options_compatibility_list.itemnames		= compatibility_items;
-	s_options_compatibility_list.curvalue		= Cvar_VariableValue( "s_primary" );
+	s_options_compatibility_list.curvalue		= (int)Cvar_VariableValue( "s_primary" );
 
 	s_options_sensitivity_slider.generic.type	= MTYPE_SLIDER;
 	s_options_sensitivity_slider.generic.x		= 0;
@@ -1758,7 +1758,7 @@ void M_Credits_MenuDraw( void )
 	/*
 	** draw the credits
 	*/
-	for ( i = 0, y = viddef.height - ( ( cls.realtime - credits_start_time ) / 40.0F ); credits[i] && y < viddef.height; y += 10, i++ )
+	for ( i = 0, y = (int)(viddef.height - ( ( cls.realtime - credits_start_time ) / 40.0F )); credits[i] && y < (int)viddef.height; y += 10, i++ )
 	{
 		int j, stringoffset = 0;
 		int bold = false;
@@ -1940,7 +1940,7 @@ void Game_MenuInit( void )
 		0
 	};
 
-	s_game_menu.x = viddef.width * 0.50;
+	s_game_menu.x = (int)(viddef.width * 0.50f);
 	s_game_menu.nitems = 0;
 
 	s_easy_game_action.generic.type	= MTYPE_ACTION;
@@ -2296,7 +2296,7 @@ void JoinServer_MenuInit( void )
 {
 	int i;
 
-	s_joinserver_menu.x = viddef.width * 0.50 - 120;
+	s_joinserver_menu.x = (int)(viddef.width * 0.50f) - 120;
 	s_joinserver_menu.nitems = 0;
 
 	s_joinserver_address_book_action.generic.type	= MTYPE_ACTION;
@@ -2440,9 +2440,9 @@ void StartServerActionFunc( void *self )
 	timelimit	= atoi( s_timelimit_field.buffer );
 	fraglimit	= atoi( s_fraglimit_field.buffer );
 
-	Cvar_SetValue( "maxclients", ClampCvar( 0, maxclients, maxclients ) );
-	Cvar_SetValue ("timelimit", ClampCvar( 0, timelimit, timelimit ) );
-	Cvar_SetValue ("fraglimit", ClampCvar( 0, fraglimit, fraglimit ) );
+	Cvar_SetValue( "maxclients", ClampCvar( 0, (float)maxclients, (float)maxclients ) );
+	Cvar_SetValue ("timelimit", ClampCvar( 0, (float)timelimit, (float)timelimit ) );
+	Cvar_SetValue ("fraglimit", ClampCvar( 0, (float)fraglimit, (float)fraglimit ) );
 	Cvar_Set("hostname", s_hostname_field.buffer );
 //	Cvar_SetValue ("deathmatch", !s_rules_box.curvalue );
 //	Cvar_SetValue ("coop", s_rules_box.curvalue );
@@ -2450,15 +2450,15 @@ void StartServerActionFunc( void *self )
 //PGM
 	if((s_rules_box.curvalue < 2) || (Developer_searchpath(2) != 2))
 	{
-		Cvar_SetValue ("deathmatch", !s_rules_box.curvalue );
-		Cvar_SetValue ("coop", s_rules_box.curvalue );
+		Cvar_SetValue ("deathmatch", s_rules_box.curvalue ? 0.0f : 1.0f);
+		Cvar_SetValue ("coop", (float)s_rules_box.curvalue );
 		Cvar_SetValue ("gamerules", 0 );
 	}
 	else
 	{
 		Cvar_SetValue ("deathmatch", 1 );	// deathmatch is always true for rogue games, right?
 		Cvar_SetValue ("coop", 0 );			// FIXME - this might need to depend on which game we're running
-		Cvar_SetValue ("gamerules", s_rules_box.curvalue );
+		Cvar_SetValue ("gamerules", (float)s_rules_box.curvalue );
 	}
 //PGM
 
@@ -2596,7 +2596,7 @@ void StartServer_MenuInit( void )
 	/*
 	** initialize the menu stuff
 	*/
-	s_startserver_menu.x = viddef.width * 0.50;
+	s_startserver_menu.x = (int)(viddef.width * 0.50f);
 	s_startserver_menu.nitems = 0;
 
 	s_startmap_list.generic.type = MTYPE_SPINCONTROL;
@@ -2772,7 +2772,7 @@ static void DMFlagCallback( void *self )
 	int flags;
 	int bit = 0;
 
-	flags = Cvar_VariableValue( "dmflags" );
+	flags = (int)Cvar_VariableValue( "dmflags" );
 
 	if ( f == &s_friendlyfire_box )
 	{
@@ -2903,7 +2903,7 @@ static void DMFlagCallback( void *self )
 	}
 
 setvalue:
-	Cvar_SetValue ("dmflags", flags);
+	Cvar_SetValue ("dmflags", (float)flags);
 
 	Com_sprintf( dmoptions_statusbar, sizeof( dmoptions_statusbar ), "dmflags = %d", flags );
 
@@ -2919,10 +2919,10 @@ void DMOptions_MenuInit( void )
 	{
 		"disabled", "by skin", "by model", 0
 	};
-	int dmflags = Cvar_VariableValue( "dmflags" );
+	int dmflags = (int)Cvar_VariableValue( "dmflags" );
 	int y = 0;
 
-	s_dmoptions_menu.x = viddef.width * 0.50;
+	s_dmoptions_menu.x = (int)(viddef.width * 0.50);
 	s_dmoptions_menu.nitems = 0;
 
 	s_falls_box.generic.type = MTYPE_SPINCONTROL;
@@ -3157,27 +3157,27 @@ static void DownloadCallback( void *self )
 
 	if (f == &s_allow_download_box)
 	{
-		Cvar_SetValue("allow_download", f->curvalue);
+		Cvar_SetValue("allow_download", (float)f->curvalue);
 	}
 
 	else if (f == &s_allow_download_maps_box)
 	{
-		Cvar_SetValue("allow_download_maps", f->curvalue);
+		Cvar_SetValue("allow_download_maps", (float)f->curvalue);
 	}
 
 	else if (f == &s_allow_download_models_box)
 	{
-		Cvar_SetValue("allow_download_models", f->curvalue);
+		Cvar_SetValue("allow_download_models", (float)f->curvalue);
 	}
 
 	else if (f == &s_allow_download_players_box)
 	{
-		Cvar_SetValue("allow_download_players", f->curvalue);
+		Cvar_SetValue("allow_download_players", (float)f->curvalue);
 	}
 
 	else if (f == &s_allow_download_sounds_box)
 	{
-		Cvar_SetValue("allow_download_sounds", f->curvalue);
+		Cvar_SetValue("allow_download_sounds", (float)f->curvalue);
 	}
 }
 
@@ -3189,7 +3189,7 @@ void DownloadOptions_MenuInit( void )
 	};
 	int y = 0;
 
-	s_downloadoptions_menu.x = viddef.width * 0.50;
+	s_downloadoptions_menu.x = (int)(viddef.width * 0.50);
 	s_downloadoptions_menu.nitems = 0;
 
 	s_download_title.generic.type = MTYPE_SEPARATOR;
@@ -3373,7 +3373,7 @@ static playermodelinfo_s s_pmi[MAX_PLAYERMODELS];
 static char *s_pmnames[MAX_PLAYERMODELS];
 static int s_numplayermodels;
 
-static int rate_tbl[] = { 2500, 3200, 5000, 10000, 25000, 0 };
+static float rate_tbl[] = { 2500, 3200, 5000, 10000, 25000, 0 };
 static const char *rate_names[] = { "28.8 Modem", "33.6 Modem", "Single ISDN",
 	"Dual ISDN/Cable", "T1/LAN", "User defined", 0 };
 
@@ -3384,7 +3384,7 @@ void DownloadOptionsFunc( void *self )
 
 static void HandednessCallback( void *unused )
 {
-	Cvar_SetValue( "hand", s_player_handedness_box.curvalue );
+	Cvar_SetValue( "hand", (float)s_player_handedness_box.curvalue );
 }
 
 static void RateCallback( void *unused )
@@ -3711,7 +3711,7 @@ qboolean PlayerConfig_MenuInit( void )
 	s_player_handedness_box.generic.name	= 0;
 	s_player_handedness_box.generic.cursor_offset = -48;
 	s_player_handedness_box.generic.callback = HandednessCallback;
-	s_player_handedness_box.curvalue = Cvar_VariableValue( "hand" );
+	s_player_handedness_box.curvalue = (int)Cvar_VariableValue( "hand" );
 	s_player_handedness_box.itemnames = handedness;
 
 	for (i = 0; i < sizeof(rate_tbl) / sizeof(*rate_tbl) - 1; i++)
@@ -3770,8 +3770,8 @@ void PlayerConfig_MenuDraw( void )
 	refdef.width = 144;
 	refdef.height = 168;
 	refdef.fov_x = 40;
-	refdef.fov_y = CalcFov( refdef.fov_x, refdef.width, refdef.height );
-	refdef.time = cls.realtime*0.001;
+	refdef.fov_y = CalcFov( refdef.fov_x, (float)refdef.width, (float)refdef.height );
+	refdef.time = cls.realtime*0.001f;
 
 	if ( s_pmi[s_player_model_box.curvalue].skindisplaynames )
 	{
@@ -3793,7 +3793,7 @@ void PlayerConfig_MenuDraw( void )
 		entity.frame = 0;
 		entity.oldframe = 0;
 		entity.backlerp = 0.0;
-		entity.angles[1] = yaw++;
+		entity.angles[1] = (float)(yaw++);
 		if ( ++yaw > 360 )
 			yaw -= 360;
 
@@ -3805,7 +3805,7 @@ void PlayerConfig_MenuDraw( void )
 
 		Menu_Draw( &s_player_config_menu );
 
-		M_DrawTextBox( ( refdef.x ) * ( 320.0F / viddef.width ) - 8, ( viddef.height / 2 ) * ( 240.0F / viddef.height) - 77, refdef.width / 8, refdef.height / 8 );
+		M_DrawTextBox( (int)(( refdef.x ) * ( 320.0F / viddef.width ) - 8), (int)(( viddef.height / 2 ) * ( 240.0F / viddef.height) - 77), refdef.width / 8, refdef.height / 8 );
 		refdef.height += 4;
 
 		re.RenderFrame( &refdef );

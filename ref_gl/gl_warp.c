@@ -74,7 +74,7 @@ void SubdividePolygon (int numverts, float *verts)
 	for (i=0 ; i<3 ; i++)
 	{
 		m = (mins[i] + maxs[i]) * 0.5;
-		m = SUBDIVIDE_SIZE * floor (m/SUBDIVIDE_SIZE + 0.5);
+		m = SUBDIVIDE_SIZE * floorf (m/SUBDIVIDE_SIZE + 0.5);
 		if (maxs[i] - m < 8)
 			continue;
 		if (m - mins[i] < 8)
@@ -194,7 +194,7 @@ void GL_SubdivideSurface (msurface_t *fa)
 
 
 
-// speed up sin calculations - Ed
+// speed up sinf calculations - Ed
 float	r_turbsin[] =
 {
 	#include "warpsin.h"
@@ -231,11 +231,11 @@ void EmitWaterPolys (msurface_t *fa)
 			os = v[3];
 			ot = v[4];
 
-			s = os + r_turbsin[(int)((ot*0.125+r_newrefdef.time) * TURBSCALE) & 255];
+			s = os + r_turbsin[(int)((ot*0.125f+r_newrefdef.time) * TURBSCALE) & 255];
 			s += scroll;
 			s *= (1.0/64);
 
-			t = ot + r_turbsin[(int)((os*0.125+rdt) * TURBSCALE) & 255];
+			t = ot + r_turbsin[(int)((os*0.125f+rdt) * TURBSCALE) & 255];
 
 			t *= (1.0/64);
 
@@ -320,9 +320,9 @@ return;
 	{
 		VectorAdd (vp, v, v);
 	}
-	av[0] = fabs(v[0]);
-	av[1] = fabs(v[1]);
-	av[2] = fabs(v[2]);
+	av[0] = fabsf(v[0]);
+	av[1] = fabsf(v[1]);
+	av[2] = fabsf(v[2]);
 	if (av[0] > av[1] && av[0] > av[2])
 	{
 		if (v[0] < 0)

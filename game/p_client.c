@@ -479,7 +479,7 @@ void LookAtKiller (edict_t *self, edict_t *inflictor, edict_t *attacker)
 	}
 
 	if (dir[0])
-		self->client->killer_yaw = 180/M_PI*atan2(dir[1], dir[0]);
+		self->client->killer_yaw = 180/M_PI*atan2f(dir[1], dir[0]);
 	else {
 		self->client->killer_yaw = 0;
 		if (dir[1] > 0)
@@ -1648,8 +1648,8 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 
 		for (i=0 ; i<3 ; i++)
 		{
-			ent->s.origin[i] = pm.s.origin[i]*0.125;
-			ent->velocity[i] = pm.s.velocity[i]*0.125;
+			ent->s.origin[i] = pm.s.origin[i]*0.125f;
+			ent->velocity[i] = pm.s.velocity[i]*0.125f;
 		}
 
 		VectorCopy (pm.mins, ent->mins);

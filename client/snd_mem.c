@@ -46,10 +46,10 @@ void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, byte *data)
 
 	stepscale = (float)inrate / dma.speed;	// this is usually 0.5, 1, or 2
 
-	outcount = sc->length / stepscale;
+	outcount = (int)(sc->length / stepscale);
 	sc->length = outcount;
 	if (sc->loopstart != -1)
-		sc->loopstart = sc->loopstart / stepscale;
+		sc->loopstart = (int)(sc->loopstart / stepscale);
 
 	sc->speed = dma.speed;
 	if (s_loadas8bit->value)
@@ -71,7 +71,7 @@ void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, byte *data)
 	{
 // general case
 		samplefrac = 0;
-		fracstep = stepscale*256;
+		fracstep = (int)(stepscale*256);
 		for (i=0 ; i<outcount ; i++)
 		{
 			srcsample = samplefrac >> 8;
@@ -145,7 +145,7 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 	}
 
 	stepscale = (float)info.rate / dma.speed;	
-	len = info.samples / stepscale;
+	len = (int)(info.samples / stepscale);
 
 	len = len * info.width * info.channels;
 

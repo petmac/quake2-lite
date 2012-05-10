@@ -108,7 +108,7 @@ void S_TransferPaintBuffer(int endtime)
 		// write a fixed sine wave
 		count = (endtime - paintedtime);
 		for (i=0 ; i<count ; i++)
-			paintbuffer[i].left = paintbuffer[i].right = sin((paintedtime+i)*0.1)*20000*256;
+			paintbuffer[i].left = paintbuffer[i].right = (int)(sinf((paintedtime+i)*0.1)*20000*256);
 	}
 
 
@@ -178,7 +178,7 @@ void S_PaintChannels(int endtime)
 	int		ltime, count;
 	playsound_t	*ps;
 
-	snd_vol = s_volume->value*256;
+	snd_vol = (int)(s_volume->value*256);
 
 //Com_Printf ("%i to %i\n", paintedtime, endtime);
 	while (paintedtime < endtime)
@@ -194,13 +194,13 @@ void S_PaintChannels(int endtime)
 			ps = s_pendingplays.next;
 			if (ps == &s_pendingplays)
 				break;	// no more pending sounds
-			if (ps->begin <= paintedtime)
+			if ((int)ps->begin <= paintedtime)
 			{
 				S_IssuePlaysound (ps);
 				continue;
 			}
 
-			if (ps->begin < end)
+			if ((int)ps->begin < end)
 				end = ps->begin;		// stop here
 			break;
 		}

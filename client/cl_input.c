@@ -279,23 +279,25 @@ void CL_BaseMove (usercmd_t *cmd)
 	
 	memset (cmd, 0, sizeof(*cmd));
 	
-	VectorCopy (cl.viewangles, cmd->angles);
+	cmd->angles[0] = (short)(cl.viewangles[0]);
+	cmd->angles[1] = (short)(cl.viewangles[1]);
+	cmd->angles[2] = (short)(cl.viewangles[2]);
 	if (in_strafe.state & 1)
 	{
-		cmd->sidemove += cl_sidespeed->value * CL_KeyState (&in_right);
-		cmd->sidemove -= cl_sidespeed->value * CL_KeyState (&in_left);
+		cmd->sidemove += (short)(cl_sidespeed->value * CL_KeyState (&in_right));
+		cmd->sidemove -= (short)(cl_sidespeed->value * CL_KeyState (&in_left));
 	}
 
-	cmd->sidemove += cl_sidespeed->value * CL_KeyState (&in_moveright);
-	cmd->sidemove -= cl_sidespeed->value * CL_KeyState (&in_moveleft);
+	cmd->sidemove += (short)(cl_sidespeed->value * CL_KeyState (&in_moveright));
+	cmd->sidemove -= (short)(cl_sidespeed->value * CL_KeyState (&in_moveleft));
 
-	cmd->upmove += cl_upspeed->value * CL_KeyState (&in_up);
-	cmd->upmove -= cl_upspeed->value * CL_KeyState (&in_down);
+	cmd->upmove += (short)(cl_upspeed->value * CL_KeyState (&in_up));
+	cmd->upmove -= (short)(cl_upspeed->value * CL_KeyState (&in_down));
 
 	if (! (in_klook.state & 1) )
 	{	
-		cmd->forwardmove += cl_forwardspeed->value * CL_KeyState (&in_forward);
-		cmd->forwardmove -= cl_forwardspeed->value * CL_KeyState (&in_back);
+		cmd->forwardmove += (short)(cl_forwardspeed->value * CL_KeyState (&in_forward));
+		cmd->forwardmove -= (short)(cl_forwardspeed->value * CL_KeyState (&in_back));
 	}	
 
 //
@@ -353,7 +355,7 @@ void CL_FinishMove (usercmd_t *cmd)
 		cmd->buttons |= BUTTON_ANY;
 
 	// send milliseconds of time to apply the move
-	ms = cls.frametime * 1000;
+	ms = (int)(cls.frametime * 1000);
 	if (ms > 250)
 		ms = 100;		// time was unreasonable
 	cmd->msec = ms;

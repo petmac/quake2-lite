@@ -111,7 +111,7 @@ void CL_AddNetgraph (void)
 	ping /= 30;
 	if (ping > 30)
 		ping = 30;
-	SCR_DebugGraph (ping, 0xd0);
+	SCR_DebugGraph ((float)ping, 0xd0);
 }
 
 
@@ -154,8 +154,8 @@ void SCR_DrawDebugGraph (void)
 
 	x = scr_vrect.x;
 	y = scr_vrect.y+scr_vrect.height;
-	re.DrawFill (x, y-scr_graphheight->value,
-		w, scr_graphheight->value, 8);
+	re.DrawFill (x, (int)(y-scr_graphheight->value),
+		w, (int)(scr_graphheight->value), 8);
 
 	for (a=0 ; a<w ; a++)
 	{
@@ -201,7 +201,7 @@ void SCR_CenterPrint (char *str)
 
 	strncpy (scr_centerstring, str, sizeof(scr_centerstring)-1);
 	scr_centertime_off = scr_centertime->value;
-	scr_centertime_start = cl.time;
+	scr_centertime_start = (float)cl.time;
 
 	// count the number of lines for centering
 	scr_center_lines = 1;
@@ -263,7 +263,7 @@ void SCR_DrawCenterString (void)
 	start = scr_centerstring;
 
 	if (scr_center_lines <= 4)
-		y = viddef.height*0.35;
+		y = (int)(viddef.height*0.35f);
 	else
 		y = 48;
 
@@ -323,7 +323,7 @@ static void SCR_CalcVrect (void)
 	if (scr_viewsize->value > 100)
 		Cvar_Set ("viewsize","100");
 
-	size = scr_viewsize->value;
+	size = (int)scr_viewsize->value;
 
 	scr_vrect.width = viddef.width*size/100;
 	scr_vrect.width &= ~7;
@@ -379,14 +379,14 @@ void SCR_Sky_f (void)
 		return;
 	}
 	if (Cmd_Argc() > 2)
-		rotate = atof(Cmd_Argv(2));
+		rotate = (float)atof(Cmd_Argv(2));
 	else
 		rotate = 0;
 	if (Cmd_Argc() == 6)
 	{
-		axis[0] = atof(Cmd_Argv(3));
-		axis[1] = atof(Cmd_Argv(4));
-		axis[2] = atof(Cmd_Argv(5));
+		axis[0] = (float)atof(Cmd_Argv(3));
+		axis[1] = (float)atof(Cmd_Argv(4));
+		axis[2] = (float)atof(Cmd_Argv(5));
 	}
 	else
 	{
@@ -575,7 +575,7 @@ void SCR_BeginLoadingPlaque (void)
 	else
 		scr_draw_loading = 1;
 	SCR_UpdateScreen ();
-	cls.disable_screen = Sys_Milliseconds ();
+	cls.disable_screen = (float)Sys_Milliseconds ();
 	cls.disable_servercount = cl.servercount;
 }
 
@@ -636,7 +636,7 @@ void SCR_TimeRefresh_f (void)
 		re.BeginFrame( 0 );
 		for (i=0 ; i<128 ; i++)
 		{
-			cl.refdef.viewangles[1] = i/128.0*360.0;
+			cl.refdef.viewangles[1] = i/128.0f*360.0f;
 			re.RenderFrame (&cl.refdef);
 		}
 		re.EndFrame();
@@ -645,7 +645,7 @@ void SCR_TimeRefresh_f (void)
 	{
 		for (i=0 ; i<128 ; i++)
 		{
-			cl.refdef.viewangles[1] = i/128.0*360.0;
+			cl.refdef.viewangles[1] = i/128.0f*360.0f;
 
 			re.BeginFrame( 0 );
 			re.RenderFrame (&cl.refdef);
@@ -654,7 +654,7 @@ void SCR_TimeRefresh_f (void)
 	}
 
 	stop = Sys_Milliseconds ();
-	time = (stop-start)/1000.0;
+	time = (stop-start)/1000.0f;
 	Com_Printf ("%f seconds (%f fps)\n", time, 128/time);
 }
 
@@ -728,7 +728,7 @@ void SCR_TileClear (void)
 	scr_dirty.y2 = -9999;
 
 	// don't bother with anything convered by the console)
-	top = scr_con_current*viddef.height;
+	top = (int)(scr_con_current*viddef.height);
 	if (top >= clear.y1)
 		clear.y1 = top;
 

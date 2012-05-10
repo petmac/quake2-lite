@@ -549,7 +549,7 @@ void SV_BuildClientFrame (client_t *client)
 
 	// find the client's PVS
 	for (i=0 ; i<3 ; i++)
-		org[i] = clent->client->ps.pmove.origin[i]*0.125 + clent->client->ps.viewoffset[i];
+		org[i] = clent->client->ps.pmove.origin[i]*0.125f + clent->client->ps.viewoffset[i];
 
 	leafnum = CM_PointLeafnum (org);
 	clientarea = CM_LeafArea (leafnum);

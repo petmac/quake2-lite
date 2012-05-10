@@ -20,17 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 	
 // q_shared.h -- included first by ALL program modules
 
-#ifdef _WIN32
-// unknown pragmas are SUPPOSED to be ignored, but....
-#pragma warning(disable : 4244)     // MIPS
-#pragma warning(disable : 4136)     // X86
-#pragma warning(disable : 4051)     // ALPHA
-
-#pragma warning(disable : 4018)     // signed/unsigned mismatch
-#pragma warning(disable : 4305)		// truncation from const double to float
-
-#endif
-
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -119,16 +108,12 @@ typedef	int	fixed8_t;
 typedef	int	fixed16_t;
 
 #ifndef M_PI
-#define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
+#define M_PI		3.14159265358979323846f	// matches value in gcc v2 math.h
 #endif
 
 struct cplane_s;
 
 extern vec3_t vec3_origin;
-
-#define	nanmask (255<<23)
-
-#define	IS_NAN(x) (((*(int *)&x)&nanmask)==nanmask)
 
 #define Q_ftol( f ) ( long ) (f)
 
@@ -1036,7 +1021,7 @@ ROGUE - VERSIONS
 */
 
 #define	ANGLE2SHORT(x)	((int)((x)*65536/360) & 65535)
-#define	SHORT2ANGLE(x)	((x)*(360.0/65536))
+#define	SHORT2ANGLE(x)	((x)*(360.0f/65536))
 
 
 //
