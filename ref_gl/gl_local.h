@@ -188,7 +188,6 @@ extern cvar_t	*gl_vertex_arrays;
 
 extern cvar_t	*gl_ext_swapinterval;
 extern cvar_t	*gl_ext_palettedtexture;
-extern cvar_t	*gl_ext_multitexture;
 extern cvar_t	*gl_ext_pointparameters;
 extern cvar_t	*gl_ext_compiled_vertex_array;
 
@@ -251,10 +250,7 @@ extern	float	r_world_matrix[16];
 
 void R_TranslatePlayerSkin (int playernum);
 void GL_Bind (int texnum);
-void GL_MBind( GLenum target, int texnum );
 void GL_TexEnv( GLenum value );
-void GL_EnableMultitexture( qboolean enable );
-void GL_SelectTexture( GLenum );
 
 void R_LightPoint (vec3_t p, vec3_t color);
 void R_PushDlights (void);
@@ -414,8 +410,7 @@ typedef struct
 
 	int lightmap_textures;
 
-	int	currenttextures[2];
-	int currenttmu;
+	int	currenttexture;
 
 	float camera_separation;
 	qboolean stereo_enabled;

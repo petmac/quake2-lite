@@ -641,234 +641,22 @@ void DrawTextureChains (void)
 
 //	GL_TexEnv( GL_REPLACE );
 
-	if ( !qglSelectTextureSGIS && !qglActiveTextureARB )
+	for ( i = 0, image=gltextures ; i<numgltextures ; i++,image++)
 	{
-		for ( i = 0, image=gltextures ; i<numgltextures ; i++,image++)
-		{
-			if (!image->registration_sequence)
-				continue;
-			s = image->texturechain;
-			if (!s)
-				continue;
-			c_visible_textures++;
+		if (!image->registration_sequence)
+			continue;
+		s = image->texturechain;
+		if (!s)
+			continue;
+		c_visible_textures++;
 
-			for ( ; s ; s=s->texturechain)
-				R_RenderBrushPoly (s);
+		for ( ; s ; s=s->texturechain)
+			R_RenderBrushPoly (s);
 
-			image->texturechain = NULL;
-		}
-	}
-	else
-	{
-		for ( i = 0, image=gltextures ; i<numgltextures ; i++,image++)
-		{
-			if (!image->registration_sequence)
-				continue;
-			if (!image->texturechain)
-				continue;
-			c_visible_textures++;
-
-			for ( s = image->texturechain; s ; s=s->texturechain)
-			{
-				if ( !( s->flags & SURF_DRAWTURB ) )
-					R_RenderBrushPoly (s);
-			}
-		}
-
-		GL_EnableMultitexture( false );
-		for ( i = 0, image=gltextures ; i<numgltextures ; i++,image++)
-		{
-			if (!image->registration_sequence)
-				continue;
-			s = image->texturechain;
-			if (!s)
-				continue;
-
-			for ( ; s ; s=s->texturechain)
-			{
-				if ( s->flags & SURF_DRAWTURB )
-					R_RenderBrushPoly (s);
-			}
-
-			image->texturechain = NULL;
-		}
-//		GL_EnableMultitexture( true );
+		image->texturechain = NULL;
 	}
 
 	GL_TexEnv( GL_REPLACE );
-}
-
-
-static void GL_RenderLightmappedPoly( msurface_t *surf )
-{
-	int		i, nv = surf->polys->numverts;
-	int		map;
-	float	*v;
-	image_t *image = R_TextureAnimation( surf->texinfo );
-	qboolean is_dynamic = false;
-	unsigned lmtex = surf->lightmaptexturenum;
-	glpoly_t *p;
-
-	for ( map = 0; map < MAXLIGHTMAPS && surf->styles[map] != 255; map++ )
-	{
-		if ( r_newrefdef.lightstyles[surf->styles[map]].white != surf->cached_light[map] )
-			goto dynamic;
-	}
-
-	// dynamic this frame or dynamic previously
-	if ( ( surf->dlightframe == r_framecount ) )
-	{
-dynamic:
-		if ( gl_dynamic->value )
-		{
-			if ( !(surf->texinfo->flags & (SURF_SKY|SURF_TRANS33|SURF_TRANS66|SURF_WARP ) ) )
-			{
-				is_dynamic = true;
-			}
-		}
-	}
-
-	if ( is_dynamic )
-	{
-		unsigned	temp[128*128];
-		int			smax, tmax;
-
-		if ( ( surf->styles[map] >= 32 || surf->styles[map] == 0 ) && ( surf->dlightframe != r_framecount ) )
-		{
-			smax = (surf->extents[0]>>4)+1;
-			tmax = (surf->extents[1]>>4)+1;
-
-			R_BuildLightMap( surf, (void *)temp, smax*4 );
-			R_SetCacheState( surf );
-
-			GL_MBind( GL_TEXTURE1, gl_state.lightmap_textures + surf->lightmaptexturenum );
-
-			lmtex = surf->lightmaptexturenum;
-
-			qglTexSubImage2D( GL_TEXTURE_2D, 0,
-							  surf->light_s, surf->light_t, 
-							  smax, tmax, 
-							  GL_LIGHTMAP_FORMAT, 
-							  GL_UNSIGNED_BYTE, temp );
-
-		}
-		else
-		{
-			smax = (surf->extents[0]>>4)+1;
-			tmax = (surf->extents[1]>>4)+1;
-
-			R_BuildLightMap( surf, (void *)temp, smax*4 );
-
-			GL_MBind( GL_TEXTURE1, gl_state.lightmap_textures + 0 );
-
-			lmtex = 0;
-
-			qglTexSubImage2D( GL_TEXTURE_2D, 0,
-							  surf->light_s, surf->light_t, 
-							  smax, tmax, 
-							  GL_LIGHTMAP_FORMAT, 
-							  GL_UNSIGNED_BYTE, temp );
-
-		}
-
-		c_brush_polys++;
-
-		GL_MBind( GL_TEXTURE0, image->texnum );
-		GL_MBind( GL_TEXTURE1, gl_state.lightmap_textures + lmtex );
-
-//==========
-//PGM
-		if (surf->texinfo->flags & SURF_FLOWING)
-		{
-			float scroll;
-		
-			scroll = -64 * ( (r_newrefdef.time / 40.0) - (int)(r_newrefdef.time / 40.0) );
-			if(scroll == 0.0)
-				scroll = -64.0;
-
-			for ( p = surf->polys; p; p = p->chain )
-			{
-				v = p->verts[0];
-				qglBegin (GL_POLYGON);
-				for (i=0 ; i< nv; i++, v+= VERTEXSIZE)
-				{
-					qglMTexCoord2fSGIS( GL_TEXTURE0, (v[3]+scroll), v[4]);
-					qglMTexCoord2fSGIS( GL_TEXTURE1, v[5], v[6]);
-					qglVertex3fv (v);
-				}
-				qglEnd ();
-			}
-		}
-		else
-		{
-			for ( p = surf->polys; p; p = p->chain )
-			{
-				v = p->verts[0];
-				qglBegin (GL_POLYGON);
-				for (i=0 ; i< nv; i++, v+= VERTEXSIZE)
-				{
-					qglMTexCoord2fSGIS( GL_TEXTURE0, v[3], v[4]);
-					qglMTexCoord2fSGIS( GL_TEXTURE1, v[5], v[6]);
-					qglVertex3fv (v);
-				}
-				qglEnd ();
-			}
-		}
-//PGM
-//==========
-	}
-	else
-	{
-		c_brush_polys++;
-
-		GL_MBind( GL_TEXTURE0, image->texnum );
-		GL_MBind( GL_TEXTURE1, gl_state.lightmap_textures + lmtex );
-
-//==========
-//PGM
-		if (surf->texinfo->flags & SURF_FLOWING)
-		{
-			float scroll;
-		
-			scroll = -64 * ( (r_newrefdef.time / 40.0) - (int)(r_newrefdef.time / 40.0) );
-			if(scroll == 0.0)
-				scroll = -64.0;
-
-			for ( p = surf->polys; p; p = p->chain )
-			{
-				v = p->verts[0];
-				qglBegin (GL_POLYGON);
-				for (i=0 ; i< nv; i++, v+= VERTEXSIZE)
-				{
-					qglMTexCoord2fSGIS( GL_TEXTURE0, (v[3]+scroll), v[4]);
-					qglMTexCoord2fSGIS( GL_TEXTURE1, v[5], v[6]);
-					qglVertex3fv (v);
-				}
-				qglEnd ();
-			}
-		}
-		else
-		{
-//PGM
-//==========
-			for ( p = surf->polys; p; p = p->chain )
-			{
-				v = p->verts[0];
-				qglBegin (GL_POLYGON);
-				for (i=0 ; i< nv; i++, v+= VERTEXSIZE)
-				{
-					qglMTexCoord2fSGIS( GL_TEXTURE0, v[3], v[4]);
-					qglMTexCoord2fSGIS( GL_TEXTURE1, v[5], v[6]);
-					qglVertex3fv (v);
-				}
-				qglEnd ();
-			}
-//==========
-//PGM
-		}
-//PGM
-//==========
-	}
 }
 
 /*
@@ -922,23 +710,16 @@ void R_DrawInlineBModel (void)
 				psurf->texturechain = r_alpha_surfaces;
 				r_alpha_surfaces = psurf;
 			}
-			else if ( qglMTexCoord2fSGIS && !( psurf->flags & SURF_DRAWTURB ) )
-			{
-				GL_RenderLightmappedPoly( psurf );
-			}
 			else
 			{
-				GL_EnableMultitexture( false );
 				R_RenderBrushPoly( psurf );
-				GL_EnableMultitexture( true );
 			}
 		}
 	}
 
 	if ( !(currententity->flags & RF_TRANSLUCENT) )
 	{
-		if ( !qglMTexCoord2fSGIS )
-			R_BlendLightmaps ();
+		R_BlendLightmaps ();
 	}
 	else
 	{
@@ -963,7 +744,7 @@ void R_DrawBrushModel (entity_t *e)
 		return;
 
 	currententity = e;
-	gl_state.currenttextures[0] = gl_state.currenttextures[1] = -1;
+	gl_state.currenttexture = -1;
 
 	if (e->angles[0] || e->angles[1] || e->angles[2])
 	{
@@ -1007,14 +788,10 @@ e->angles[2] = -e->angles[2];	// stupid quake bug
 e->angles[0] = -e->angles[0];	// stupid quake bug
 e->angles[2] = -e->angles[2];	// stupid quake bug
 
-	GL_EnableMultitexture( true );
-	GL_SelectTexture( GL_TEXTURE0);
 	GL_TexEnv( GL_REPLACE );
-	GL_SelectTexture( GL_TEXTURE1);
 	GL_TexEnv( GL_MODULATE );
 
 	R_DrawInlineBModel ();
-	GL_EnableMultitexture( false );
 
 	qglPopMatrix ();
 }
@@ -1117,60 +894,17 @@ void R_RecursiveWorldNode (mnode_t *node)
 		}
 		else
 		{
-			if ( qglMTexCoord2fSGIS && !( surf->flags & SURF_DRAWTURB ) )
-			{
-				GL_RenderLightmappedPoly( surf );
-			}
-			else
-			{
-				// the polygon is visible, so add it to the texture
-				// sorted chain
-				// FIXME: this is a hack for animation
-				image = R_TextureAnimation (surf->texinfo);
-				surf->texturechain = image->texturechain;
-				image->texturechain = surf;
-			}
+			// the polygon is visible, so add it to the texture
+			// sorted chain
+			// FIXME: this is a hack for animation
+			image = R_TextureAnimation (surf->texinfo);
+			surf->texturechain = image->texturechain;
+			image->texturechain = surf;
 		}
 	}
 
 	// recurse down the back side
 	R_RecursiveWorldNode (node->children[!side]);
-/*
-	for ( ; c ; c--, surf++)
-	{
-		if (surf->visframe != r_framecount)
-			continue;
-
-		if ( (surf->flags & SURF_PLANEBACK) != sidebit )
-			continue;		// wrong side
-
-		if (surf->texinfo->flags & SURF_SKY)
-		{	// just adds to visible sky bounds
-			R_AddSkySurface (surf);
-		}
-		else if (surf->texinfo->flags & (SURF_TRANS33|SURF_TRANS66))
-		{	// add to the translucent chain
-//			surf->texturechain = alpha_surfaces;
-//			alpha_surfaces = surf;
-		}
-		else
-		{
-			if ( qglMTexCoord2fSGIS && !( surf->flags & SURF_DRAWTURB ) )
-			{
-				GL_RenderLightmappedPoly( surf );
-			}
-			else
-			{
-				// the polygon is visible, so add it to the texture
-				// sorted chain
-				// FIXME: this is a hack for animation
-				image = R_TextureAnimation (surf->texinfo);
-				surf->texturechain = image->texturechain;
-				image->texturechain = surf;
-			}
-		}
-	}
-*/
 }
 
 
@@ -1198,33 +932,13 @@ void R_DrawWorld (void)
 	ent.frame = (int)(r_newrefdef.time*2);
 	currententity = &ent;
 
-	gl_state.currenttextures[0] = gl_state.currenttextures[1] = -1;
+	gl_state.currenttexture = -1;
 
 	qglColor3f (1,1,1);
 	memset (gl_lms.lightmap_surfaces, 0, sizeof(gl_lms.lightmap_surfaces));
 	R_ClearSkyBox ();
 
-	if ( qglMTexCoord2fSGIS )
-	{
-		GL_EnableMultitexture( true );
-
-		GL_SelectTexture( GL_TEXTURE0);
-		GL_TexEnv( GL_REPLACE );
-		GL_SelectTexture( GL_TEXTURE1);
-
-		if ( gl_lightmap->value )
-			GL_TexEnv( GL_REPLACE );
-		else 
-			GL_TexEnv( GL_MODULATE );
-
-		R_RecursiveWorldNode (r_worldmodel->nodes);
-
-		GL_EnableMultitexture( false );
-	}
-	else
-	{
-		R_RecursiveWorldNode (r_worldmodel->nodes);
-	}
+	R_RecursiveWorldNode (r_worldmodel->nodes);
 
 	/*
 	** theoretically nothing should happen in the next two functions
@@ -1557,9 +1271,6 @@ void GL_BeginBuildingLightmaps (model_t *m)
 
 	r_framecount = 1;		// no dlightcache
 
-	GL_EnableMultitexture( true );
-	GL_SelectTexture( GL_TEXTURE1);
-
 	/*
 	** setup the base lightstyles so the lightmaps won't have to be regenerated
 	** the first time they're seen
@@ -1643,6 +1354,5 @@ GL_EndBuildingLightmaps
 void GL_EndBuildingLightmaps (void)
 {
 	LM_UploadBlock( false );
-	GL_EnableMultitexture( false );
 }
 
