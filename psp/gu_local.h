@@ -174,6 +174,7 @@ typedef struct
 	float	x, y, z;
 } glvert_t;
 
+#define GLVERT_TYPE (GU_TEXTURE_32BITF | GU_VERTEX_32BITF | GU_TRANSFORM_3D)
 
 #define	MAX_LBM_HEIGHT		480
 
@@ -237,7 +238,6 @@ extern	cvar_t	*gl_ztrick;
 extern	cvar_t	*gl_clear;
 extern	cvar_t	*gl_cull;
 extern	cvar_t	*gl_poly;
-extern	cvar_t	*gl_texsort;
 extern	cvar_t	*gl_polyblend;
 extern	cvar_t	*gl_flashblend;
 extern	cvar_t	*gl_lightmaptype;

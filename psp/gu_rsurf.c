@@ -201,7 +201,7 @@ void DrawGLPoly (glpoly_t *p)
 	}
 
 	// Draw.
-	sceGumDrawArray(GU_TRIANGLE_FAN, GU_TEXTURE_32BITF | GU_VERTEX_32BITF | GU_TRANSFORM_3D, p->numverts, NULL, out);
+	sceGumDrawArray(GU_TRIANGLE_FAN, GLVERT_TYPE, p->numverts, NULL, out);
 }
 
 //============

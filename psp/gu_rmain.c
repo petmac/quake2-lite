@@ -772,7 +772,6 @@ void	R_SetGL2D (void)
 {
 	ASSERT(GU_IsInDisplayList());
 
-	//sceGuViewport(2048, 2048, GU_SCR_WIDTH, GU_SCR_HEIGHT);
 	sceGumMatrixMode(GU_PROJECTION);
 	sceGumLoadIdentity();
 	sceGumOrtho(0, GU_SCR_WIDTH, GU_SCR_HEIGHT, 0, -99999, 99999);
@@ -782,14 +781,8 @@ void	R_SetGL2D (void)
 	sceGumLoadIdentity();
 	sceGuDisable(GU_DEPTH_TEST);
 	sceGuDisable(GU_CULL_FACE);
-	//sceGuEnable(GU_BLEND);
-	//sceGuEnable(GU_ALPHA_TEST);
+	sceGuEnable(GU_BLEND);
 	sceGuColor(GU_COLOR(1, 1, 1, 1));
-
-	Draw_Char(0, 0, 'T');
-	Draw_Char(8, 0, 'e');
-	Draw_Char(16, 0, 's');
-	Draw_Char(24, 0, 't');
 }
 
 static void GL_DrawColoredStereoLinePair( float r, float g, float b, float y )
@@ -928,7 +921,7 @@ void R_Register( void )
 	gl_showtris = ri.Cvar_Get ("gl_showtris", "0", 0);
 	gl_ztrick = ri.Cvar_Get ("gl_ztrick", "0", 0);
 	gl_finish = ri.Cvar_Get ("gl_finish", "0", CVAR_ARCHIVE);
-	gl_clear = ri.Cvar_Get ("gl_clear", "1", 0); // TODO PeterM Reset to 0.
+	gl_clear = ri.Cvar_Get ("gl_clear", "0", 0);
 	gl_cull = ri.Cvar_Get ("gl_cull", "1", 0);
 	gl_polyblend = ri.Cvar_Get ("gl_polyblend", "1", 0);
 	gl_flashblend = ri.Cvar_Get ("gl_flashblend", "0", 0);
