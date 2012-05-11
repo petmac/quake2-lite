@@ -1154,7 +1154,7 @@ void *Z_MallocEx (int size, const char *file, int line, const char *function)
 	size = size + sizeof(zhead_t);
 	z = malloc(size);
 	if (!z)
-		Com_Error (ERR_FATAL, "Z_MallocEx: failed on allocation of %i bytes",size);
+		Com_Error (ERR_FATAL, "Z_MallocEx: failed on allocation of %i bytes (%s, line %d)", size, function, line);
 	memset (z, 0, size);
 	z_count++;
 	z_bytes += size;
