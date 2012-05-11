@@ -336,10 +336,9 @@ void R_DrawEntitiesOnList (void)
 		}
 	}
 
-#ifndef PSP
 	// draw transparent entities
 	// we could sort these if it ever becomes a problem...
-	qglDepthMask (0);		// no z writes
+	sceGuDepthMask(GU_FALSE);		// no z writes
 	for (i=0 ; i<r_newrefdef.num_entities ; i++)
 	{
 		currententity = &r_newrefdef.entities[i];
@@ -376,8 +375,7 @@ void R_DrawEntitiesOnList (void)
 			}
 		}
 	}
-	qglDepthMask (1);		// back to writing
-#endif
+	sceGuDepthMask(GU_TRUE);		// back to writing
 }
 
 /*
