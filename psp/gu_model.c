@@ -471,7 +471,6 @@ void Mod_LoadTexinfo (lump_t *l)
 		if (!out->image)
 		{
 			ri.Con_Printf (PRINT_ALL, "Couldn't load %s\n", name);
-			out->image = r_notexture;
 		}
 	}
 

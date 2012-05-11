@@ -611,8 +611,6 @@ void GL_LightScaleTexture (unsigned *in, int inwidth, int inheight, qboolean onl
 /*
 ================
 GL_LoadPic
-
-This is also used as an entry point for the generated r_notexture
 ================
 */
 static u32 next_power_of_two(u32 x)
@@ -715,7 +713,7 @@ image_t *GL_LoadWal (char *name)
 	if (!mt)
 	{
 		ri.Con_Printf (PRINT_ALL, "GL_FindImage: can't load %s\n", name);
-		return r_notexture;
+		return NULL;
 	}
 
 	width = LittleLong (mt->width);
