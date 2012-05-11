@@ -176,16 +176,16 @@ void GL_SetDefaultState( void )
 	sceGuEnable(GU_CLIP_PLANES);
 
 	// Depth.
-	sceGuDepthRange(65535, 0);
+	sceGuDepthRange(0, 65535);
 	sceGuDisable(GU_DEPTH_TEST);
-	sceGuDepthFunc(GU_GEQUAL);
+	sceGuDepthFunc(GU_LEQUAL);
 
 	// Shading.
 	sceGuColor(0xffffffff);
 	sceGuShadeModel(GU_SMOOTH);
 
 	// Clear.
-	sceGuClearColor(GU_COLOR(1, 0, 0.5, 0.5));
+	sceGuClearColor(GU_COLOR(0.0625f, 0.125f, 0.25f, 1));
 	sceGuClearDepth(65535);
 
 	// Culling.

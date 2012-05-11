@@ -757,9 +757,7 @@ void R_DrawAliasModel (entity_t *e)
 #endif
 	}
 
-#ifndef PSP
-    qglPushMatrix ();
-#endif
+	sceGumPushMatrix();
 	e->angles[PITCH] = -e->angles[PITCH];	// sigh.
 	R_RotateForEntity (e);
 	e->angles[PITCH] = -e->angles[PITCH];	// sigh.
@@ -824,32 +822,22 @@ void R_DrawAliasModel (entity_t *e)
 #ifndef PSP
 	GL_TexEnv( GU_TFX_REPLACE );
 	qglShadeModel (GL_FLAT);
-
-	qglPopMatrix ();
-
-#if 0
-	qglDisable( GL_CULL_FACE );
-	qglPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-	qglDisable( GL_TEXTURE_2D );
-	qglBegin( GL_TRIANGLE_STRIP );
-	for ( i = 0; i < 8; i++ )
-	{
-		qglVertex3fv( bbox[i] );
-	}
-	qglEnd();
-	qglEnable( GL_TEXTURE_2D );
-	qglPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-	qglEnable( GL_CULL_FACE );
 #endif
+
+	sceGumPopMatrix();
+	sceGumUpdateMatrix();
 
 	if ( ( currententity->flags & RF_WEAPONMODEL ) && ( r_lefthand->value == 1.0F ) )
 	{
+#ifndef PSP
 		qglMatrixMode( GL_PROJECTION );
 		qglPopMatrix();
 		qglMatrixMode( GL_MODELVIEW );
 		qglCullFace( GL_FRONT );
+#endif
 	}
 
+#ifndef PSP
 	if ( currententity->flags & RF_TRANSLUCENT )
 	{
 		qglDisable (GU_BLEND);

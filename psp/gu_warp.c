@@ -558,14 +558,9 @@ R_DrawSkyBox
 int	skytexorder[6] = {0,2,1,3,4,5};
 void R_DrawSkyBox (void)
 {
+#ifndef PSP
 	int		i;
 
-#if 0
-qglEnable (GU_BLEND);
-GL_TexEnv( GL_MODULATE );
-qglColor4f (1,1,1,0.5);
-qglDisable (GL_DEPTH_TEST);
-#endif
 	if (skyrotate)
 	{	// check for no sky at all
 		for (i=0 ; i<6 ; i++)
@@ -576,11 +571,9 @@ qglDisable (GL_DEPTH_TEST);
 			return;		// nothing visible
 	}
 
-#ifndef PSP
 qglPushMatrix ();
 qglTranslatef (r_origin[0], r_origin[1], r_origin[2]);
 qglRotatef (r_newrefdef.time * skyrotate, skyaxis[0], skyaxis[1], skyaxis[2]);
-#endif
 
 	for (i=0 ; i<6 ; i++)
 	{
@@ -596,7 +589,6 @@ qglRotatef (r_newrefdef.time * skyrotate, skyaxis[0], skyaxis[1], skyaxis[2]);
 		|| skymins[1][i] >= skymaxs[1][i])
 			continue;
 
-#ifndef PSP
 		GL_Bind (sky_images[skytexorder[i]]->texnum);
 
 		qglBegin (GL_QUADS);
@@ -605,16 +597,8 @@ qglRotatef (r_newrefdef.time * skyrotate, skyaxis[0], skyaxis[1], skyaxis[2]);
 		MakeSkyVec (skymaxs[0][i], skymaxs[1][i], i);
 		MakeSkyVec (skymaxs[0][i], skymins[1][i], i);
 		qglEnd ();
-#endif
 	}
-#ifndef PSP
 qglPopMatrix ();
-#endif
-#if 0
-glDisable (GL_BLEND);
-glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-glColor4f (1,1,1,0.5);
-glEnable (GL_DEPTH_TEST);
 #endif
 }
 
