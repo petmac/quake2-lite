@@ -117,6 +117,8 @@ typedef	int	fixed16_t;
 
 #define Q_PI		3.14159265358979323846f	// matches value in gcc v2 math.h
 
+#define DEG2RAD( a ) (( a * Q_PI ) / 180.0F)
+
 struct cplane_s;
 
 extern vec3_t vec3_origin;

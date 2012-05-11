@@ -610,12 +610,8 @@ void R_DrawAlphaSurfaces (void)
 	//
 	// go back to the world matrix
 	//
-#ifndef PSP
-    qglLoadMatrixf (r_world_matrix);
-
-	qglEnable (GU_BLEND);
-	GL_TexEnv( GU_TFX_MODULATE );
-#endif
+	sceGumLoadIdentity();
+	sceGumUpdateMatrix();
 
 	// the textures are prescaled up for a better lighting range,
 	// so scale it back down

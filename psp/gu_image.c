@@ -67,9 +67,7 @@ void GL_Bind (const image_t *texnum)
 		return;
 #endif
 	gl_state.currenttexture = texnum;
-#ifndef PSP
-	qglBindTexture (GL_TEXTURE_2D, texnum);
-#endif
+
 	if (texnum && texnum->texnum)
 	{
 		sceGuTexImage(0, texnum->buffer_width, texnum->buffer_height, texnum->buffer_width, texnum->texnum);

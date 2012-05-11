@@ -53,7 +53,6 @@ vec3_t	vpn;
 vec3_t	vright;
 vec3_t	r_origin;
 
-float	r_world_matrix[16];
 float	r_base_world_matrix[16];
 
 gu_pixel_t *gu_back_buffer;
@@ -124,13 +123,19 @@ qboolean R_CullBox (vec3_t mins, vec3_t maxs)
 
 void R_RotateForEntity (entity_t *e)
 {
-#ifndef PSP
-    qglTranslatef (e->origin[0],  e->origin[1],  e->origin[2]);
+	ScePspFVector3 translation;
 
-    qglRotatef (e->angles[1],  0, 0, 1);
-    qglRotatef (-e->angles[0],  0, 1, 0);
-    qglRotatef (-e->angles[2],  1, 0, 0);
-#endif
+	translation.x = e->origin[0];
+	translation.y = e->origin[1];
+	translation.z = e->origin[2];
+
+	sceGumTranslate(&translation);
+
+    sceGumRotateZ (DEG2RAD(e->angles[1]));
+    sceGumRotateY (DEG2RAD(-e->angles[0]));
+    sceGumRotateX (DEG2RAD(-e->angles[2]));
+
+	sceGumUpdateMatrix();
 }
 
 /*
@@ -376,109 +381,56 @@ void R_DrawEntitiesOnList (void)
 }
 
 /*
-** GL_DrawParticles
-**
-*/
-void GL_DrawParticles( int num_particles, const particle_t particles[], const unsigned colortable[768] )
-{
-#ifndef PSP
-	const particle_t *p;
-	int				i;
-	vec3_t			up, right;
-	float			scale;
-	byte			color[4];
-
-    GL_Bind(r_particletexture->texnum);
-	qglDepthMask( GL_FALSE );		// no z buffering
-	qglEnable( GU_BLEND );
-	GL_TexEnv( GU_TFX_MODULATE );
-	qglBegin( GL_TRIANGLES );
-
-	VectorScale (vup, 1.5, up);
-	VectorScale (vright, 1.5, right);
-
-	for ( p = particles, i=0 ; i < num_particles ; i++,p++)
-	{
-		// hack a scale up to keep particles from disapearing
-		scale = ( p->origin[0] - r_origin[0] ) * vpn[0] + 
-			    ( p->origin[1] - r_origin[1] ) * vpn[1] +
-			    ( p->origin[2] - r_origin[2] ) * vpn[2];
-
-		if (scale < 20)
-			scale = 1;
-		else
-			scale = 1 + scale * 0.004;
-
-		*(int *)color = colortable[p->color];
-		color[3] = p->alpha*255;
-
-		qglColor4ubv( color );
-
-		qglTexCoord2f( 0.0625, 0.0625 );
-		qglVertex3fv( p->origin );
-
-		qglTexCoord2f( 1.0625, 0.0625 );
-		qglVertex3f( p->origin[0] + up[0]*scale, 
-			         p->origin[1] + up[1]*scale, 
-					 p->origin[2] + up[2]*scale);
-
-		qglTexCoord2f( 0.0625, 1.0625 );
-		qglVertex3f( p->origin[0] + right[0]*scale, 
-			         p->origin[1] + right[1]*scale, 
-					 p->origin[2] + right[2]*scale);
-	}
-
-	qglEnd ();
-	qglDisable( GU_BLEND );
-	qglColor4f( 1,1,1,1 );
-	qglDepthMask( 1 );		// back to normal Z buffering
-	GL_TexEnv( GU_TFX_REPLACE );
-#endif
-}
-
-/*
 ===============
 R_DrawParticles
 ===============
 */
+typedef struct
+{
+	ScePspRGBA8888 colour;
+	ScePspFVector3 position;
+} gu_particle_vertex_t;
+
 void R_DrawParticles (void)
 {
-#ifndef PSP
-	if ( gl_ext_pointparameters->value && qglPointParameterfEXT )
+	int i;
+	unsigned char color[4];
+	const particle_t *p;
+	gu_particle_vertex_t *vertices;
+
+	if (r_newrefdef.num_particles <= 0)
 	{
-		int i;
-		unsigned char color[4];
-		const particle_t *p;
-
-		qglDepthMask( GL_FALSE );
-		qglEnable( GU_BLEND );
-		qglDisable( GL_TEXTURE_2D );
-
-		qglPointSize( gl_particle_size->value );
-
-		qglBegin( GL_POINTS );
-		for ( i = 0, p = r_newrefdef.particles; i < r_newrefdef.num_particles; i++, p++ )
-		{
-			*(int *)color = d_8to24table[p->color];
-			color[3] = p->alpha*255;
-
-			qglColor4ubv( color );
-
-			qglVertex3fv( p->origin );
-		}
-		qglEnd();
-
-		qglDisable( GU_BLEND );
-		qglColor4f( 1.0F, 1.0F, 1.0F, 1.0F );
-		qglDepthMask( GL_TRUE );
-		qglEnable( GL_TEXTURE_2D );
-
+		return;
 	}
-	else
-#endif
+
+	vertices = sceGuGetMemory(sizeof(gu_particle_vertex_t) * r_newrefdef.num_particles);
+	if (vertices == NULL)
 	{
-		GL_DrawParticles( r_newrefdef.num_particles, r_newrefdef.particles, d_8to24table );
+		return;
 	}
+
+	sceGuDepthMask(GU_FALSE);
+	sceGuEnable(GU_BLEND);
+	sceGuDisable(GU_TEXTURE_2D);
+
+	for ( i = 0, p = r_newrefdef.particles; i < r_newrefdef.num_particles; i++, p++ )
+	{
+		gu_particle_vertex_t *const vertex = &vertices[i];
+		const ScePspRGBA8888 rgbx = d_8to24table[p->color];
+		const ScePspRGBA8888 rgbz = rgbx & GU_RGBA(255, 255, 255, 0);
+		const ScePspRGBA8888 zzza = GU_RGBA(0, 0, 0, (int)(p->alpha * 255));
+
+		vertex->colour = rgbz | zzza;
+		vertex->position.x = p->origin[0];
+		vertex->position.y = p->origin[1];
+		vertex->position.z = p->origin[2];
+	}
+
+	sceGuDrawArray(GU_POINTS, GU_COLOR_8888 | GU_VERTEX_32BITF | GU_TRANSFORM_3D, r_newrefdef.num_particles, NULL, vertices);
+
+	sceGuDisable(GU_BLEND);
+	sceGuDepthMask(GU_TRUE);
+	sceGuEnable(GU_TEXTURE_2D);
 }
 
 /*
@@ -651,27 +603,6 @@ void R_SetupFrame (void)
 	}
 }
 
-
-void MYgluPerspective( double fovy, double aspect,
-		     double zNear, double zFar )
-{
-   double xmin, xmax, ymin, ymax;
-
-   ymax = zNear * tan( fovy * M_PI / 360.0 );
-   ymin = -ymax;
-
-   xmin = ymin * aspect;
-   xmax = ymax * aspect;
-
-   xmin += -( 2 * gl_state.camera_separation ) / zNear;
-   xmax += -( 2 * gl_state.camera_separation ) / zNear;
-
-#ifndef PSP
-   qglFrustum( xmin, xmax, ymin, ymax, zNear, zFar );
-#endif
-}
-
-
 /*
 =============
 R_SetupGL
@@ -682,6 +613,7 @@ void R_SetupGL (void)
 	float	screenaspect;
 //	float	yfov;
 	int		x, x2, y2, y, w, h;
+	ScePspFVector3 view_translation;
 
 	//
 	// set up viewport
@@ -703,42 +635,48 @@ void R_SetupGL (void)
 	//
     screenaspect = (float)r_newrefdef.width/r_newrefdef.height;
 //	yfov = 2*atan((float)r_newrefdef.height/r_newrefdef.width)*180/M_PI;
-#ifndef PSP
-	qglMatrixMode(GL_PROJECTION);
-    qglLoadIdentity ();
-#endif
-    MYgluPerspective (r_newrefdef.fov_y,  screenaspect,  4,  4096);
+
+	sceGumMatrixMode(GU_PROJECTION);
+	sceGumLoadIdentity();
+    sceGumPerspective (r_newrefdef.fov_y,  screenaspect,  4,  4096);
 
 #ifndef PSP
 	qglCullFace(GL_FRONT);
+#endif
 
-	qglMatrixMode(GL_MODELVIEW);
-    qglLoadIdentity ();
+	sceGumMatrixMode(GU_VIEW);
+    sceGumLoadIdentity();
 
-    qglRotatef (-90,  1, 0, 0);	    // put Z going up
-    qglRotatef (90,  0, 0, 1);	    // put Z going up
-    qglRotatef (-r_newrefdef.viewangles[2],  1, 0, 0);
-    qglRotatef (-r_newrefdef.viewangles[0],  0, 1, 0);
-    qglRotatef (-r_newrefdef.viewangles[1],  0, 0, 1);
-    qglTranslatef (-r_newrefdef.vieworg[0],  -r_newrefdef.vieworg[1],  -r_newrefdef.vieworg[2]);
+	sceGumRotateX (DEG2RAD(-90));	    // put Z going up
+    sceGumRotateZ (DEG2RAD(90));	    // put Z going up
+    sceGumRotateX (-r_newrefdef.viewangles[2]);
+    sceGumRotateY (-r_newrefdef.viewangles[0]);
+    sceGumRotateZ (-r_newrefdef.viewangles[1]);
+	
+	view_translation.x = -r_newrefdef.vieworg[0];
+	view_translation.y = -r_newrefdef.vieworg[1];
+	view_translation.z = -r_newrefdef.vieworg[2];
+    sceGumTranslate (&view_translation);
 
 //	if ( gl_state.camera_separation != 0 && gl_state.stereo_enabled )
 //		qglTranslatef ( gl_state.camera_separation, 0, 0 );
 
-	qglGetFloatv (GL_MODELVIEW_MATRIX, r_world_matrix);
+	sceGumMatrixMode(GU_MODEL);
+	sceGumLoadIdentity();
+
+	sceGumUpdateMatrix();
 
 	//
 	// set drawing parms
 	//
 	if (gl_cull->value)
-		qglEnable(GL_CULL_FACE);
+		sceGuEnable(GU_CULL_FACE);
 	else
-		qglDisable(GL_CULL_FACE);
+		sceGuDisable(GU_CULL_FACE);
 
-	qglDisable(GU_BLEND);
-	qglDisable(GL_ALPHA_TEST);
-	qglEnable(GL_DEPTH_TEST);
-#endif
+	sceGuDisable(GU_BLEND);
+	sceGuDisable(GU_ALPHA_TEST);
+	sceGuEnable(GU_DEPTH_TEST);
 }
 
 /*

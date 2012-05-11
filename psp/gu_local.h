@@ -248,8 +248,6 @@ extern	cvar_t		*intensity;
 extern	int		c_visible_lightmaps;
 extern	int		c_visible_textures;
 
-extern	float	r_world_matrix[16];
-
 void R_TranslatePlayerSkin (int playernum);
 void GL_Bind (const image_t *texnum);
 void GL_TexEnv( int value );
@@ -338,11 +336,6 @@ void	GL_FreeUnusedImages (void);
 
 void GL_TextureAlphaMode( char *string );
 void GL_TextureSolidMode( char *string );
-
-/*
-** GL extension emulation functions
-*/
-void GL_DrawParticles( int n, const particle_t particles[], const unsigned colortable[768] );
 
 typedef struct
 {

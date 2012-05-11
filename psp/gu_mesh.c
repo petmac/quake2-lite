@@ -745,8 +745,6 @@ void R_DrawAliasModel (entity_t *e)
 
 	if ( ( currententity->flags & RF_WEAPONMODEL ) && ( r_lefthand->value == 1.0F ) )
 	{
-		extern void MYgluPerspective( double fovy, double aspect, double zNear, double zFar );
-
 #ifndef PSP
 		qglMatrixMode( GL_PROJECTION );
 		qglPushMatrix();
