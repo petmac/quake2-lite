@@ -523,9 +523,8 @@ void R_RenderBrushPoly (msurface_t *fa)
 	}
 	else
 	{
+		GL_Bind( image );
 #ifndef PSP
-		GL_Bind( image->texnum );
-
 		GL_TexEnv( GU_TFX_REPLACE );
 #endif
 	}
@@ -628,9 +627,7 @@ void R_DrawAlphaSurfaces (void)
 
 	for (s=r_alpha_surfaces ; s ; s=s->texturechain)
 	{
-#ifndef PSP
-		GL_Bind(s->texinfo->image->texnum);
-#endif
+		GL_Bind(s->texinfo->image);
 		c_brush_polys++;
 #ifndef PSP
 		if (s->texinfo->flags & SURF_TRANS33)
