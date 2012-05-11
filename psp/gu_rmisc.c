@@ -166,6 +166,8 @@ void GL_ScreenShot_f (void)
 */
 void GL_SetDefaultState( void )
 {
+	ASSERT(GU_IsInDisplayList());
+
 	// Viewport.
 	sceGuOffset(2048 - (GU_SCR_WIDTH / 2), 2048 - (GU_SCR_HEIGHT / 2));
 	sceGuViewport(2048, 2048, GU_SCR_WIDTH, GU_SCR_HEIGHT);
@@ -175,7 +177,8 @@ void GL_SetDefaultState( void )
 
 	// Depth.
 	sceGuDepthRange(65535, 0);
-	sceGuDisable (GU_DEPTH_TEST);
+	sceGuDisable(GU_DEPTH_TEST);
+	sceGuDepthFunc(GU_GEQUAL);
 
 	// Shading.
 	sceGuColor(0xffffffff);
@@ -183,18 +186,21 @@ void GL_SetDefaultState( void )
 
 	// Clear.
 	sceGuClearColor(GU_COLOR(1, 0, 0.5, 0.5));
+	sceGuClearDepth(65535);
 
 	// Culling.
 	sceGuFrontFace(GU_CW);
 	sceGuDisable(GU_CULL_FACE);
 
 	// Texturing.
-	sceGuClutMode(GU_PSM_8888, 0, 255, 0);
 	sceGuTexFilter(GU_LINEAR, GU_LINEAR);
 	sceGuTexFunc(GU_TFX_REPLACE, GU_TCC_RGBA);
 	sceGuTexMode(GU_PSM_T8, 0, 0, GU_FALSE);
 	sceGuTexWrap(GU_REPEAT, GU_REPEAT);
 	sceGuEnable(GU_TEXTURE_2D);
+	sceGuTexMapMode(GU_TEXTURE_COORDS, 0, 0);
+	sceGuTexScale(1.0f, 1.0f);
+	sceGuTexOffset(0.0f, 0.0f);
 
 	// Blending.
 	sceGuBlendFunc(GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
@@ -206,5 +212,17 @@ void GL_SetDefaultState( void )
 	sceGuDisable(GU_LIGHTING);
 
 	// Upload the CLUT.
-	GL_SetTexturePalette( d_8to24table );
+	sceGuClutMode(GU_PSM_8888, 0, 255, 0);
+	GL_SetTexturePalette(d_8to24table);
+
+	// Matrices.
+	sceGumMatrixMode(GU_PROJECTION);
+	sceGumLoadIdentity();
+	sceGumMatrixMode(GU_VIEW);
+	sceGumLoadIdentity();
+	sceGumMatrixMode(GU_TEXTURE);
+	sceGumLoadIdentity();
+	sceGumMatrixMode(GU_MODEL);
+	sceGumLoadIdentity();
+	sceGumUpdateMatrix();
 }

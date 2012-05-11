@@ -53,6 +53,7 @@ void Draw_Char (int x, int y, int num)
 	gu_2d_vertex_t *vertices;
 
 	LOG_FUNCTION_ENTRY;
+	ASSERT(GU_IsInDisplayList());
 
 	// Skip spaces.
 	if ((num & 127) == 32)
@@ -160,14 +161,12 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 
 	LOG_FUNCTION_ENTRY;
 
+	ASSERT(GU_IsInDisplayList());
+
 	gl = Draw_FindPic (pic);
 	if (!gl || !gl->texnum)
 	{
-		ri.Con_Printf (PRINT_ALL, "Can't find pic: %s\n", pic);
-
-		LOG_FUNCTION_EXIT;
-
-		return;
+		sceGuDisable(GU_TEXTURE_2D);
 	}
 
 	// Set the texture image.
@@ -189,6 +188,11 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 	// Draw the character.
 	sceGuDrawArray(GU_SPRITES, GU_2D_VERTEX_TYPE, 2, NULL, vertices);
 
+	if (!gl || !gl->texnum)
+	{
+		sceGuEnable(GU_TEXTURE_2D);
+	}
+
 	LOG_FUNCTION_EXIT;
 }
 
@@ -205,14 +209,12 @@ void Draw_Pic (int x, int y, char *pic)
 
 	LOG_FUNCTION_ENTRY;
 
+	ASSERT(GU_IsInDisplayList());
+
 	gl = Draw_FindPic (pic);
 	if (!gl || !gl->texnum)
 	{
-		ri.Con_Printf (PRINT_ALL, "Can't find pic: %s\n", pic);
-
-		LOG_FUNCTION_EXIT;
-
-		return;
+		sceGuDisable(GU_TEXTURE_2D);
 	}
 
 	// Set the texture image.
@@ -234,6 +236,11 @@ void Draw_Pic (int x, int y, char *pic)
 	// Draw the character.
 	sceGuDrawArray(GU_SPRITES, GU_2D_VERTEX_TYPE, 2, NULL, vertices);
 
+	if (!gl || !gl->texnum)
+	{
+		sceGuEnable(GU_TEXTURE_2D);
+	}
+
 	LOG_FUNCTION_EXIT;
 }
 
@@ -247,41 +254,8 @@ refresh window.
 */
 void Draw_TileClear (int x, int y, int w, int h, char *pic)
 {
-	image_t	*image;
-
-	LOG_FUNCTION_ENTRY;
-
-	image = Draw_FindPic (pic);
-	if (!image)
-	{
-		ri.Con_Printf (PRINT_ALL, "Can't find pic: %s\n", pic);
-
-		LOG_FUNCTION_EXIT;
-
-		return;
-	}
-
-#ifndef PSP
-	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) )  && !image->has_alpha)
-		qglDisable (GL_ALPHA_TEST);
-
-	GL_Bind (image->texnum);
-	qglBegin (GL_QUADS);
-	qglTexCoord2f (x/64.0, y/64.0);
-	qglVertex2f (x, y);
-	qglTexCoord2f ( (x+w)/64.0, y/64.0);
-	qglVertex2f (x+w, y);
-	qglTexCoord2f ( (x+w)/64.0, (y+h)/64.0);
-	qglVertex2f (x+w, y+h);
-	qglTexCoord2f ( x/64.0, (y+h)/64.0 );
-	qglVertex2f (x, y+h);
-	qglEnd ();
-
-	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) )  && !image->has_alpha)
-		qglEnable (GL_ALPHA_TEST);
-#endif
-
-	LOG_FUNCTION_EXIT;
+	// TODO Do the tiling.
+	Draw_StretchPic(x, y, w, h, pic);
 }
 
 
@@ -297,6 +271,7 @@ void Draw_Fill (int x, int y, int w, int h, int c)
 	gu_2d_vertex_t *vertices;
 
 	LOG_FUNCTION_ENTRY;
+	ASSERT(GU_IsInDisplayList());
 
 	if ( (unsigned)c > 255)
 		ri.Sys_Error (ERR_FATAL, "Draw_Fill: bad color");
@@ -418,4 +393,3 @@ void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 
 	LOG_FUNCTION_EXIT;
 }
-

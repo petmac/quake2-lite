@@ -53,6 +53,11 @@ typedef struct {
 #	define LOG_FUNCTION_ENTRY do { } while (0)
 #	define LOG_FUNCTION_EXIT do { } while (0)
 #endif
+#if 1
+#	define ASSERT(x) do { if (!(x)) Sys_Error("ASSERT(%s) failed!. %s(%d)", #x, __FUNCTION__, __LINE__); } while (0)
+#else
+#	define ASSERT(x) do {} while (0)
+#endif
 
 // Constants.
 #define GU_SCR_WIDTH 480
@@ -62,6 +67,7 @@ typedef struct {
 void GU_StartDisplayList(void);
 void GU_FinishDisplayList(void);
 void GU_SyncDisplayList(void);
+qboolean GU_IsInDisplayList(void);
 
 // VRAM.
 #define GU_SCR_BUF_WIDTH 512

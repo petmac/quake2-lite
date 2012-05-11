@@ -32,6 +32,8 @@ ScePspRGBA8888 __attribute__((aligned(16))) d_8to24table[256];
 
 void GL_SetTexturePalette(const ScePspRGBA8888 *palette)
 {
+	ASSERT(GU_IsInDisplayList());
+
 	sceKernelDcacheWritebackAll();
 	sceGuClutLoad(32, palette);
 }
@@ -51,11 +53,7 @@ void GL_Bind (const image_t *texnum)
 {
 	extern	image_t	*draw_chars;
 
-	// TODO Handle unloaded textures.
-	if (!texnum || !texnum->texnum)
-	{
-		texnum = draw_chars;
-	}
+	ASSERT(GU_IsInDisplayList());
 
 	if (gl_nobind->value && draw_chars)		// performance evaluation option
 		texnum = draw_chars;

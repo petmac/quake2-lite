@@ -65,3 +65,8 @@ void GU_SyncDisplayList(void)
 		pending_finish = false;
 	}
 }
+
+qboolean GU_IsInDisplayList(void)
+{
+	return in_display_list;
+}

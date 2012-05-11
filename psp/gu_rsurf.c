@@ -607,6 +607,8 @@ void R_DrawAlphaSurfaces (void)
 	msurface_t	*s;
 	float		intens;
 
+	ASSERT(GU_IsInDisplayList());
+
 	//
 	// go back to the world matrix
 	//

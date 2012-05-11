@@ -125,6 +125,8 @@ void R_RotateForEntity (entity_t *e)
 {
 	ScePspFVector3 translation;
 
+	ASSERT(GU_IsInDisplayList());
+
 	translation.x = e->origin[0];
 	translation.y = e->origin[1];
 	translation.z = e->origin[2];
@@ -296,6 +298,8 @@ void R_DrawEntitiesOnList (void)
 {
 	int		i;
 
+	ASSERT(GU_IsInDisplayList());
+
 	if (!r_drawentities->value)
 		return;
 
@@ -396,6 +400,8 @@ void R_DrawParticles (void)
 	const particle_t *p;
 	gu_particle_vertex_t *vertices;
 
+	ASSERT(GU_IsInDisplayList());
+
 	if (r_newrefdef.num_particles <= 0)
 	{
 		return;
@@ -442,6 +448,8 @@ void R_PolyBlend (void)
 		return;
 	if (!v_blend[3])
 		return;
+
+	ASSERT(GU_IsInDisplayList());
 
 #ifndef PSP
 	qglDisable (GL_ALPHA_TEST);
@@ -613,6 +621,8 @@ void R_SetupGL (void)
 	int		x, x2, y2, y, w, h;
 	ScePspFVector3 view_translation;
 
+	ASSERT(GU_IsInDisplayList());
+
 	//
 	// set up viewport
 	//
@@ -636,7 +646,7 @@ void R_SetupGL (void)
 
 	sceGumMatrixMode(GU_PROJECTION);
 	sceGumLoadIdentity();
-    sceGumPerspective (r_newrefdef.fov_y,  screenaspect,  4,  4096);
+	sceGumPerspective (r_newrefdef.fov_y,  screenaspect,  4,  4096);
 
 #ifndef PSP
 	qglCullFace(GL_FRONT);
@@ -684,6 +694,8 @@ R_Clear
 */
 void R_Clear (void)
 {
+	ASSERT(GU_IsInDisplayList());
+
 	if (gl_clear->value)
 	{
 		sceGuClear(GU_COLOR_BUFFER_BIT | GU_DEPTH_BUFFER_BIT);
@@ -762,7 +774,9 @@ void R_RenderView (refdef_t *fd)
 
 void	R_SetGL2D (void)
 {
-	sceGuViewport(2048, 2048, GU_SCR_WIDTH, GU_SCR_HEIGHT);
+	ASSERT(GU_IsInDisplayList());
+
+	//sceGuViewport(2048, 2048, GU_SCR_WIDTH, GU_SCR_HEIGHT);
 	sceGumMatrixMode(GU_PROJECTION);
 	sceGumLoadIdentity();
 	sceGumOrtho(0, GU_SCR_WIDTH, GU_SCR_HEIGHT, 0, -99999, 99999);
@@ -773,9 +787,14 @@ void	R_SetGL2D (void)
 	sceGumUpdateMatrix();
 	sceGuDisable(GU_DEPTH_TEST);
 	sceGuDisable(GU_CULL_FACE);
-	sceGuEnable(GU_BLEND);
+	//sceGuEnable(GU_BLEND);
 	//sceGuEnable(GU_ALPHA_TEST);
 	sceGuColor(GU_COLOR(1, 1, 1, 1));
+
+	Draw_Char(0, 0, 'T');
+	Draw_Char(8, 0, 'e');
+	Draw_Char(16, 0, 's');
+	Draw_Char(24, 0, 't');
 }
 
 static void GL_DrawColoredStereoLinePair( float r, float g, float b, float y )
