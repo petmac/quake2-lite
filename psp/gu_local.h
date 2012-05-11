@@ -39,11 +39,11 @@ PSP specifics.
 
 // Vertex type.
 typedef struct {
-	float u, v;
-	float x, y, z;
+	short u, v;
+	short x, y, z;
 } gu_2d_vertex_t;
 
-#define GU_2D_VERTEX_TYPE (GU_TEXTURE_32BITF | GU_VERTEX_32BITF | GU_TRANSFORM_2D)
+#define GU_2D_VERTEX_TYPE (GU_TEXTURE_16BIT | GU_VERTEX_16BIT | GU_TRANSFORM_2D)
 
 // Debugging/profiling.
 #if 0
