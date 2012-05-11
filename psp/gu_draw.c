@@ -164,7 +164,7 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 	ASSERT(GU_IsInDisplayList());
 
 	gl = Draw_FindPic (pic);
-	if (!gl || !gl->texnum)
+	if (!gl || !gl->data)
 	{
 		sceGuDisable(GU_TEXTURE_2D);
 	}
@@ -188,7 +188,7 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 	// Draw the pic.
 	sceGumDrawArray(GU_SPRITES, GU_2D_VERTEX_TYPE, 2, NULL, vertices);
 
-	if (!gl || !gl->texnum)
+	if (!gl || !gl->data)
 	{
 		sceGuEnable(GU_TEXTURE_2D);
 	}
@@ -212,7 +212,7 @@ void Draw_Pic (int x, int y, char *pic)
 	ASSERT(GU_IsInDisplayList());
 
 	gl = Draw_FindPic (pic);
-	if (!gl || !gl->texnum)
+	if (!gl || !gl->data)
 	{
 		sceGuDisable(GU_TEXTURE_2D);
 	}
@@ -236,7 +236,7 @@ void Draw_Pic (int x, int y, char *pic)
 	// Draw the pic.
 	sceGumDrawArray(GU_SPRITES, GU_2D_VERTEX_TYPE, 2, NULL, vertices);
 
-	if (!gl || !gl->texnum)
+	if (!gl || !gl->data)
 	{
 		sceGuEnable(GU_TEXTURE_2D);
 	}

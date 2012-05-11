@@ -63,9 +63,9 @@ void GL_Bind (const image_t *texnum)
 #endif
 	gl_state.currenttexture = texnum;
 
-	if (texnum && texnum->texnum)
+	if (texnum && texnum->data)
 	{
-		sceGuTexImage(0, texnum->buffer_width, texnum->buffer_height, texnum->buffer_width, texnum->texnum);
+		sceGuTexImage(0, texnum->buffer_width, texnum->buffer_height, texnum->buffer_width, texnum->data);
 	}
 }
 
@@ -88,7 +88,7 @@ void	GL_ImageList_f (void)
 
 	for (i=0, image=gltextures ; i<numgltextures ; i++, image++)
 	{
-		if (image->texnum <= 0)
+		if (image->data == NULL)
 			continue;
 		switch (image->type)
 		{
@@ -638,7 +638,7 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 	// find a free image_t
 	for (i=0, image=gltextures ; i<numgltextures ; i++,image++)
 	{
-		if (!image->texnum)
+		if (!image->data)
 			break;
 	}
 	if (i == numgltextures)
@@ -665,31 +665,9 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 	}
 	buffer_height = next_power_of_two(height);
 
-#if 0
-	Com_DPrintf("Texture %s, %d x %d.\n", name, width, height);
-#endif
-
+	Com_DPrintf("GL_LoadPic: %s ... %d x %d (%d x %d), %d bytes.\n", name, width, height, buffer_width, buffer_height, (buffer_width * buffer_height));
+	
 	memset(image, 0, sizeof(*image));
-
-	image->texnum = GU_AllocateVRAM(buffer_width * height);
-#if 0
-	if (image->texnum == NULL)
-	{
-		image->texnum = Hunk_AllocAllowFail(&hunk_ref, buffer_width * height);
-	}
-#endif
-
-	if (image->texnum != NULL)
-	{
-		for (i = 0; i < height; ++i)
-		{
-			char *const dst = ((char *)(image->texnum)) + (i * buffer_width);
-			const char *const src = pic + (i * width);
-			memcpy(dst, src, width);
-		}
-
-		sceKernelDcacheWritebackAll();
-	}
 
 	strcpy (image->name, name);
 	image->width = width;
@@ -697,7 +675,26 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 	image->buffer_width = buffer_width;
 	image->buffer_height = buffer_height;
 	image->type = type;
-	image->has_alpha = false;
+
+	image->data = GU_AllocateVRAM(buffer_width * height);
+	if (image->data == NULL)
+	{
+		Com_DPrintf("\tNOT ENOUGH VRAM\n");
+#if 0
+		image->data = Hunk_AllocAllowFail(&hunk_ref, buffer_width * height);
+#endif
+	}
+	if (image->data != NULL)
+	{
+		for (i = 0; i < height; ++i)
+		{
+			char *const dst = ((char *)(image->data)) + (i * buffer_width);
+			const char *const src = pic + (i * width);
+			memcpy(dst, src, width);
+		}
+
+		sceKernelDcacheWritebackAll();
+	}
 
 	return image;
 }
@@ -818,38 +815,6 @@ struct image_s *R_RegisterSkin (char *name)
 	LOG_FUNCTION_EXIT;
 
 	return s;
-}
-
-
-/*
-================
-GL_FreeUnusedImages
-
-Any image that was not touched on this registration sequence
-will be freed.
-================
-*/
-void GL_FreeUnusedImages (void)
-{
-	int		i;
-	image_t	*image;
-
-	for (i=0, image=gltextures ; i<numgltextures ; i++, image++)
-	{
-		// never free r_notexture or particle texture
-		if ((image == r_notexture) || (image == r_particletexture))
-		{
-			continue;
-		}
-
-		if (image->type == it_pic)
-			continue;		// don't free pics
-		// free it
-#ifndef PSP
-		qglDeleteTextures (1, &image->texnum);
-#endif
-		memset (image, 0, sizeof(*image));
-	}
 }
 
 

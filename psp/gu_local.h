@@ -59,6 +59,10 @@ typedef struct {
 #	define ASSERT(x) do {} while (0)
 #endif
 
+#define STATIC_ASSERT(expr, msg)   \
+	extern char STATIC_ASSERTION__##msg[1]; \
+	extern char STATIC_ASSERTION__##msg[(expr)?1:2]
+
 // Constants.
 #define GU_SCR_WIDTH 480
 #define GU_SCR_HEIGHT 272
@@ -137,12 +141,11 @@ typedef struct image_s
 	int width;
 	int height;
 	
-	void *texnum;						// texture address in VRAM.
+	void *data;						// texture address in VRAM.
 	int buffer_width;
 	int buffer_height;
 
 	struct msurface_s *texturechain;	// for sort-by-texture world drawing
-	qboolean has_alpha;
 } image_t;
 
 #define		MAX_GLTEXTURES	1024
@@ -329,8 +332,6 @@ void	GL_SetTexturePalette(const ScePspRGBA8888 *palette);
 
 void	GL_InitImages (void);
 void	GL_ShutdownImages (void);
-
-void	GL_FreeUnusedImages (void);
 
 void GL_TextureAlphaMode( char *string );
 void GL_TextureSolidMode( char *string );

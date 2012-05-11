@@ -1176,8 +1176,6 @@ void R_EndRegistration (void)
 {
 	LOG_FUNCTION_ENTRY;
 
-	GL_FreeUnusedImages ();
-
 	LOG_FUNCTION_EXIT;
 }
 
