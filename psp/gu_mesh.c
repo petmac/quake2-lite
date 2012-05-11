@@ -825,7 +825,6 @@ void R_DrawAliasModel (entity_t *e)
 #endif
 
 	sceGumPopMatrix();
-	sceGumUpdateMatrix();
 
 	if ( ( currententity->flags & RF_WEAPONMODEL ) && ( r_lefthand->value == 1.0F ) )
 	{

@@ -93,7 +93,7 @@ void Draw_Char (int x, int y, int num)
 	vertices[1].z = 0;
 
 	// Draw the character.
-	sceGuDrawArray(GU_SPRITES, GU_2D_VERTEX_TYPE, 2, NULL, vertices);
+	sceGumDrawArray(GU_SPRITES, GU_2D_VERTEX_TYPE, 2, NULL, vertices);
 
 	LOG_FUNCTION_EXIT;
 }
@@ -185,8 +185,8 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 	vertices[1].y = y + h;
 	vertices[1].z = 0;
 
-	// Draw the character.
-	sceGuDrawArray(GU_SPRITES, GU_2D_VERTEX_TYPE, 2, NULL, vertices);
+	// Draw the pic.
+	sceGumDrawArray(GU_SPRITES, GU_2D_VERTEX_TYPE, 2, NULL, vertices);
 
 	if (!gl || !gl->texnum)
 	{
@@ -233,8 +233,8 @@ void Draw_Pic (int x, int y, char *pic)
 	vertices[1].y = y + gl->height;
 	vertices[1].z = 0;
 
-	// Draw the character.
-	sceGuDrawArray(GU_SPRITES, GU_2D_VERTEX_TYPE, 2, NULL, vertices);
+	// Draw the pic.
+	sceGumDrawArray(GU_SPRITES, GU_2D_VERTEX_TYPE, 2, NULL, vertices);
 
 	if (!gl || !gl->texnum)
 	{
@@ -293,8 +293,8 @@ void Draw_Fill (int x, int y, int w, int h, int c)
 	vertices[1].y = y + h;
 	vertices[1].z = 0;
 
-	// Draw the character.
-	sceGuDrawArray(GU_SPRITES, GU_2D_VERTEX_TYPE, 2, NULL, vertices);
+	// Draw the fill.
+	sceGumDrawArray(GU_SPRITES, GU_2D_VERTEX_TYPE, 2, NULL, vertices);
 
 	// Restore state.
 	sceGuColor(0xffffffff);

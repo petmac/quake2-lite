@@ -136,8 +136,6 @@ void R_RotateForEntity (entity_t *e)
     sceGumRotateZ (DEG2RAD(e->angles[1]));
     sceGumRotateY (DEG2RAD(-e->angles[0]));
     sceGumRotateX (DEG2RAD(-e->angles[2]));
-
-	sceGumUpdateMatrix();
 }
 
 /*
@@ -430,7 +428,7 @@ void R_DrawParticles (void)
 		vertex->position.z = p->origin[2];
 	}
 
-	sceGuDrawArray(GU_POINTS, GU_COLOR_8888 | GU_VERTEX_32BITF | GU_TRANSFORM_3D, r_newrefdef.num_particles, NULL, vertices);
+	sceGumDrawArray(GU_POINTS, GU_COLOR_8888 | GU_VERTEX_32BITF | GU_TRANSFORM_3D, r_newrefdef.num_particles, NULL, vertices);
 
 	sceGuDisable(GU_BLEND);
 	sceGuDepthMask(GU_TRUE);
@@ -657,9 +655,9 @@ void R_SetupGL (void)
 
 	sceGumRotateX (DEG2RAD(-90));	    // put Z going up
     sceGumRotateZ (DEG2RAD(90));	    // put Z going up
-    sceGumRotateX (-r_newrefdef.viewangles[2]);
-    sceGumRotateY (-r_newrefdef.viewangles[0]);
-    sceGumRotateZ (-r_newrefdef.viewangles[1]);
+    sceGumRotateX (DEG2RAD(-r_newrefdef.viewangles[2]));
+    sceGumRotateY (DEG2RAD(-r_newrefdef.viewangles[0]));
+    sceGumRotateZ (DEG2RAD(-r_newrefdef.viewangles[1]));
 	
 	view_translation.x = -r_newrefdef.vieworg[0];
 	view_translation.y = -r_newrefdef.vieworg[1];
@@ -671,8 +669,6 @@ void R_SetupGL (void)
 
 	sceGumMatrixMode(GU_MODEL);
 	sceGumLoadIdentity();
-
-	sceGumUpdateMatrix();
 
 	//
 	// set drawing parms
@@ -784,7 +780,6 @@ void	R_SetGL2D (void)
 	sceGumLoadIdentity();
 	sceGumMatrixMode(GU_MODEL);
 	sceGumLoadIdentity();
-	sceGumUpdateMatrix();
 	sceGuDisable(GU_DEPTH_TEST);
 	sceGuDisable(GU_CULL_FACE);
 	//sceGuEnable(GU_BLEND);

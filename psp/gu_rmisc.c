@@ -224,5 +224,4 @@ void GL_SetDefaultState( void )
 	sceGumLoadIdentity();
 	sceGumMatrixMode(GU_MODEL);
 	sceGumLoadIdentity();
-	sceGumUpdateMatrix();
 }

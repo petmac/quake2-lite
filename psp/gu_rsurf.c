@@ -181,19 +181,27 @@ DrawGLPoly
 */
 void DrawGLPoly (glpoly_t *p)
 {
-#ifndef PSP
 	int		i;
-	float	*v;
+	glvert_t *out;
 
-	qglBegin (GL_POLYGON);
-	v = p->verts[0];
-	for (i=0 ; i<p->numverts ; i++, v+= VERTEXSIZE)
+	// Allocate vertices.
+	out = sceGuGetMemory(p->numverts * sizeof(glvert_t));
+
+	// Fill vertices.
+	for (i = 0; i < p->numverts; ++i)
 	{
-		qglTexCoord2f (v[3], v[4]);
-		qglVertex3fv (v);
+		const float *const src = p->verts[i];
+		glvert_t *const dst = &out[i];
+
+		dst->x = src[0];
+		dst->y = src[1];
+		dst->z = src[2];
+		dst->s = src[3];
+		dst->t = src[4];
 	}
-	qglEnd ();
-#endif
+
+	// Draw.
+	sceGumDrawArray(GU_TRIANGLE_FAN, GU_TEXTURE_32BITF | GU_VERTEX_32BITF | GU_TRANSFORM_3D, p->numverts, NULL, out);
 }
 
 //============
@@ -613,7 +621,6 @@ void R_DrawAlphaSurfaces (void)
 	// go back to the world matrix
 	//
 	sceGumLoadIdentity();
-	sceGumUpdateMatrix();
 
 	// the textures are prescaled up for a better lighting range,
 	// so scale it back down
@@ -838,7 +845,6 @@ e->angles[2] = -e->angles[2];	// stupid quake bug
 	R_DrawInlineBModel ();
 
 	sceGumPopMatrix();
-	sceGumUpdateMatrix();
 }
 
 /*

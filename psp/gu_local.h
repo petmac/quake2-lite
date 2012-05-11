@@ -170,9 +170,8 @@ extern	float	gldepthmin, gldepthmax;
 
 typedef struct
 {
-	float	x, y, z;
 	float	s, t;
-	float	r, g, b;
+	float	x, y, z;
 } glvert_t;
 
 
