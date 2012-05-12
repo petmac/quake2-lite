@@ -261,17 +261,14 @@ void R_DrawTriangleOutlines (void)
 		for ( surf = gl_lms.lightmap_surfaces[i]; surf != 0; surf = surf->lightmapchain )
 		{
 			p = surf->polys;
-			for ( ; p ; p=p->chain)
+			for (j=2 ; j<p->numverts ; j++ )
 			{
-				for (j=2 ; j<p->numverts ; j++ )
-				{
-					qglBegin (GL_LINE_STRIP);
-					qglVertex3fv (p->verts[0]);
-					qglVertex3fv (p->verts[j-1]);
-					qglVertex3fv (p->verts[j]);
-					qglVertex3fv (p->verts[0]);
-					qglEnd ();
-				}
+				qglBegin (GL_LINE_STRIP);
+				qglVertex3fv (p->verts[0]);
+				qglVertex3fv (p->verts[j-1]);
+				qglVertex3fv (p->verts[j]);
+				qglVertex3fv (p->verts[0]);
+				qglEnd ();
 			}
 		}
 	}
@@ -289,37 +286,31 @@ void DrawGLPolyChain( glpoly_t *p, float soffset, float toffset )
 #ifndef PSP
 	if ( soffset == 0 && toffset == 0 )
 	{
-		for ( ; p != 0; p = p->chain )
-		{
-			float *v;
-			int j;
+		float *v;
+		int j;
 
-			qglBegin (GL_POLYGON);
-			v = p->verts[0];
-			for (j=0 ; j<p->numverts ; j++, v+= VERTEXSIZE)
-			{
-				qglTexCoord2f (v[5], v[6] );
-				qglVertex3fv (v);
-			}
-			qglEnd ();
+		qglBegin (GL_POLYGON);
+		v = p->verts[0];
+		for (j=0 ; j<p->numverts ; j++, v+= VERTEXSIZE)
+		{
+			qglTexCoord2f (v[5], v[6] );
+			qglVertex3fv (v);
 		}
+		qglEnd ();
 	}
 	else
 	{
-		for ( ; p != 0; p = p->chain )
-		{
-			float *v;
-			int j;
+		float *v;
+		int j;
 
-			qglBegin (GL_POLYGON);
-			v = p->verts[0];
-			for (j=0 ; j<p->numverts ; j++, v+= VERTEXSIZE)
-			{
-				qglTexCoord2f (v[5] - soffset, v[6] - toffset );
-				qglVertex3fv (v);
-			}
-			qglEnd ();
+		qglBegin (GL_POLYGON);
+		v = p->verts[0];
+		for (j=0 ; j<p->numverts ; j++, v+= VERTEXSIZE)
+		{
+			qglTexCoord2f (v[5] - soffset, v[6] - toffset );
+			qglVertex3fv (v);
 		}
+		qglEnd ();
 	}
 #endif
 }
@@ -1268,7 +1259,6 @@ void GL_BuildPolygonFromSurface(msurface_t *fa)
 	//
 	poly = Hunk_Alloc (&hunk_ref, sizeof(glpoly_t) + (lnumverts-4) * VERTEXSIZE*sizeof(float));
 	poly->next = fa->polys;
-	poly->flags = fa->flags;
 	fa->polys = poly;
 	poly->numverts = lnumverts;
 
