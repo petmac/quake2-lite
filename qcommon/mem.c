@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 struct hunk_s
 {
+	qboolean locked;
 	int cursize;
 	int capacity;
 	char *membase;
@@ -198,6 +199,7 @@ static void Hunk_Init(hunk_t *hunk, const char *name, int capacity)
 	}
 
 	// Store info.
+	hunk->locked = true;
 	hunk->cursize = 0;
 	hunk->capacity = capacity;
 	hunk->membase = membase;
@@ -211,14 +213,28 @@ void Mem_Init(void)
 	Hunk_Init (&hunk_level, "Level", LEVEL_HUNK_CAPACITY);
 	Hunk_Init (&hunk_ref, "Refresh", REF_HUNK_CAPACITY);
 	Hunk_Init (&hunk_snd, "Sound", SND_HUNK_CAPACITY);
+
+	// Some hunks are always unlocked.
+	Hunk_Begin(&hunk_game);
+	Hunk_Begin(&hunk_level);
 }
 
 void *Hunk_AllocEx(hunk_t *hunk, int size, const char *file, int line, const char *function)
 {
-	void *const mem = Hunk_AllocAllowFailEx(hunk, size, file, line, function);
+	void *mem;
+
+	// Hunk locked?
+	if (hunk->locked)
+	{
+		Sys_Error("%s: Hunk \"%s\" locked when allocating %d bytes in %s.", __FUNCTION__, hunk->name, size, function);
+		return NULL;
+	}
+
+	// Allocate.
+	mem = Hunk_AllocAllowFailEx(hunk, size, file, line, function);
 	if (!mem)
 	{
-		Sys_Error("%s: Hunk \"%s\" overflowed allocating %d bytes.", __FUNCTION__, hunk->name, size);
+		Sys_Error("%s: Hunk \"%s\" overflowed allocating %d bytes in %s.", __FUNCTION__, hunk->name, size, function);
 		return NULL;
 	}
 
@@ -227,6 +243,12 @@ void *Hunk_AllocEx(hunk_t *hunk, int size, const char *file, int line, const cha
 
 void *Hunk_AllocAllowFailEx(hunk_t *hunk, int size, const char *file, int line, const char *function)
 {
+	// Hunk locked?
+	if (hunk->locked)
+	{
+		return NULL;
+	}
+
 	// round to size of double
 	size = (size+HUNK_ALIGNMENT-1)&~(HUNK_ALIGNMENT-1);
 
@@ -264,10 +286,16 @@ void Hunk_Begin(hunk_t *hunk)
 		// Reset the size.
 		hunk->cursize = 0;
 	}
+
+	// Unlock.
+	hunk->locked = false;
 }
 
 void Hunk_End(hunk_t *hunk)
 {
+	// Lock.
+	hunk->locked = true;
+
 #if HUNK_STATS
 	// Anything to report?
 	if (hunk->cursize > 0)
