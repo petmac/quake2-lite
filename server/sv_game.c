@@ -317,11 +317,11 @@ void PF_FreeTags (int tag)
 	switch (tag)
 	{
 	case TAG_GAME:
-		Hunk_Free(&hunk_game);
+		Hunk_Begin(&hunk_game);
 		break;
 
 	case TAG_LEVEL:
-		Hunk_Free(&hunk_level);
+		Hunk_Begin(&hunk_level);
 		break;
 
 	default:

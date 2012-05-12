@@ -298,7 +298,7 @@ void S_BeginRegistration (void)
 
 	num_sfx = 0;
 
-	Hunk_Free(&hunk_snd);
+	Hunk_Begin(&hunk_snd);
 
 	s_registering = true;
 }
@@ -343,6 +343,8 @@ void S_EndRegistration (void)
 			continue;
 		S_LoadSound (sfx);
 	}
+
+	Hunk_End(&hunk_snd);
 
 	s_registering = false;
 }

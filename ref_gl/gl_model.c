@@ -1108,7 +1108,7 @@ void R_BeginRegistration (char *model)
 	
 	Mod_FreeAll ();
 
-	Hunk_Free (&hunk_ref);
+	Hunk_Begin (&hunk_ref);
 	
 	r_worldmodel = Mod_ForName(fullname, true);
 
@@ -1166,6 +1166,8 @@ R_EndRegistration
 */
 void R_EndRegistration (void)
 {
+	Hunk_End (&hunk_ref);
+
 	GL_FreeUnusedImages ();
 }
 

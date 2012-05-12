@@ -253,15 +253,11 @@ void *Hunk_AllocAllowFailEx(hunk_t *hunk, int size, const char *file, int line, 
 	return (hunk->membase + hunk->cursize - size);
 }
 
-void Hunk_Free(hunk_t *hunk)
+void Hunk_Begin(hunk_t *hunk)
 {
 	// Anything to zero?
 	if (hunk->cursize > 0)
 	{
-#if HUNK_STATS
-		Hunk_ReportStats(hunk);
-#endif
-
 		// Zero the hunk.
 		memset(hunk->membase, 0, hunk->cursize);
 
@@ -269,3 +265,15 @@ void Hunk_Free(hunk_t *hunk)
 		hunk->cursize = 0;
 	}
 }
+
+void Hunk_End(hunk_t *hunk)
+{
+#if HUNK_STATS
+	// Anything to report?
+	if (hunk->cursize > 0)
+	{
+		Hunk_ReportStats(hunk);
+	}
+#endif
+}
+
