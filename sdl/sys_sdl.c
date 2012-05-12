@@ -41,6 +41,7 @@ void Sys_Error (char *error, ...)
 	va_end (argptr);
 	printf ("\n");
 
+	__debugbreak();
 	exit (1);
 }
 
