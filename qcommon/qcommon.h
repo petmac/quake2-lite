@@ -838,6 +838,9 @@ extern hunk_t hunk_ref;
 extern hunk_t hunk_snd;
 
 void Mem_Init (void);
-void *Hunk_Alloc (hunk_t *hunk, int size);
-void *Hunk_AllocAllowFail (hunk_t *hunk, int size);
+void *Hunk_AllocEx (hunk_t *hunk, int size, const char *file, int line, const char *function);
+void *Hunk_AllocAllowFailEx (hunk_t *hunk, int size, const char *file, int line, const char *function);
 void Hunk_Free (hunk_t *hunk);
+
+#define Hunk_Alloc(hunk, size) Hunk_AllocEx(hunk, size, __FILE__, __LINE__, __FUNCTION__)
+#define Hunk_AllocAllowFail(hunk, size) Hunk_AllocAllowFailEx(hunk, size, __FILE__, __LINE__, __FUNCTION__)

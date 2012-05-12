@@ -21,13 +21,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "qcommon.h"
 
+#define HUNK_STATS 1
+
 struct hunk_s
 {
 	int cursize;
 	int capacity;
 	char *membase;
 	const char *name;
+#if HUNK_STATS
 	int tidemark;
+#endif
 };
 
 #define HUNK_ALIGNMENT 8
@@ -46,7 +50,133 @@ hunk_t hunk_level;
 hunk_t hunk_ref;
 hunk_t hunk_snd;
 
-static void Hunk_Init (hunk_t *hunk, const char *name, int capacity)
+#if HUNK_STATS
+#define MAX_HUNK_STATS 16384
+
+typedef struct hunk_stat_s
+{
+	// Key.
+	hunk_t *hunk;
+	const char *file;
+	int line;
+	const char *function;
+
+	// Value.
+	int allocs;
+	int total_size;
+} hunk_stat_t;
+
+static hunk_stat_t hunk_stats[MAX_HUNK_STATS];
+
+static hunk_stat_t *Hunk_FindStat(hunk_t *hunk, const char *file, int line, const char *function)
+{
+	int i;
+
+	// Try to find a matching stat.
+	for (i = 0; i < MAX_HUNK_STATS; ++i)
+	{
+		hunk_stat_t *const stat = &hunk_stats[i];
+
+		// Is this one for the same code?
+		if ((stat->hunk == hunk) &&
+			(Q_stricmp(stat->file, file) == 0) &&
+			(stat->line == line) &&
+			(strcmp(stat->function, function) == 0))
+		{
+			// Done.
+			return stat;
+		}
+	}
+
+	// Find a free stat.
+	for (i = 0; i < MAX_HUNK_STATS; ++i)
+	{
+		hunk_stat_t *const stat = &hunk_stats[i];
+
+		// Is this one free?
+		if (stat->hunk == NULL)
+		{
+			// Set it up.
+			stat->hunk = hunk;
+			stat->file = file;
+			stat->line = line;
+			stat->function = function;
+			stat->allocs = 0;
+			stat->total_size = 0;
+
+			// Done.
+			return stat;
+		}
+	}
+
+	// No free stats.
+	return NULL;
+}
+
+static void Hunk_AddStats(hunk_t *hunk, int size, const char *file, int line, const char *function)
+{
+	hunk_stat_t *const stat = Hunk_FindStat(hunk, file, line, function);
+	if (stat == NULL)
+	{
+		return;
+	}
+
+	stat->allocs += 1;
+	stat->total_size += size;
+}
+
+static int Hunk_CompareStats(const void *a, const void *b)
+{
+	const hunk_stat_t *const sa = a;
+	const hunk_stat_t *const sb = b;
+
+	return sb->total_size - sa->total_size;
+}
+
+static void Hunk_ReportStats(hunk_t *hunk)
+{
+	int i;
+
+	// Sort stats by size.
+	qsort(&hunk_stats[0], MAX_HUNK_STATS, sizeof(hunk_stats[0]), &Hunk_CompareStats);
+
+	// Header.
+	Com_Printf(
+		"HUNK STATS: \"%s\".\n"
+		"\tCurrent size = %d.\n"
+		"\tTidemark = %d (%d%% of capacity).\n",
+		hunk->name,
+		hunk->cursize,
+		hunk->tidemark,
+		(hunk->tidemark * 100) / hunk->capacity);
+
+	// Try to find a matching stat.
+	for (i = 0; i < MAX_HUNK_STATS; ++i)
+	{
+		hunk_stat_t *const stat = &hunk_stats[i];
+
+		// Is this one for the same hunk?
+		if (stat->hunk == hunk)
+		{
+			// Print this stat.
+			Com_Printf(
+				"\t%s(%d) :\n\t\t%-26s allocated %4d K (%2d%% of current hunk size) in %d allocs (%d bytes average).\n",
+				stat->file,
+				stat->line,
+				stat->function,
+				stat->total_size / 1024,
+				(stat->total_size * 100) / hunk->cursize,
+				stat->allocs,
+				stat->total_size / stat->allocs);
+
+			// Clear stats after printing.
+			memset(stat, 0, sizeof(*stat));
+		}
+	}
+}
+#endif
+
+static void Hunk_Init(hunk_t *hunk, const char *name, int capacity)
 {
 	void *membase;
 	int base_as_int;
@@ -75,7 +205,7 @@ static void Hunk_Init (hunk_t *hunk, const char *name, int capacity)
 	hunk->tidemark = 0;
 }
 
-void Mem_Init (void)
+void Mem_Init(void)
 {
 	Hunk_Init (&hunk_game, "Game", GAME_HUNK_CAPACITY);
 	Hunk_Init (&hunk_level, "Level", LEVEL_HUNK_CAPACITY);
@@ -83,9 +213,9 @@ void Mem_Init (void)
 	Hunk_Init (&hunk_snd, "Sound", SND_HUNK_CAPACITY);
 }
 
-void *Hunk_Alloc (hunk_t *hunk, int size)
+void *Hunk_AllocEx(hunk_t *hunk, int size, const char *file, int line, const char *function)
 {
-	void *const mem = Hunk_AllocAllowFail(hunk, size);
+	void *const mem = Hunk_AllocAllowFailEx(hunk, size, file, line, function);
 	if (!mem)
 	{
 		Sys_Error("%s: Hunk \"%s\" overflowed allocating %d bytes.", __FUNCTION__, hunk->name, size);
@@ -95,36 +225,47 @@ void *Hunk_Alloc (hunk_t *hunk, int size)
 	return mem;
 }
 
-void *Hunk_AllocAllowFail (hunk_t *hunk, int size)
+void *Hunk_AllocAllowFailEx(hunk_t *hunk, int size, const char *file, int line, const char *function)
 {
 	// round to size of double
 	size = (size+HUNK_ALIGNMENT-1)&~(HUNK_ALIGNMENT-1);
 
+#if HUNK_STATS
+	if (size > 0)
+	{
+		Hunk_AddStats(hunk, size, file, line, function);
+	}
+#endif
+
 	hunk->cursize += size;
 	if (hunk->cursize > hunk->capacity)
+	{
 		return NULL;
+	}
 
+#if HUNK_STATS
 	if (hunk->cursize > hunk->tidemark)
 	{
 		hunk->tidemark = hunk->cursize;
 	}
+#endif
 
-	return (hunk->membase+hunk->cursize-size);
+	return (hunk->membase + hunk->cursize - size);
 }
 
-void Hunk_Free (hunk_t *hunk)
+void Hunk_Free(hunk_t *hunk)
 {
-	Com_Printf(
-		"Hunk_Free: Freeing hunk \"%s\". Current size = %d, tidemark = %d (%d%% of capacity).\n",
-		hunk->name,
-		hunk->cursize,
-		hunk->tidemark,
-		(hunk->tidemark * 100) / hunk->capacity);
-
+	// Anything to zero?
 	if (hunk->cursize > 0)
 	{
+#if HUNK_STATS
+		Hunk_ReportStats(hunk);
+#endif
+
+		// Zero the hunk.
 		memset(hunk->membase, 0, hunk->cursize);
 
+		// Reset the size.
 		hunk->cursize = 0;
 	}
 }
