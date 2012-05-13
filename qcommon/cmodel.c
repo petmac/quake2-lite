@@ -303,8 +303,8 @@ void CMod_LoadLeafs (lump_t *l, FILE *file, long base)
 	if (count < 1)
 		Com_Error (ERR_DROP, "Map with no leafs");
 	// need to save space for box planes
-	if (count > MAX_MAP_PLANES)
-		Com_Error (ERR_DROP, "Map has too many planes");
+	if (count > MAX_MAP_LEAFS)
+		Com_Error (ERR_DROP, "Map has too many leafs");
 
 	out = map_leafs;	
 	numleafs = count;
@@ -504,7 +504,7 @@ void CMod_LoadAreaPortals (lump_t *l, FILE *file, long base)
 		Com_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size");
 	count = l->filelen / sizeof(in);
 
-	if (count > MAX_MAP_AREAS)
+	if (count > MAX_MAP_AREAPORTALS)
 		Com_Error (ERR_DROP, "Map has too many areas");
 
 	out = map_areaportals;
