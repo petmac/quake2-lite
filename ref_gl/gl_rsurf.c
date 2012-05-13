@@ -1145,14 +1145,12 @@ void GL_BuildPolygonFromSurface(msurface_t *fa)
 	float		*vec;
 	float		s, t;
 	glpoly_t	*poly;
-	vec3_t		total;
 
 // reconstruct the polygon
 	pedges = currentmodel->edges;
 	lnumverts = fa->numedges;
 	vertpage = 0;
 
-	VectorClear (total);
 	//
 	// draw texture
 	//
@@ -1181,7 +1179,6 @@ void GL_BuildPolygonFromSurface(msurface_t *fa)
 		t = DotProduct (vec, fa->texinfo->vecs[1]) + fa->texinfo->vecs[1][3];
 		t /= fa->texinfo->image->height;
 
-		VectorAdd (total, vec, total);
 		VectorCopy (vec, poly->verts[i]);
 		poly->verts[i][3] = s;
 		poly->verts[i][4] = t;
