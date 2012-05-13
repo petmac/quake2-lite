@@ -123,7 +123,7 @@ void GL_SetDefaultState( void )
 
 	// Depth.
 	sceGuDepthRange(0, 65535);
-	sceGuDisable(GU_DEPTH_TEST);
+	sceGuEnable(GU_DEPTH_TEST);
 	sceGuDepthFunc(GU_LEQUAL);
 
 	// Shading.
@@ -151,8 +151,6 @@ void GL_SetDefaultState( void )
 	// Blending.
 	sceGuBlendFunc(GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
 	sceGuDisable(GU_BLEND);
-	//sceGuEnable(GU_ALPHA_TEST);
-	//sceGuAlphaFunc(GU_GREATER, 170, 0xff);
 
 	// Lighting.
 	sceGuDisable(GU_LIGHTING);
