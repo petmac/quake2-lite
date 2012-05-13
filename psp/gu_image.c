@@ -636,7 +636,7 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 	// find a free image_t
 	for (i=0, image=gltextures ; i<numgltextures ; i++,image++)
 	{
-		if (!image->data)
+		if (!image->name[0])
 			break;
 	}
 	if (i == numgltextures)
