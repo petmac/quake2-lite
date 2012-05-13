@@ -35,9 +35,9 @@ typedef struct
 
 typedef struct
 {
-	int			contents;
-	int			cluster;
-	int			area;
+	int				contents;
+	short			cluster;
+	unsigned short	area;
 	unsigned short	firstleafbrush;
 	unsigned short	numleafbrushes;
 } cleaf_t;
