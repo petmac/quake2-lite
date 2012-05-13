@@ -1086,9 +1086,11 @@ void Mod_LoadAliasModel (model_t *mod, void *buffer)
 		pheader->num_skins*MAX_SKINNAME);
 	for (i=0 ; i<pheader->num_skins ; i++)
 	{
+		assert(mod->skins[i] == NULL);
 		mod->skins[i] = GL_FindImage ((char *)pheader + pheader->ofs_skins + i*MAX_SKINNAME
 			, it_skin);
 	}
+	mod->numframes = pheader->num_frames;
 
 	mod->mins[0] = -32;
 	mod->mins[1] = -32;
@@ -1185,29 +1187,11 @@ struct model_s *R_RegisterModel (char *name)
 {
 	model_t	*mod;
 	int		i;
-	dsprite_t	*sprout;
-	dmdl_t		*pheader;
 
 	mod = Mod_ForName (name, false);
 	if (mod)
 	{
-		// register any images used by the models
-		if (mod->type == mod_sprite)
-		{
-			sprout = (dsprite_t *)mod->extradata;
-			for (i=0 ; i<sprout->numframes ; i++)
-				mod->skins[i] = GL_FindImage (sprout->frames[i].name, it_sprite);
-		}
-		else if (mod->type == mod_alias)
-		{
-			pheader = (dmdl_t *)mod->extradata;
-			for (i=0 ; i<pheader->num_skins ; i++)
-				mod->skins[i] = GL_FindImage ((char *)pheader + pheader->ofs_skins + i*MAX_SKINNAME, it_skin);
-//PGM
-			mod->numframes = pheader->num_frames;
-//PGM
-		}
-		else if (mod->type == mod_brush)
+		if (mod->type == mod_brush)
 		{
 			for (i=0 ; i<mod->numtexinfo ; i++)
 				mod->texinfo[i].image->registration_sequence = registration_sequence;
