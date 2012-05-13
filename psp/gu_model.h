@@ -69,7 +69,6 @@ typedef struct
 typedef struct
 {
 	unsigned short	v[2];
-	unsigned int	cachededgeoffset;
 } medge_t;
 
 typedef struct mtexinfo_s
