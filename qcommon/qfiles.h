@@ -224,7 +224,6 @@ typedef struct miptex_s
 // 16 bit short limits
 #define	MAX_MAP_MODELS		1024
 #define	MAX_MAP_BRUSHES		8192
-#define	MAX_MAP_ENTITIES	2048
 #define	MAX_MAP_ENTSTRING	0x40000
 #define	MAX_MAP_TEXINFO		8192
 
@@ -234,14 +233,8 @@ typedef struct miptex_s
 #define	MAX_MAP_NODES		65536
 #define	MAX_MAP_BRUSHSIDES	65536
 #define	MAX_MAP_LEAFS		65536
-#define	MAX_MAP_VERTS		65536
-#define	MAX_MAP_FACES		65536
-#define	MAX_MAP_LEAFFACES	65536
 #define	MAX_MAP_LEAFBRUSHES 65536
-#define	MAX_MAP_PORTALS		65536
-#define	MAX_MAP_EDGES		128000
 #define	MAX_MAP_SURFEDGES	256000
-#define	MAX_MAP_LIGHTING	0x200000
 #define	MAX_MAP_VISIBILITY	0x100000
 
 // key / value pair sizes
