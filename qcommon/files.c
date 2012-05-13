@@ -414,7 +414,7 @@ int FS_LoadFile (char *path, void **buffer)
 		return len;
 	}
 
-	buf = Z_Malloc(len);
+	buf = Z_MallocEx(len, __FILE__, __LINE__, path);
 	*buffer = buf;
 
 	FS_Read (buf, len, h);

@@ -1151,6 +1151,11 @@ void *Z_MallocEx (int size, const char *file, int line, const char *function)
 	
 	// Com_Printf("Z_MallocEx: ALLOC size = %8d, count = %8d, total = %8d, called from %s\n", size, z_count, z_bytes, function);
 
+	if (size >= (80 * 1024))
+	{
+		Com_DPrintf("*** LARGE ALLOCATION ***\n%s(%d) : %d K allocated in %s.\n", file, line, size / 1024, function);
+	}
+
 	size = size + sizeof(zhead_t);
 	z = malloc(size);
 	if (!z)
