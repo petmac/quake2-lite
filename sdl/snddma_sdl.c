@@ -56,8 +56,6 @@ qboolean SNDDMA_Init(void)
 	SDL_AudioSpec desired;
 	SDL_AudioSpec obtained;
 
-	return false;
-
 	// Set up the desired audio spec.
 	memset(&desired, 0, sizeof(desired));
 	desired.freq = (s_khz->value * 44100) / 44;
