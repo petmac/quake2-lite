@@ -87,7 +87,7 @@ interpolates between two frames and origins
 FIXME: batch lerp all vertexes
 =============
 */
-void GL_DrawAliasFrameLerp (dmdl_t *paliashdr, float backlerp)
+void GL_DrawAliasFrameLerp (mmdl_t *paliashdr, float backlerp)
 {
 	float 	l;
 	daliasframe_t	*frame, *oldframe;
@@ -102,15 +102,13 @@ void GL_DrawAliasFrameLerp (dmdl_t *paliashdr, float backlerp)
 	int		index_xyz;
 	float	*lerp;
 
-	frame = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames 
-		+ currententity->frame * paliashdr->framesize);
+	frame = (daliasframe_t *)(paliashdr->frames + currententity->frame * paliashdr->framesize);
 	verts = v = frame->verts;
 
-	oldframe = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames 
-		+ currententity->oldframe * paliashdr->framesize);
+	oldframe = (daliasframe_t *)(paliashdr->frames + currententity->oldframe * paliashdr->framesize);
 	ov = oldframe->verts;
 
-	order = (int *)((byte *)paliashdr + paliashdr->ofs_glcmds);
+	order = paliashdr->glcmds;
 
 //	glTranslatef (frame->translate[0], frame->translate[1], frame->translate[2]);
 //	glScalef (frame->scale[0], frame->scale[1], frame->scale[2]);
@@ -303,7 +301,7 @@ GL_DrawAliasShadow
 */
 extern	vec3_t			lightspot;
 
-void GL_DrawAliasShadow (dmdl_t *paliashdr, int posenum)
+void GL_DrawAliasShadow (mmdl_t *paliashdr, int posenum)
 {
 	dtrivertx_t	*verts;
 	int		*order;
@@ -314,13 +312,12 @@ void GL_DrawAliasShadow (dmdl_t *paliashdr, int posenum)
 
 	lheight = currententity->origin[2] - lightspot[2];
 
-	frame = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames 
-		+ currententity->frame * paliashdr->framesize);
+	frame = (daliasframe_t *)(paliashdr->frames + currententity->frame * paliashdr->framesize);
 	verts = frame->verts;
 
 	height = 0;
 
-	order = (int *)((byte *)paliashdr + paliashdr->ofs_glcmds);
+	order = paliashdr->glcmds;
 
 	height = -lheight + 1.0f;
 
@@ -374,13 +371,13 @@ static qboolean R_CullAliasModel( vec3_t bbox[8], entity_t *e )
 {
 	int i;
 	vec3_t		mins, maxs;
-	dmdl_t		*paliashdr;
+	mmdl_t		*paliashdr;
 	vec3_t		vectors[3];
 	vec3_t		thismins, oldmins, thismaxs, oldmaxs;
 	daliasframe_t *pframe, *poldframe;
 	vec3_t angles;
 
-	paliashdr = currentmodel->alias;
+	paliashdr = &currentmodel->alias;
 
 	if ( ( e->frame >= paliashdr->num_frames ) || ( e->frame < 0 ) )
 	{
@@ -395,13 +392,9 @@ static qboolean R_CullAliasModel( vec3_t bbox[8], entity_t *e )
 		e->oldframe = 0;
 	}
 
-	pframe = ( daliasframe_t * ) ( ( byte * ) paliashdr + 
-		                              paliashdr->ofs_frames +
-									  e->frame * paliashdr->framesize);
+	pframe = ( daliasframe_t * ) (paliashdr->frames + (e->frame * paliashdr->framesize));
 
-	poldframe = ( daliasframe_t * ) ( ( byte * ) paliashdr + 
-		                              paliashdr->ofs_frames +
-									  e->oldframe * paliashdr->framesize);
+	poldframe = ( daliasframe_t * ) (paliashdr->frames + (e->oldframe * paliashdr->framesize));
 
 	/*
 	** compute axially aligned mins and maxs
@@ -519,7 +512,7 @@ R_DrawAliasModel
 void R_DrawAliasModel (entity_t *e)
 {
 	int			i;
-	dmdl_t		*paliashdr;
+	mmdl_t		*paliashdr;
 	float		an;
 	vec3_t		bbox[8];
 	image_t		*skin;
@@ -536,7 +529,7 @@ void R_DrawAliasModel (entity_t *e)
 			return;
 	}
 
-	paliashdr = currentmodel->alias;
+	paliashdr = &currentmodel->alias;
 
 	//
 	// get lighting information

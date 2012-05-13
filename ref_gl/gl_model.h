@@ -168,6 +168,18 @@ typedef struct mleaf_s
 
 typedef enum {mod_bad, mod_brush, mod_sprite, mod_alias } modtype_t;
 
+typedef struct mmdl_s
+{
+	int			framesize;		// byte size of each frame
+	int			num_xyz;
+	int			num_tris;
+	int			num_glcmds;		// dwords in strip/fan command list
+	int			num_frames;
+
+	byte		*frames;
+	int			*glcmds;
+} mmdl_t;
+
 typedef struct model_s
 {
 	char		name[MAX_QPATH];
@@ -235,7 +247,7 @@ typedef struct model_s
 
 	int			extradatasize;
 
-	dmdl_t		*alias;
+	mmdl_t		alias;
 	dsprite_t	*sprite;
 } model_t;
 

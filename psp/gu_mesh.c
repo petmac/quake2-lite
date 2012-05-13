@@ -87,7 +87,7 @@ interpolates between two frames and origins
 FIXME: batch lerp all vertexes
 =============
 */
-void GL_DrawAliasFrameLerp (dmdl_t *paliashdr, float backlerp)
+void GL_DrawAliasFrameLerp (mmdl_t *paliashdr, float backlerp)
 {
 	float 	l;
 	daliasframe_t	*frame, *oldframe;
@@ -102,15 +102,13 @@ void GL_DrawAliasFrameLerp (dmdl_t *paliashdr, float backlerp)
 	int		index_xyz;
 	float	*lerp;
 
-	frame = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames 
-		+ currententity->frame * paliashdr->framesize);
+	frame = (daliasframe_t *)(paliashdr->frames + currententity->frame * paliashdr->framesize);
 	verts = v = frame->verts;
 
-	oldframe = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames 
-		+ currententity->oldframe * paliashdr->framesize);
+	oldframe = (daliasframe_t *)(paliashdr->frames + currententity->oldframe * paliashdr->framesize);
 	ov = oldframe->verts;
 
-	order = (int *)((byte *)paliashdr + paliashdr->ofs_glcmds);
+	order = paliashdr->glcmds;
 
 //	glTranslatef (frame->translate[0], frame->translate[1], frame->translate[2]);
 //	glScalef (frame->scale[0], frame->scale[1], frame->scale[2]);
@@ -118,7 +116,7 @@ void GL_DrawAliasFrameLerp (dmdl_t *paliashdr, float backlerp)
 	if (currententity->flags & RF_TRANSLUCENT)
 		alpha = currententity->alpha;
 	else
-		alpha = 1.0;
+		alpha = 1.0f;
 
 #ifndef PSP
 	// PMM - added double shell
@@ -126,7 +124,7 @@ void GL_DrawAliasFrameLerp (dmdl_t *paliashdr, float backlerp)
 		qglDisable( GL_TEXTURE_2D );
 #endif
 
-	frontlerp = 1.0 - backlerp;
+	frontlerp = 1.0f - backlerp;
 
 	// move should be the delta back to the previous frame * backlerp
 	VectorSubtract (currententity->oldorigin, currententity->origin, delta);
@@ -307,7 +305,7 @@ GL_DrawAliasShadow
 */
 extern	vec3_t			lightspot;
 
-void GL_DrawAliasShadow (dmdl_t *paliashdr, int posenum)
+void GL_DrawAliasShadow (mmdl_t *paliashdr, int posenum)
 {
 #ifndef PSP
 	dtrivertx_t	*verts;
@@ -319,15 +317,14 @@ void GL_DrawAliasShadow (dmdl_t *paliashdr, int posenum)
 
 	lheight = currententity->origin[2] - lightspot[2];
 
-	frame = (daliasframe_t *)((byte *)paliashdr + paliashdr->ofs_frames 
-		+ currententity->frame * paliashdr->framesize);
+	frame = (daliasframe_t *)(paliashdr->frames + currententity->frame * paliashdr->framesize);
 	verts = frame->verts;
 
 	height = 0;
 
-	order = (int *)((byte *)paliashdr + paliashdr->ofs_glcmds);
+	order = paliashdr->glcmds;
 
-	height = -lheight + 1.0;
+	height = -lheight + 1.0f;
 
 	while (1)
 	{
@@ -380,13 +377,13 @@ static qboolean R_CullAliasModel( vec3_t bbox[8], entity_t *e )
 {
 	int i;
 	vec3_t		mins, maxs;
-	dmdl_t		*paliashdr;
+	mmdl_t		*paliashdr;
 	vec3_t		vectors[3];
 	vec3_t		thismins, oldmins, thismaxs, oldmaxs;
 	daliasframe_t *pframe, *poldframe;
 	vec3_t angles;
 
-	paliashdr = (dmdl_t *)currentmodel->extradata;
+	paliashdr = &currentmodel->alias;
 
 	if ( ( e->frame >= paliashdr->num_frames ) || ( e->frame < 0 ) )
 	{
@@ -401,13 +398,9 @@ static qboolean R_CullAliasModel( vec3_t bbox[8], entity_t *e )
 		e->oldframe = 0;
 	}
 
-	pframe = ( daliasframe_t * ) ( ( byte * ) paliashdr + 
-		                              paliashdr->ofs_frames +
-									  e->frame * paliashdr->framesize);
+	pframe = ( daliasframe_t * ) (paliashdr->frames + (e->frame * paliashdr->framesize));
 
-	poldframe = ( daliasframe_t * ) ( ( byte * ) paliashdr + 
-		                              paliashdr->ofs_frames +
-									  e->oldframe * paliashdr->framesize);
+	poldframe = ( daliasframe_t * ) (paliashdr->frames + (e->oldframe * paliashdr->framesize));
 
 	/*
 	** compute axially aligned mins and maxs
@@ -525,7 +518,7 @@ R_DrawAliasModel
 void R_DrawAliasModel (entity_t *e)
 {
 	int			i;
-	dmdl_t		*paliashdr;
+	mmdl_t		*paliashdr;
 	float		an;
 	vec3_t		bbox[8];
 	image_t		*skin;
@@ -542,7 +535,7 @@ void R_DrawAliasModel (entity_t *e)
 			return;
 	}
 
-	paliashdr = (dmdl_t *)currentmodel->extradata;
+	paliashdr = &currentmodel->alias;
 
 	//
 	// get lighting information
@@ -555,21 +548,21 @@ void R_DrawAliasModel (entity_t *e)
 		VectorClear (shadelight);
 		if (currententity->flags & RF_SHELL_HALF_DAM)
 		{
-				shadelight[0] = 0.56;
-				shadelight[1] = 0.59;
-				shadelight[2] = 0.45;
+				shadelight[0] = 0.56f;
+				shadelight[1] = 0.59f;
+				shadelight[2] = 0.45f;
 		}
 		if ( currententity->flags & RF_SHELL_DOUBLE )
 		{
-			shadelight[0] = 0.9;
-			shadelight[1] = 0.7;
+			shadelight[0] = 0.9f;
+			shadelight[1] = 0.7f;
 		}
 		if ( currententity->flags & RF_SHELL_RED )
-			shadelight[0] = 1.0;
+			shadelight[0] = 1.0f;
 		if ( currententity->flags & RF_SHELL_GREEN )
-			shadelight[1] = 1.0;
+			shadelight[1] = 1.0f;
 		if ( currententity->flags & RF_SHELL_BLUE )
-			shadelight[2] = 1.0;
+			shadelight[2] = 1.0f;
 	}
 /*
 		// PMM -special case for godmode
@@ -578,7 +571,7 @@ void R_DrawAliasModel (entity_t *e)
 			(currententity->flags & RF_SHELL_GREEN) )
 		{
 			for (i=0 ; i<3 ; i++)
-				shadelight[i] = 1.0;
+				shadelight[i] = 1.0f;
 		}
 		else if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_BLUE | RF_SHELL_DOUBLE ) )
 		{
@@ -586,26 +579,26 @@ void R_DrawAliasModel (entity_t *e)
 
 			if ( currententity->flags & RF_SHELL_RED )
 			{
-				shadelight[0] = 1.0;
+				shadelight[0] = 1.0f;
 				if (currententity->flags & (RF_SHELL_BLUE|RF_SHELL_DOUBLE) )
-					shadelight[2] = 1.0;
+					shadelight[2] = 1.0f;
 			}
 			else if ( currententity->flags & RF_SHELL_BLUE )
 			{
 				if ( currententity->flags & RF_SHELL_DOUBLE )
 				{
-					shadelight[1] = 1.0;
-					shadelight[2] = 1.0;
+					shadelight[1] = 1.0f;
+					shadelight[2] = 1.0f;
 				}
 				else
 				{
-					shadelight[2] = 1.0;
+					shadelight[2] = 1.0f;
 				}
 			}
 			else if ( currententity->flags & RF_SHELL_DOUBLE )
 			{
-				shadelight[0] = 0.9;
-				shadelight[1] = 0.7;
+				shadelight[0] = 0.9f;
+				shadelight[1] = 0.7f;
 			}
 		}
 		else if ( currententity->flags & ( RF_SHELL_HALF_DAM | RF_SHELL_GREEN ) )
@@ -616,15 +609,15 @@ void R_DrawAliasModel (entity_t *e)
 			{
 				shadelight[0] = 0.56;
 				shadelight[1] = 0.59;
-				shadelight[2] = 0.45;
+				shadelight[2] = 0.45f;
 			}
 			if ( currententity->flags & RF_SHELL_GREEN )
 			{
-				shadelight[1] = 1.0;
+				shadelight[1] = 1.0f;
 			}
 		}
 	}
-			//PMM - ok, now flatten these down to range from 0 to 1.0.
+			//PMM - ok, now flatten these down to range from 0 to 1.0f.
 	//		max_shell_val = max(shadelight[0], max(shadelight[1], shadelight[2]));
 	//		if (max_shell_val > 0)
 	//		{
@@ -638,7 +631,7 @@ void R_DrawAliasModel (entity_t *e)
 	else if ( currententity->flags & RF_FULLBRIGHT )
 	{
 		for (i=0 ; i<3 ; i++)
-			shadelight[i] = 1.0;
+			shadelight[i] = 1.0f;
 	}
 	else
 	{
@@ -685,13 +678,13 @@ void R_DrawAliasModel (entity_t *e)
 	if ( currententity->flags & RF_MINLIGHT )
 	{
 		for (i=0 ; i<3 ; i++)
-			if (shadelight[i] > 0.1)
+			if (shadelight[i] > 0.1f)
 				break;
 		if (i == 3)
 		{
-			shadelight[0] = 0.1;
-			shadelight[1] = 0.1;
-			shadelight[2] = 0.1;
+			shadelight[0] = 0.1f;
+			shadelight[1] = 0.1f;
+			shadelight[2] = 0.1f;
 		}
 	}
 
@@ -700,10 +693,10 @@ void R_DrawAliasModel (entity_t *e)
 		float	scale;
 		float	min;
 
-		scale = 0.1 * sin(r_newrefdef.time*7);
+		scale = 0.1f * sinf(r_newrefdef.time*7);
 		for (i=0 ; i<3 ; i++)
 		{
-			min = shadelight[i] * 0.8;
+			min = shadelight[i] * 0.8f;
 			shadelight[i] += scale;
 			if (shadelight[i] < min)
 				shadelight[i] = min;
@@ -714,7 +707,7 @@ void R_DrawAliasModel (entity_t *e)
 // PGM	ir goggles color override
 	if ( r_newrefdef.rdflags & RDF_IRGOGGLES && currententity->flags & RF_IR_VISIBLE)
 	{
-		shadelight[0] = 1.0;
+		shadelight[0] = 1.0f;
 		shadelight[1] = 0.0;
 		shadelight[2] = 0.0;
 	}
@@ -723,9 +716,9 @@ void R_DrawAliasModel (entity_t *e)
 
 	shadedots = r_avertexnormal_dots[((int)(currententity->angles[1] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)];
 	
-	an = currententity->angles[1]/180*M_PI;
-	shadevector[0] = cos(-an);
-	shadevector[1] = sin(-an);
+	an = currententity->angles[1]/180*Q_PI;
+	shadevector[0] = cosf(-an);
+	shadevector[1] = sinf(-an);
 	shadevector[2] = 1;
 	VectorNormalize (shadevector);
 
@@ -740,7 +733,7 @@ void R_DrawAliasModel (entity_t *e)
 	//
 #ifndef PSP
 	if (currententity->flags & RF_DEPTHHACK) // hack the depth range to prevent view model from poking into walls
-		qglDepthRange (gldepthmin, gldepthmin + 0.3*(gldepthmax-gldepthmin));
+		qglDepthRange (gldepthmin, gldepthmin + 0.3f*(gldepthmax-gldepthmin));
 #endif
 
 	if ( ( currententity->flags & RF_WEAPONMODEL ) && ( r_lefthand->value == 1.0F ) )

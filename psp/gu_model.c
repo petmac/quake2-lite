@@ -179,6 +179,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 	FILE *file;
 	long base;
 	int type;
+	char *extradata;
 	
 	if (!name[0])
 		ri.Sys_Error (ERR_DROP, "Mod_ForName: NULL name");
@@ -234,6 +235,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 	}
 	
 	loadmodel = mod;
+	extradata = Hunk_Alloc(&hunk_ref, 0);
 
 	//
 	// fill it in
@@ -249,7 +251,6 @@ model_t *Mod_ForName (char *name, qboolean crash)
 	switch (LittleLong(type))
 	{
 	case IDALIASHEADER:
-		loadmodel->extradata = Hunk_Alloc (&hunk_ref, 0);
 		Mod_LoadAliasModel (mod, file, base);
 		break;
 		
@@ -260,7 +261,6 @@ model_t *Mod_ForName (char *name, qboolean crash)
 			buf = Z_Malloc(modfilelen); // TODO PeterM This is totally wrong.
 			ri.FS_Read(buf, modfilelen, file); // TODO PeterM This is totally wrong.
 
-			loadmodel->extradata = Hunk_Alloc (&hunk_ref, 0);
 			Mod_LoadSpriteModel (mod, buf);
 
 			Z_Free(buf); // TODO PeterM This is totally wrong.
@@ -268,7 +268,6 @@ model_t *Mod_ForName (char *name, qboolean crash)
 		break;
 	
 	case IDBSPHEADER:
-		loadmodel->extradata = Hunk_Alloc (&hunk_ref, 0);
 		Mod_LoadBrushModel (mod, file, base);
 		break;
 
@@ -277,7 +276,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 		break;
 	}
 
-	loadmodel->extradatasize = (byte *)Hunk_Alloc (&hunk_ref, 0) - (byte *)loadmodel->extradata;
+	loadmodel->extradatasize = (char *)Hunk_Alloc (&hunk_ref, 0) - extradata;
 
 	ri.FS_FCloseFile(file);
 
@@ -969,13 +968,12 @@ Mod_LoadAliasModel
 */
 void Mod_LoadAliasModel (model_t *mod, FILE *file, long base)
 {
-	int					i, j;
-	dmdl_t				inmodel, *pheader;
-	dstvert_t			inst, *poutst;
-	dtriangle_t			intri, *pouttri;
-	daliasframe_t		inframe, *poutframe;
-	int					*poutcmd;
-	int					version;
+	int				i, j;
+	dmdl_t			inmodel;
+	mmdl_t			*pheader;
+	daliasframe_t	*poutframe;
+	int				*poutcmd;
+	int				version;
 
 	ri.FS_Read(&inmodel, sizeof(inmodel), file);
 
@@ -984,24 +982,23 @@ void Mod_LoadAliasModel (model_t *mod, FILE *file, long base)
 		ri.Sys_Error (ERR_DROP, "%s has wrong version number (%i should be %i)",
 				 mod->name, version, ALIAS_VERSION);
 
-	pheader = Hunk_Alloc (&hunk_ref, LittleLong(inmodel.ofs_end));
-	
-	// byte swap the header fields and sanity check
-	for (i=0 ; i<sizeof(dmdl_t)/4 ; i++)
-		((int *)pheader)[i] = LittleLong (((int *)&inmodel)[i]);
+	pheader = &mod->alias;
 
-	if (pheader->skinheight > MAX_LBM_HEIGHT)
-		ri.Sys_Error (ERR_DROP, "model %s has a skin taller than %d", mod->name,
-				   MAX_LBM_HEIGHT);
+	// byte swap the header fields and sanity check
+	for (i=0 ; i<sizeof(inmodel)/4 ; i++)
+		((int *)&inmodel)[i] = LittleLong (((int *)&inmodel)[i]);
+
+	pheader->framesize = inmodel.framesize;
+	pheader->num_xyz = inmodel.num_xyz;
+	pheader->num_tris = inmodel.num_tris;
+	pheader->num_glcmds = inmodel.num_glcmds;
+	pheader->num_frames = inmodel.num_frames;
 
 	if (pheader->num_xyz <= 0)
 		ri.Sys_Error (ERR_DROP, "model %s has no vertices", mod->name);
 
 	if (pheader->num_xyz > MAX_VERTS)
 		ri.Sys_Error (ERR_DROP, "model %s has too many vertices", mod->name);
-
-	if (pheader->num_st <= 0)
-		ri.Sys_Error (ERR_DROP, "model %s has no st vertices", mod->name);
 
 	if (pheader->num_tris <= 0)
 		ri.Sys_Error (ERR_DROP, "model %s has no triangles", mod->name);
@@ -1010,55 +1007,23 @@ void Mod_LoadAliasModel (model_t *mod, FILE *file, long base)
 		ri.Sys_Error (ERR_DROP, "model %s has no frames", mod->name);
 
 //
-// load base s and t vertices (not used in gl version)
-//
-	fseek(file, base + pheader->ofs_st, SEEK_SET);
-	poutst = (dstvert_t *) ((byte *)pheader + pheader->ofs_st);
-
-	for (i=0 ; i<pheader->num_st ; i++)
-	{
-		ri.FS_Read(&inst, sizeof(inst), file);
-
-		poutst[i].s = LittleShort (inst.s);
-		poutst[i].t = LittleShort (inst.t);
-	}
-
-//
-// load triangle lists
-//
-	fseek(file, base + pheader->ofs_tris, SEEK_SET);
-	pouttri = (dtriangle_t *) ((byte *)pheader + pheader->ofs_tris);
-
-	for (i=0 ; i<pheader->num_tris ; i++)
-	{
-		ri.FS_Read(&intri, sizeof(intri), file);
-
-		for (j=0 ; j<3 ; j++)
-		{
-			pouttri[i].index_xyz[j] = LittleShort (intri.index_xyz[j]);
-			pouttri[i].index_st[j] = LittleShort (intri.index_st[j]);
-		}
-	}
-
-//
 // load the frames
 //
+	pheader->frames = Hunk_Alloc(&hunk_ref, pheader->num_frames * pheader->framesize);
+
+	fseek(file, base + inmodel.ofs_frames, SEEK_SET);
+	ri.FS_Read(pheader->frames, pheader->num_frames * pheader->framesize, file);
+
 	for (i=0 ; i<pheader->num_frames ; i++)
 	{
-		fseek(file, base + pheader->ofs_frames + i * pheader->framesize, SEEK_SET);
-		ri.FS_Read(&inframe, sizeof(inframe.scale) + sizeof(inframe.translate) + sizeof(inframe.name), file);
 
-		poutframe = (daliasframe_t *) ((byte *)pheader 
-			+ pheader->ofs_frames + i * pheader->framesize);
+		poutframe = (daliasframe_t *) (pheader->frames + i * pheader->framesize);
 
-		memcpy (poutframe->name, inframe.name, sizeof(poutframe->name));
 		for (j=0 ; j<3 ; j++)
 		{
-			poutframe->scale[j] = LittleFloat (inframe.scale[j]);
-			poutframe->translate[j] = LittleFloat (inframe.translate[j]);
+			poutframe->scale[j] = LittleFloat (poutframe->scale[j]);
+			poutframe->translate[j] = LittleFloat (poutframe->translate[j]);
 		}
-		// verts are all 8 bit, so no swapping needed
-		ri.FS_Read(poutframe->verts, pheader->num_xyz*sizeof(dtrivertx_t), file);
 	}
 
 	mod->type = mod_alias;
@@ -1066,22 +1031,31 @@ void Mod_LoadAliasModel (model_t *mod, FILE *file, long base)
 	//
 	// load the glcmds
 	//
-	fseek(file, base + pheader->ofs_glcmds, SEEK_SET);
-	poutcmd = (int *) ((byte *)pheader + pheader->ofs_glcmds);
-	ri.FS_Read(poutcmd, pheader->num_glcmds * sizeof(int), file);
-	for (i=0 ; i<pheader->num_glcmds ; i++)
-		poutcmd[i] = LittleLong (poutcmd[i]);
 
+	pheader->glcmds = Hunk_Alloc(&hunk_ref, pheader->num_glcmds * sizeof(int));
+
+	fseek(file, base + inmodel.ofs_glcmds, SEEK_SET);
+	ri.FS_Read(pheader->glcmds, pheader->num_glcmds * sizeof(int), file);
+
+	poutcmd = pheader->glcmds;
+	for (i=0 ; i<pheader->num_glcmds ; i++)
+	{
+		poutcmd[i] = LittleLong (poutcmd[i]);
+	}
 
 	// register all skins
-	fseek(file, base + pheader->ofs_skins, SEEK_SET);
-	ri.FS_Read((char *)pheader + pheader->ofs_skins, pheader->num_skins*MAX_SKINNAME, file);
-	for (i=0 ; i<pheader->num_skins ; i++)
+	fseek(file, base + inmodel.ofs_skins, SEEK_SET);
+	for (i=0 ; i<inmodel.num_skins ; i++)
 	{
+		char name[MAX_SKINNAME];
+
+		ri.FS_Read(name, MAX_SKINNAME, file);
+
 		assert(mod->skins[i] == NULL);
-		mod->skins[i] = GL_FindImage ((char *)pheader + pheader->ofs_skins + i*MAX_SKINNAME
-			, it_skin);
+		mod->skins[i] = GL_FindImage (name, it_skin);
 	}
+
+	// TODO PeterM Is this used anywhere?
 	mod->numframes = pheader->num_frames;
 
 	mod->mins[0] = -32;
@@ -1112,6 +1086,7 @@ void Mod_LoadSpriteModel (model_t *mod, void *buffer)
 
 	sprin = (dsprite_t *)buffer;
 	sprout = Hunk_Alloc (&hunk_ref, modfilelen);
+	mod->sprite = sprout;
 
 	sprout->ident = LittleLong (sprin->ident);
 	sprout->version = LittleLong (sprin->version);
@@ -1162,7 +1137,7 @@ void R_BeginRegistration (char *model)
 	
 	Mod_FreeAll ();
 
-	Hunk_Begin(&hunk_ref);
+	Hunk_Begin (&hunk_ref);
 	
 	r_worldmodel = Mod_ForName(fullname, true);
 
@@ -1244,7 +1219,6 @@ void Mod_FreeAll (void)
 
 	for (i=0 ; i<mod_numknown ; i++)
 	{
-		if (mod_known[i].extradatasize)
-			Mod_Free (&mod_known[i]);
+		Mod_Free (&mod_known[i]);
 	}
 }
