@@ -331,7 +331,7 @@ void R_DrawEntitiesOnList (void)
 
 	// draw transparent entities
 	// we could sort these if it ever becomes a problem...
-	sceGuDepthMask(GU_FALSE);		// no z writes
+	sceGuDepthMask(GU_TRUE);		// no z writes
 	for (i=0 ; i<r_newrefdef.num_entities ; i++)
 	{
 		currententity = &r_newrefdef.entities[i];
@@ -368,7 +368,7 @@ void R_DrawEntitiesOnList (void)
 			}
 		}
 	}
-	sceGuDepthMask(GU_TRUE);		// back to writing
+	sceGuDepthMask(GU_FALSE);		// back to writing
 }
 
 /*
@@ -402,7 +402,7 @@ void R_DrawParticles (void)
 		return;
 	}
 
-	sceGuDepthMask(GU_FALSE);
+	sceGuDepthMask(GU_TRUE);
 	sceGuEnable(GU_BLEND);
 	sceGuDisable(GU_TEXTURE_2D);
 
@@ -422,7 +422,7 @@ void R_DrawParticles (void)
 	sceGumDrawArray(GU_POINTS, GU_COLOR_8888 | GU_VERTEX_32BITF | GU_TRANSFORM_3D, r_newrefdef.num_particles, NULL, vertices);
 
 	sceGuDisable(GU_BLEND);
-	sceGuDepthMask(GU_TRUE);
+	sceGuDepthMask(GU_FALSE);
 	sceGuEnable(GU_TEXTURE_2D);
 }
 
@@ -670,7 +670,6 @@ void R_SetupGL (void)
 		sceGuDisable(GU_CULL_FACE);
 
 	sceGuDisable(GU_BLEND);
-	sceGuDisable(GU_ALPHA_TEST);
 	sceGuEnable(GU_DEPTH_TEST);
 }
 
@@ -773,7 +772,7 @@ void	R_SetGL2D (void)
 	sceGuDisable(GU_DEPTH_TEST);
 	sceGuDisable(GU_CULL_FACE);
 	sceGuEnable(GU_BLEND);
-	sceGuColor(GU_COLOR(1, 1, 1, 1));
+	sceGuColor(0xffffffff);
 }
 
 static void GL_DrawColoredStereoLinePair( float r, float g, float b, float y )
