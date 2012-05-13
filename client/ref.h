@@ -208,6 +208,10 @@ typedef struct
 	int		(*FS_LoadFile) (char *name, void **buf);
 	void	(*FS_FreeFile) (void *buf);
 
+	int		(*FS_FOpenFile) (char *filename, FILE **file);
+	void	(*FS_FCloseFile) (FILE *f);
+	void	(*FS_Read) (void *buffer, int len, FILE *f);
+
 	// gamedir will be the current directory that generated
 	// files should be stored to, ie: "f:\quake\id1"
 	char	*(*FS_Gamedir) (void);

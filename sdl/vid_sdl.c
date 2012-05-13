@@ -159,6 +159,9 @@ qboolean VID_LoadRefresh()
 	ri.Sys_Error = VID_Error;
 	ri.FS_LoadFile = FS_LoadFile;
 	ri.FS_FreeFile = FS_FreeFile;
+	ri.FS_FOpenFile = FS_FOpenFile;
+	ri.FS_FCloseFile = FS_FCloseFile;
+	ri.FS_Read = FS_Read;
 	ri.FS_Gamedir = FS_Gamedir;
 	ri.Cvar_Get = Cvar_Get;
 	ri.Cvar_Set = Cvar_Set;
