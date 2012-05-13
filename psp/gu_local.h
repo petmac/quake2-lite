@@ -47,8 +47,8 @@ typedef struct {
 
 // Debugging/profiling.
 #if 0
-#	define LOG_FUNCTION_ENTRY Com_DPrintf("%s {\n", __FUNCTION__)
-#	define LOG_FUNCTION_EXIT Com_DPrintf("}\n")
+#	define LOG_FUNCTION_ENTRY ri.Con_Printf(PRINT_DEVELOPER, "%s {\n", __FUNCTION__)
+#	define LOG_FUNCTION_EXIT ri.Con_Printf(PRINT_DEVELOPER, "}\n")
 #else
 #	define LOG_FUNCTION_ENTRY do { } while (0)
 #	define LOG_FUNCTION_EXIT do { } while (0)

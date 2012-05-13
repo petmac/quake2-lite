@@ -663,8 +663,10 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 	}
 	buffer_height = next_power_of_two(height);
 
-	Com_DPrintf("GL_LoadPic: %s ... %d x %d (%d x %d), %d bytes.\n", name, width, height, buffer_width, buffer_height, (buffer_width * buffer_height));
-	
+#if 0
+	ri.Con_Printf(PRINT_DEVELOPER, "GL_LoadPic: %s ... %d x %d (%d x %d), %d bytes.\n", name, width, height, buffer_width, buffer_height, (buffer_width * buffer_height));
+#endif
+
 	memset(image, 0, sizeof(*image));
 
 	strcpy (image->name, name);
@@ -677,8 +679,8 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 	image->data = GU_AllocateVRAM(buffer_width * height);
 	if (image->data == NULL)
 	{
-		Com_DPrintf("\tNOT ENOUGH VRAM\n");
 #if 0
+		ri.Con_Printf(PRINT_DEVELOPER, "\tNOT ENOUGH VRAM\n");
 		image->data = Hunk_AllocAllowFail(&hunk_ref, buffer_width * height);
 #endif
 	}
