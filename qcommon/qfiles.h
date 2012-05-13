@@ -222,20 +222,20 @@ typedef struct miptex_s
 // upper design bounds
 // leaffaces, leafbrushes, planes, and verts are still bounded by
 // 16 bit short limits
-#define	MAX_MAP_MODELS		1024
-#define	MAX_MAP_BRUSHES		8192
-#define	MAX_MAP_ENTSTRING	0x40000
-#define	MAX_MAP_TEXINFO		8192
+#define	MAX_MAP_MODELS		128
+#define	MAX_MAP_BRUSHES		4096
+#define	MAX_MAP_ENTSTRING	(128 * 1024)
+#define	MAX_MAP_TEXINFO		2048
 
-#define	MAX_MAP_AREAS		256
-#define	MAX_MAP_AREAPORTALS	1024
-#define	MAX_MAP_PLANES		65536
-#define	MAX_MAP_NODES		65536
-#define	MAX_MAP_BRUSHSIDES	65536
-#define	MAX_MAP_LEAFS		65536
-#define	MAX_MAP_LEAFBRUSHES 65536
+#define	MAX_MAP_AREAS		8
+#define	MAX_MAP_AREAPORTALS	8
+#define	MAX_MAP_PLANES		8192
+#define	MAX_MAP_NODES		8192
+#define	MAX_MAP_BRUSHSIDES	32768
+#define	MAX_MAP_LEAFS		8192
+#define	MAX_MAP_LEAFBRUSHES 16384
 #define	MAX_MAP_SURFEDGES	256000
-#define	MAX_MAP_VISIBILITY	0x100000
+#define	MAX_MAP_VISIBILITY	(256 * 1024)
 
 // key / value pair sizes
 
