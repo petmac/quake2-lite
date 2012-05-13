@@ -26,7 +26,7 @@ int		modfilelen;
 
 void Mod_LoadSpriteModel (model_t *mod, void *buffer);
 void Mod_LoadBrushModel (model_t *mod, FILE *file, long base);
-void Mod_LoadAliasModel (model_t *mod, void *buffer);
+void Mod_LoadAliasModel (model_t *mod, FILE *file, long base);
 model_t *Mod_LoadModel (model_t *mod, qboolean crash);
 
 byte	mod_novis[MAX_MAP_LEAFS/8];
@@ -251,17 +251,8 @@ model_t *Mod_ForName (char *name, qboolean crash)
 	switch (LittleLong(type))
 	{
 	case IDALIASHEADER:
-		{
-			void *buf;
-			
-			buf = Z_Malloc(modfilelen); // TODO PeterM This is totally wrong.
-			ri.FS_Read(buf, modfilelen, file); // TODO PeterM This is totally wrong.
-
-			loadmodel->extradata = Hunk_Alloc (&hunk_ref, 0);
-			Mod_LoadAliasModel (mod, buf);
-
-			Z_Free(buf); // TODO PeterM This is totally wrong.
-		}
+		loadmodel->extradata = Hunk_Alloc (&hunk_ref, 0);
+		Mod_LoadAliasModel (mod, file, base);
 		break;
 		
 	case IDSPRITEHEADER:
@@ -979,28 +970,28 @@ ALIAS MODELS
 Mod_LoadAliasModel
 =================
 */
-void Mod_LoadAliasModel (model_t *mod, void *buffer)
+void Mod_LoadAliasModel (model_t *mod, FILE *file, long base)
 {
 	int					i, j;
-	dmdl_t				*pinmodel, *pheader;
-	dstvert_t			*pinst, *poutst;
-	dtriangle_t			*pintri, *pouttri;
-	daliasframe_t		*pinframe, *poutframe;
-	int					*pincmd, *poutcmd;
+	dmdl_t				inmodel, *pheader;
+	dstvert_t			inst, *poutst;
+	dtriangle_t			intri, *pouttri;
+	daliasframe_t		inframe, *poutframe;
+	int					*poutcmd;
 	int					version;
 
-	pinmodel = (dmdl_t *)buffer;
+	ri.FS_Read(&inmodel, sizeof(inmodel), file);
 
-	version = LittleLong (pinmodel->version);
+	version = LittleLong (inmodel.version);
 	if (version != ALIAS_VERSION)
 		ri.Sys_Error (ERR_DROP, "%s has wrong version number (%i should be %i)",
 				 mod->name, version, ALIAS_VERSION);
 
-	pheader = Hunk_Alloc (&hunk_ref, LittleLong(pinmodel->ofs_end));
+	pheader = Hunk_Alloc (&hunk_ref, LittleLong(inmodel.ofs_end));
 	
 	// byte swap the header fields and sanity check
 	for (i=0 ; i<sizeof(dmdl_t)/4 ; i++)
-		((int *)pheader)[i] = LittleLong (((int *)buffer)[i]);
+		((int *)pheader)[i] = LittleLong (((int *)&inmodel)[i]);
 
 	if (pheader->skinheight > MAX_LBM_HEIGHT)
 		ri.Sys_Error (ERR_DROP, "model %s has a skin taller than %d", mod->name,
@@ -1024,27 +1015,31 @@ void Mod_LoadAliasModel (model_t *mod, void *buffer)
 //
 // load base s and t vertices (not used in gl version)
 //
-	pinst = (dstvert_t *) ((byte *)pinmodel + pheader->ofs_st);
+	fseek(file, base + pheader->ofs_st, SEEK_SET);
 	poutst = (dstvert_t *) ((byte *)pheader + pheader->ofs_st);
 
 	for (i=0 ; i<pheader->num_st ; i++)
 	{
-		poutst[i].s = LittleShort (pinst[i].s);
-		poutst[i].t = LittleShort (pinst[i].t);
+		ri.FS_Read(&inst, sizeof(inst), file);
+
+		poutst[i].s = LittleShort (inst.s);
+		poutst[i].t = LittleShort (inst.t);
 	}
 
 //
 // load triangle lists
 //
-	pintri = (dtriangle_t *) ((byte *)pinmodel + pheader->ofs_tris);
+	fseek(file, base + pheader->ofs_tris, SEEK_SET);
 	pouttri = (dtriangle_t *) ((byte *)pheader + pheader->ofs_tris);
 
 	for (i=0 ; i<pheader->num_tris ; i++)
 	{
+		ri.FS_Read(&intri, sizeof(intri), file);
+
 		for (j=0 ; j<3 ; j++)
 		{
-			pouttri[i].index_xyz[j] = LittleShort (pintri[i].index_xyz[j]);
-			pouttri[i].index_st[j] = LittleShort (pintri[i].index_st[j]);
+			pouttri[i].index_xyz[j] = LittleShort (intri.index_xyz[j]);
+			pouttri[i].index_st[j] = LittleShort (intri.index_st[j]);
 		}
 	}
 
@@ -1053,21 +1048,20 @@ void Mod_LoadAliasModel (model_t *mod, void *buffer)
 //
 	for (i=0 ; i<pheader->num_frames ; i++)
 	{
-		pinframe = (daliasframe_t *) ((byte *)pinmodel 
-			+ pheader->ofs_frames + i * pheader->framesize);
+		fseek(file, base + pheader->ofs_frames + i * pheader->framesize, SEEK_SET);
+		ri.FS_Read(&inframe, sizeof(inframe.scale) + sizeof(inframe.translate) + sizeof(inframe.name), file);
+
 		poutframe = (daliasframe_t *) ((byte *)pheader 
 			+ pheader->ofs_frames + i * pheader->framesize);
 
-		memcpy (poutframe->name, pinframe->name, sizeof(poutframe->name));
+		memcpy (poutframe->name, inframe.name, sizeof(poutframe->name));
 		for (j=0 ; j<3 ; j++)
 		{
-			poutframe->scale[j] = LittleFloat (pinframe->scale[j]);
-			poutframe->translate[j] = LittleFloat (pinframe->translate[j]);
+			poutframe->scale[j] = LittleFloat (inframe.scale[j]);
+			poutframe->translate[j] = LittleFloat (inframe.translate[j]);
 		}
 		// verts are all 8 bit, so no swapping needed
-		memcpy (poutframe->verts, pinframe->verts, 
-			pheader->num_xyz*sizeof(dtrivertx_t));
-
+		ri.FS_Read(poutframe->verts, pheader->num_xyz*sizeof(dtrivertx_t), file);
 	}
 
 	mod->type = mod_alias;
@@ -1075,15 +1069,16 @@ void Mod_LoadAliasModel (model_t *mod, void *buffer)
 	//
 	// load the glcmds
 	//
-	pincmd = (int *) ((byte *)pinmodel + pheader->ofs_glcmds);
+	fseek(file, base + pheader->ofs_glcmds, SEEK_SET);
 	poutcmd = (int *) ((byte *)pheader + pheader->ofs_glcmds);
+	ri.FS_Read(poutcmd, pheader->num_glcmds * sizeof(int), file);
 	for (i=0 ; i<pheader->num_glcmds ; i++)
-		poutcmd[i] = LittleLong (pincmd[i]);
+		poutcmd[i] = LittleLong (poutcmd[i]);
 
 
 	// register all skins
-	memcpy ((char *)pheader + pheader->ofs_skins, (char *)pinmodel + pheader->ofs_skins,
-		pheader->num_skins*MAX_SKINNAME);
+	fseek(file, base + pheader->ofs_skins, SEEK_SET);
+	ri.FS_Read((char *)pheader + pheader->ofs_skins, pheader->num_skins*MAX_SKINNAME, file);
 	for (i=0 ; i<pheader->num_skins ; i++)
 	{
 		assert(mod->skins[i] == NULL);
