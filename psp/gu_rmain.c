@@ -52,6 +52,7 @@ vec3_t	r_origin;
 
 float	r_base_world_matrix[16];
 
+vram_t *vram;
 gu_pixel_t *gu_back_buffer;
 
 //
@@ -928,7 +929,6 @@ int R_Init( void *hinstance, void *hWnd )
 {	
 	int		j;
 	extern float r_turbsin[256];
-	vram_t *vram = NULL;
 
 	LOG_FUNCTION_ENTRY;
 
@@ -944,13 +944,14 @@ int R_Init( void *hinstance, void *hWnd )
 
 	R_Register();
 
-	gu_back_buffer = (gu_pixel_t *)sceGeEdramGetAddr();
+	vram = sceGeEdramGetAddr();
+	gu_back_buffer = vram->fb.fb1;
 
 	sceGuInit();
 	GU_StartDisplayList();
-	sceGuDrawBuffer(GU_PSM_5650, vram->fb1, GU_SCR_BUF_WIDTH);
-	sceGuDispBuffer(GU_SCR_WIDTH, GU_SCR_HEIGHT, vram->fb2, GU_SCR_BUF_WIDTH);
-	sceGuDepthBuffer(vram->depth, GU_SCR_BUF_WIDTH);
+	sceGuDrawBuffer(GU_PSM_5650, ((vram_t *)NULL)->fb.fb1, GU_SCR_BUF_WIDTH);
+	sceGuDispBuffer(GU_SCR_WIDTH, GU_SCR_HEIGHT, ((vram_t *)NULL)->fb.fb2, GU_SCR_BUF_WIDTH);
+	sceGuDepthBuffer(((vram_t *)NULL)->fb.depth, GU_SCR_BUF_WIDTH);
 
 	GL_SetDefaultState();
 

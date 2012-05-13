@@ -619,10 +619,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\gu_vram.c"
-				>
-			</File>
-			<File
 				RelativePath=".\gu_warp.c"
 				>
 			</File>

@@ -10,7 +10,6 @@ OBJS = \
 	gu_rmain.o \
 	gu_rmisc.o \
 	gu_rsurf.o \
-	gu_vram.o \
 	gu_warp.o \
 	\
 	net_psp.o \

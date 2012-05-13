@@ -22,10 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "gu_local.h"
 
-#define GU_DISPLAY_LIST_SIZE (1024 * 1024) // TODO PeterM Shrink?
-
-// The display list.
-static char __attribute__((aligned(16))) gu_display_list[GU_DISPLAY_LIST_SIZE];
 static qboolean in_display_list;
 static qboolean pending_finish;
 
@@ -33,7 +29,7 @@ void GU_StartDisplayList(void)
 {
 	GU_SyncDisplayList();
 
-	sceGuStart(GU_DIRECT, gu_display_list);
+	sceGuStart(GU_DIRECT, vram->display_list);
 
 	in_display_list = true;
 }
@@ -48,9 +44,9 @@ void GU_FinishDisplayList(void)
 	}
 
 	size = sceGuFinish();
-	if (size > GU_DISPLAY_LIST_SIZE)
+	if (size > R_DISPLAY_LIST_SIZE)
 	{
-		Sys_Error("%s: GU Display list overflow. %d > %d.", __FUNCTION__, size, GU_DISPLAY_LIST_SIZE);
+		Sys_Error("%s: GU Display list overflow. %d > %d.", __FUNCTION__, size, R_DISPLAY_LIST_SIZE);
 	}
 
 	pending_finish = true;

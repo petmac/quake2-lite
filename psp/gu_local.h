@@ -78,17 +78,22 @@ qboolean GU_IsInDisplayList(void);
 
 typedef ScePspRGB565 gu_pixel_t;
 
-typedef struct
+typedef struct framebuffers_s
 {
 	gu_pixel_t fb1[GU_SCR_BUF_WIDTH * GU_SCR_HEIGHT];
 	gu_pixel_t fb2[GU_SCR_BUF_WIDTH * GU_SCR_HEIGHT];
 	u16 depth[GU_SCR_BUF_WIDTH * GU_SCR_HEIGHT];
-	char hunk[1]; // Variable size, up to the end of VRAM.
+} framebuffers_t;
+
+#define R_DISPLAY_LIST_SIZE ((2 * 1024 * 1024) - sizeof(framebuffers_t))
+
+typedef struct vram_s
+{
+	framebuffers_t fb;
+	char display_list[R_DISPLAY_LIST_SIZE];
 } vram_t;
 
-void *GU_AllocateVRAM(int size);
-void GU_FreeVRAM(void);
-
+extern vram_t *vram;
 extern gu_pixel_t *gu_back_buffer;
 
 /*
