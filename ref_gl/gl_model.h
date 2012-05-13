@@ -234,7 +234,9 @@ typedef struct model_s
 	image_t		*skins[MAX_MD2SKINS];
 
 	int			extradatasize;
-	void		*extradata;
+
+	dmdl_t		*alias;
+	dsprite_t	*sprite;
 } model_t;
 
 //============================================================================

@@ -181,6 +181,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 	FILE *file;
 	long base;
 	int type;
+	char *extradata;
 	
 	if (!name[0])
 		ri.Sys_Error (ERR_DROP, "Mod_ForName: NULL name");
@@ -236,6 +237,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 	}
 	
 	loadmodel = mod;
+	extradata = Hunk_Alloc(&hunk_ref, 0);
 
 	//
 	// fill it in
@@ -251,7 +253,6 @@ model_t *Mod_ForName (char *name, qboolean crash)
 	switch (LittleLong(type))
 	{
 	case IDALIASHEADER:
-		loadmodel->extradata = Hunk_Alloc (&hunk_ref, 0);
 		Mod_LoadAliasModel (mod, file, base);
 		break;
 		
@@ -262,7 +263,6 @@ model_t *Mod_ForName (char *name, qboolean crash)
 			buf = Z_Malloc(modfilelen); // TODO PeterM This is totally wrong.
 			ri.FS_Read(buf, modfilelen, file); // TODO PeterM This is totally wrong.
 
-			loadmodel->extradata = Hunk_Alloc (&hunk_ref, 0);
 			Mod_LoadSpriteModel (mod, buf);
 
 			Z_Free(buf); // TODO PeterM This is totally wrong.
@@ -270,7 +270,6 @@ model_t *Mod_ForName (char *name, qboolean crash)
 		break;
 	
 	case IDBSPHEADER:
-		loadmodel->extradata = Hunk_Alloc (&hunk_ref, 0);
 		Mod_LoadBrushModel (mod, file, base);
 		break;
 
@@ -279,7 +278,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 		break;
 	}
 
-	loadmodel->extradatasize = (byte *)Hunk_Alloc (&hunk_ref, 0) - (byte *)loadmodel->extradata;
+	loadmodel->extradatasize = (char *)Hunk_Alloc (&hunk_ref, 0) - extradata;
 
 	ri.FS_FCloseFile(file);
 
@@ -988,7 +987,8 @@ void Mod_LoadAliasModel (model_t *mod, FILE *file, long base)
 				 mod->name, version, ALIAS_VERSION);
 
 	pheader = Hunk_Alloc (&hunk_ref, LittleLong(inmodel.ofs_end));
-	
+	mod->alias = pheader;
+
 	// byte swap the header fields and sanity check
 	for (i=0 ; i<sizeof(dmdl_t)/4 ; i++)
 		((int *)pheader)[i] = LittleLong (((int *)&inmodel)[i]);
@@ -1115,6 +1115,7 @@ void Mod_LoadSpriteModel (model_t *mod, void *buffer)
 
 	sprin = (dsprite_t *)buffer;
 	sprout = Hunk_Alloc (&hunk_ref, modfilelen);
+	mod->sprite = sprout;
 
 	sprout->ident = LittleLong (sprin->ident);
 	sprout->version = LittleLong (sprin->version);
@@ -1234,7 +1235,6 @@ void Mod_FreeAll (void)
 
 	for (i=0 ; i<mod_numknown ; i++)
 	{
-		if (mod_known[i].extradatasize)
-			Mod_Free (&mod_known[i]);
+		Mod_Free (&mod_known[i]);
 	}
 }

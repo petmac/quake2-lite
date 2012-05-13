@@ -188,7 +188,7 @@ void R_DrawSpriteModel (entity_t *e)
 	// don't even bother culling, because it's just a single
 	// polygon without a surface cache
 
-	psprite = (dsprite_t *)currentmodel->extradata;
+	psprite = (dsprite_t *)currentmodel->sprite;
 
 #if 0
 	if (e->frame < 0 || e->frame >= psprite->numframes)

@@ -380,7 +380,7 @@ static qboolean R_CullAliasModel( vec3_t bbox[8], entity_t *e )
 	daliasframe_t *pframe, *poldframe;
 	vec3_t angles;
 
-	paliashdr = (dmdl_t *)currentmodel->extradata;
+	paliashdr = currentmodel->alias;
 
 	if ( ( e->frame >= paliashdr->num_frames ) || ( e->frame < 0 ) )
 	{
@@ -536,7 +536,7 @@ void R_DrawAliasModel (entity_t *e)
 			return;
 	}
 
-	paliashdr = (dmdl_t *)currentmodel->extradata;
+	paliashdr = currentmodel->alias;
 
 	//
 	// get lighting information
