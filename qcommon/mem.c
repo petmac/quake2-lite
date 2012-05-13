@@ -223,13 +223,6 @@ void *Hunk_AllocEx(hunk_t *hunk, int size, const char *file, int line, const cha
 {
 	void *mem;
 
-	// Hunk locked?
-	if (hunk->locked)
-	{
-		Sys_Error("%s: Hunk \"%s\" locked when allocating %d bytes in %s.", __FUNCTION__, hunk->name, size, function);
-		return NULL;
-	}
-
 	// Allocate.
 	mem = Hunk_AllocAllowFailEx(hunk, size, file, line, function);
 	if (!mem)
@@ -243,21 +236,21 @@ void *Hunk_AllocEx(hunk_t *hunk, int size, const char *file, int line, const cha
 
 void *Hunk_AllocAllowFailEx(hunk_t *hunk, int size, const char *file, int line, const char *function)
 {
-	// Hunk locked?
-	if (hunk->locked)
-	{
-		return NULL;
-	}
-
-	// round to size of double
-	size = (size+HUNK_ALIGNMENT-1)&~(HUNK_ALIGNMENT-1);
-
-#if HUNK_STATS
 	if (size > 0)
 	{
+#if HUNK_STATS
 		Hunk_AddStats(hunk, size, file, line, function);
-	}
 #endif
+
+		// Hunk locked?
+		if (hunk->locked)
+		{
+			Com_Printf("%s: Hunk \"%s\" locked when allocating %d bytes in %s.\n", __FUNCTION__, hunk->name, size, function);
+		}
+	}
+
+	// Round up to alignment.
+	size = (size + HUNK_ALIGNMENT - 1) & ~(HUNK_ALIGNMENT - 1);
 
 	hunk->cursize += size;
 	if (hunk->cursize > hunk->capacity)
