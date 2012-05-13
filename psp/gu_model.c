@@ -1137,8 +1137,12 @@ void R_BeginRegistration (char *model)
 	
 	Mod_FreeAll ();
 
+	GL_FreeImages();
+
 	Hunk_Begin (&hunk_ref);
 	
+	Draw_InitLocal ();
+
 	r_worldmodel = Mod_ForName(fullname, true);
 
 	r_viewcluster = -1;

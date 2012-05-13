@@ -51,12 +51,8 @@ void GL_TexEnv( int mode )
 
 void GL_Bind (const image_t *texnum)
 {
-	extern	image_t	*draw_chars;
-
 	ASSERT(GU_IsInDisplayList());
 
-	if (gl_nobind->value && draw_chars)		// performance evaluation option
-		texnum = draw_chars;
 #ifndef PSP
 	if ( gl_state.currenttexture == texnum)
 		return;
@@ -128,7 +124,7 @@ PCX LOADING
 LoadPCX
 ==============
 */
-void LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *height)
+static void LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *height)
 {
 	byte	*raw;
 	pcx_t	*pcx;
@@ -138,7 +134,10 @@ void LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *heigh
 	byte	*out, *pix;
 
 	*pic = NULL;
-	*palette = NULL;
+	if (palette)
+	{
+		*palette = NULL;
+	}
 
 	//
 	// load the file
@@ -608,11 +607,6 @@ void GL_LightScaleTexture (unsigned *in, int inwidth, int inheight, qboolean onl
 	}
 }
 
-/*
-================
-GL_LoadPic
-================
-*/
 static u32 next_power_of_two(u32 x)
 {
 	x--;
@@ -626,77 +620,37 @@ static u32 next_power_of_two(u32 x)
 	return x;
 }
 
-image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t type, int bits)
+image_t *GL_Upload (image_t *image, byte *pic)
 {
-	int i;
-	image_t *image;
-	int buffer_width;
-	int buffer_height;
-
-	// find a free image_t
-	for (i=0, image=gltextures ; i<numgltextures ; i++,image++)
+	// Calculate buffer size.
+	if (image->width <= 16)
 	{
-		if (!image->name[0])
-			break;
-	}
-	if (i == numgltextures)
-	{
-		if (numgltextures == MAX_GLTEXTURES)
-			ri.Sys_Error (ERR_DROP, "MAX_GLTEXTURES");
-		numgltextures++;
-	}
-	image = &gltextures[i];
-
-	if (strlen(name) >= sizeof(image->name))
-		ri.Sys_Error (ERR_DROP, "Draw_LoadPic: \"%s\" is too long", name);
-	if (type == it_skin && bits == 8)
-		R_FloodFillSkin(pic, width, height);
-
-	// Calculate buffer width.
-	if (width <= 16)
-	{
-		buffer_width = 16;
+		image->buffer_width = 16;
 	}
 	else
 	{
-		buffer_width = next_power_of_two(width);
+		image->buffer_width = next_power_of_two(image->width);
 	}
-	buffer_height = next_power_of_two(height);
+	image->buffer_height = next_power_of_two(image->height);
 
 #if 0
-	ri.Con_Printf(PRINT_DEVELOPER, "GL_LoadPic: %s ... %d x %d (%d x %d), %d bytes.\n", name, width, height, buffer_width, buffer_height, (buffer_width * buffer_height));
+	ri.Con_Printf(PRINT_DEVELOPER, "GL_Upload: %s ... %d x %d (%d x %d), %d bytes.\n", name, width, height, buffer_width, buffer_height, (buffer_width * buffer_height));
 #endif
 
-	memset(image, 0, sizeof(*image));
-
-	strcpy (image->name, name);
-	image->width = width;
-	image->height = height;
-	image->buffer_width = buffer_width;
-	image->buffer_height = buffer_height;
-	image->type = type;
-
-	image->data = GU_AllocateVRAM(buffer_width * height);
-	if (image->data == NULL)
-	{
-#if 0
-		ri.Con_Printf(PRINT_DEVELOPER, "\tNOT ENOUGH VRAM\n");
-		image->data = Hunk_AllocAllowFail(&hunk_ref, buffer_width * height);
-#endif
-	}
+	image->data = Hunk_AllocAllowFail(&hunk_ref, image->buffer_width * image->height);
 	if (image->data != NULL)
 	{
-		for (i = 0; i < height; ++i)
+		int i;
+
+		for (i = 0; i < image->height; ++i)
 		{
-			char *const dst = ((char *)(image->data)) + (i * buffer_width);
-			const char *const src = pic + (i * width);
-			memcpy(dst, src, width);
+			char *const dst = ((char *)(image->data)) + (i * image->buffer_width);
+			const char *const src = pic + (i * image->width);
+			memcpy(dst, src, image->width);
 		}
 
 		sceKernelDcacheWritebackAll();
 	}
-
-	return image;
 }
 
 
@@ -705,11 +659,10 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 GL_LoadWal
 ================
 */
-image_t *GL_LoadWal (char *name)
+image_t *GL_LoadWal (image_t *image, char *name)
 {
 	miptex_t	*mt;
-	int			width, height, ofs;
-	image_t		*image;
+	int			ofs;
 
 	ri.FS_LoadFile (name, (void **)&mt);
 	if (!mt)
@@ -718,11 +671,11 @@ image_t *GL_LoadWal (char *name)
 		return NULL;
 	}
 
-	width = LittleLong (mt->width);
-	height = LittleLong (mt->height);
+	image->width = LittleLong (mt->width);
+	image->height = LittleLong (mt->height);
 	ofs = LittleLong (mt->offsets[0]);
 
-	image = GL_LoadPic (name, (byte *)mt + ofs, width, height, it_wall, 8);
+	GL_Upload(image, (byte *)mt + ofs);
 
 	ri.FS_FreeFile ((void *)mt);
 
@@ -740,8 +693,7 @@ image_t	*GL_FindImage (char *name, imagetype_t type)
 {
 	image_t	*image;
 	int		i, len;
-	byte	*pic, *palette;
-	int		width, height;
+	const char *ext;
 
 	if (!name)
 		return NULL;	//	ri.Sys_Error (ERR_DROP, "GL_FindImage: NULL name");
@@ -749,50 +701,69 @@ image_t	*GL_FindImage (char *name, imagetype_t type)
 	if (len<5)
 		return NULL;	//	ri.Sys_Error (ERR_DROP, "GL_FindImage: bad name: %s", name);
 
+	//ri.Con_Printf(PRINT_DEVELOPER, "Looking for %s.\n", name);
+
 	// look for it
 	for (i=0, image=gltextures ; i<numgltextures ; i++,image++)
 	{
 		if (!strcmp(name, image->name))
 		{
+			//ri.Con_Printf(PRINT_DEVELOPER, "\tFound in slot %d\n", i);
 			return image;
 		}
 	}
 
+	//ri.Con_Printf(PRINT_DEVELOPER, "\tDidn't find %s in %d images.\n", name, numgltextures);
+
+	// find a free image_t
+	for (i=0, image=gltextures ; i<numgltextures ; i++,image++)
+	{
+		if (!image->name[0])
+			break;
+	}
+	if (i == numgltextures)
+	{
+		if (numgltextures == MAX_GLTEXTURES)
+			ri.Sys_Error (ERR_DROP, "MAX_GLTEXTURES");
+		numgltextures++;
+	}
+	image = &gltextures[i];
+
+	//ri.Con_Printf(PRINT_DEVELOPER, "\tPut in slot %d.\n", i);
+
+	memset(image, 0, sizeof(*image));
+	strcpy(image->name, name);
+	image->type = type;
+
+	ext = name + len - 4;
+
 	//
 	// load the pic from disk
 	//
-	pic = NULL;
-	palette = NULL;
-	if (!strcmp(name+len-4, ".pcx"))
+	if (!strcmp(ext, ".pcx"))
 	{
-		LoadPCX (name, &pic, &palette, &width, &height);
-		if (!pic)
-			return NULL; // ri.Sys_Error (ERR_DROP, "GL_FindImage: can't load %s", name);
-		image = GL_LoadPic (name, pic, width, height, type, 8);
+		byte *pic = NULL;
+
+		LoadPCX (image->name, &pic, NULL, &image->width, &image->height);
+		if (pic)
+		{
+			GL_Upload(image, pic);
+			Z_Free(pic);
+		}
 	}
-	else if (!strcmp(name+len-4, ".wal"))
+	else if (!strcmp(ext, ".wal"))
 	{
-		image = GL_LoadWal (name);
+		GL_LoadWal (image, image->name);
 	}
-	else if (!strcmp(name+len-4, ".tga"))
+	else if (!strcmp(ext, ".tga"))
 	{
 #ifndef PSP
 		LoadTGA (name, &pic, &width, &height);
 		if (!pic)
 			return NULL; // ri.Sys_Error (ERR_DROP, "GL_FindImage: can't load %s", name);
 		image = GL_LoadPic (name, pic, width, height, type, 32);
-#else
-		return NULL;
 #endif
 	}
-	else
-		return NULL;	//	ri.Sys_Error (ERR_DROP, "GL_FindImage: bad extension on: %s", name);
-
-
-	if (pic)
-		Z_Free(pic);
-	if (palette)
-		Z_Free(palette);
 
 	return image;
 }
@@ -896,18 +867,23 @@ GL_ShutdownImages
 */
 void	GL_ShutdownImages (void)
 {
-	int		i;
-	image_t	*image;
+	GL_FreeImages();
 
-	// PeterM TODO What to do with gl_state.d_16to8table?
-
-	for (i=0, image=gltextures ; i<numgltextures ; i++, image++)
-	{
-		// free it
-#ifndef PSP
-		qglDeleteTextures (1, &image->texnum);
-#endif
-		memset (image, 0, sizeof(*image));
-	}
+	ri.FS_FreeFile(gl_state.d_16to8table);
 }
 
+void GL_FreeImages (void)
+{
+	int i;
+
+	ri.Con_Printf(PRINT_DEVELOPER, "Freeing %d images.\n", numgltextures);
+
+	for (i = 0; i < numgltextures; ++i)
+	{
+		image_t *const image = &gltextures[i];
+
+		memset (image, 0, sizeof(*image));
+	}
+
+	numgltextures = 0;
+}

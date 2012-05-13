@@ -35,11 +35,11 @@ struct hunk_s
 #endif
 };
 
-#define HUNK_ALIGNMENT 8
+#define HUNK_ALIGNMENT 16
 
 #define GAME_HUNK_CAPACITY (1 * 1024 * 1024)
 #define LEVEL_HUNK_CAPACITY (32 * 1024)
-#define REF_HUNK_CAPACITY (8 * 1024 * 1024)
+#define REF_HUNK_CAPACITY (12 * 1024 * 1024)
 #ifdef PSP
 #define SND_HUNK_CAPACITY (1 * 1024 * 1024)
 #else

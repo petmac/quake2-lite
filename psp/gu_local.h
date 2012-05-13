@@ -135,16 +135,20 @@ typedef enum
 
 typedef struct image_s
 {
+	// Set by GL_FindImage.
 	char name[MAX_QPATH];			// game path, including extension
 	imagetype_t type;
 
+	// Set by GL_LoadPic.
 	int width;
 	int height;
-	
-	void *data;						// texture address in VRAM.
+
+	// Set by GL_Upload.
 	int buffer_width;
 	int buffer_height;
+	void *data;						// texture address in VRAM.
 
+	// Set at runtime.
 	struct msurface_s *texturechain;	// for sort-by-texture world drawing
 } image_t;
 
@@ -226,8 +230,6 @@ extern	cvar_t	*gl_lightmap;
 extern	cvar_t	*gl_shadows;
 extern	cvar_t	*gl_dynamic;
 extern  cvar_t  *gl_monolightmap;
-extern	cvar_t	*gl_nobind;
-extern	cvar_t	*gl_round_down;
 extern	cvar_t	*gl_picmip;
 extern	cvar_t	*gl_skymip;
 extern	cvar_t	*gl_showtris;
@@ -318,16 +320,14 @@ void GL_ResampleTexture (unsigned *in, int inwidth, int inheight, unsigned *out,
 
 struct image_s *R_RegisterSkin (char *name);
 
-void LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *height);
-image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t type, int bits);
 image_t	*GL_FindImage (char *name, imagetype_t type);
-void	GL_TextureMode( char *string );
 void	GL_ImageList_f (void);
 
 void	GL_SetTexturePalette(const ScePspRGBA8888 *palette);
 
 void	GL_InitImages (void);
 void	GL_ShutdownImages (void);
+void	GL_FreeImages (void);
 
 void GL_TextureAlphaMode( char *string );
 void GL_TextureSolidMode( char *string );
