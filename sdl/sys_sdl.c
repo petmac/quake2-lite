@@ -238,7 +238,7 @@ int main (int argc, char **argv)
 		{
 			curtime = SDL_GetTicks();
 
-#if 1
+#if 0
 			Qcommon_Frame ((curtime - oldtime) * 4);
 #else
 			Qcommon_Frame (curtime - oldtime);
