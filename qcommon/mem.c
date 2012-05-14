@@ -183,7 +183,11 @@ static void Hunk_Init(hunk_t *hunk, const char *name, int capacity)
 	int base_as_int;
 
 	// Allocate memory.
-	membase = calloc(capacity, 1);
+#ifdef _MSC_VER
+	membase = _aligned_malloc(capacity, HUNK_ALIGNMENT);
+#else
+	membase = memalign(capacity, HUNK_ALIGNMENT);
+#endif
 	if (membase == NULL)
 	{
 		Sys_Error ("Hunk_Init: Failed to allocate hunk \"%s\".", name);
@@ -197,6 +201,9 @@ static void Hunk_Init(hunk_t *hunk, const char *name, int capacity)
 		Sys_Error ("Hunk_Init: Hunk \"%s\" membase is not aligned.", name);
 		return;
 	}
+
+	// Zero hunk.
+	memset(membase, 0, capacity);
 
 	// Store info.
 	hunk->locked = true;
