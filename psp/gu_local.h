@@ -36,6 +36,7 @@ PSP specifics.
 #include <pspge.h>
 #include <pspgu.h>
 #include <pspgum.h>
+#include <psputils.h>
 
 // Vertex type.
 typedef struct {

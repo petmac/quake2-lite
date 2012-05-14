@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../client/keys.h"
 
 #include <pspctrl.h>
+#include <pspdisplay.h>
 #include <pspgu.h>
 #include <pspkernel.h>
 #include <psprtc.h>

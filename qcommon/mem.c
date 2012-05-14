@@ -21,6 +21,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "qcommon.h"
 
+#include <malloc.h>
+
 #define HUNK_STATS 1
 
 struct hunk_s
@@ -186,7 +188,7 @@ static void Hunk_Init(hunk_t *hunk, const char *name, int capacity)
 #ifdef _MSC_VER
 	membase = _aligned_malloc(capacity, HUNK_ALIGNMENT);
 #else
-	membase = memalign(capacity, HUNK_ALIGNMENT);
+	membase = memalign(HUNK_ALIGNMENT, capacity);
 #endif
 	if (membase == NULL)
 	{
