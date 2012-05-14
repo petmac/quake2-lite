@@ -87,13 +87,19 @@ interpolates between two frames and origins
 FIXME: batch lerp all vertexes
 =============
 */
+typedef struct mtrivertx_s
+{
+	float s, t;
+	ScePspRGBA8888 colour;
+	float x, y, z;
+} mtrivertx_t;
+
 void GL_DrawAliasFrameLerp (mmdl_t *paliashdr, float backlerp)
 {
 	float 	l;
 	daliasframe_t	*frame, *oldframe;
 	dtrivertx_t	*v, *ov, *verts;
 	int		*order;
-	int		count;
 	float	frontlerp;
 	float	alpha;
 	vec3_t	move, delta, vectors[3];
@@ -118,11 +124,9 @@ void GL_DrawAliasFrameLerp (mmdl_t *paliashdr, float backlerp)
 	else
 		alpha = 1.0f;
 
-#ifndef PSP
 	// PMM - added double shell
 	if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
-		qglDisable( GL_TEXTURE_2D );
-#endif
+		sceGuDisable(GU_TEXTURE_2D);
 
 	frontlerp = 1.0f - backlerp;
 
@@ -151,149 +155,77 @@ void GL_DrawAliasFrameLerp (mmdl_t *paliashdr, float backlerp)
 
 	GL_LerpVerts( paliashdr->num_xyz, v, ov, verts, lerp, move, frontv, backv );
 
-#ifndef PSP
-	if ( gl_vertex_arrays->value )
+	while (1)
 	{
-		float colorArray[MAX_VERTS*4];
+		int count;
+		int prim;
+		mtrivertx_t *vertices;
+		mtrivertx_t *vertex_end;
+		mtrivertx_t *vertex;
 
-		qglEnableClientState( GL_VERTEX_ARRAY );
-		qglVertexPointer( 3, GL_FLOAT, 16, s_lerped );	// padded for SIMD
-
-//		if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE ) )
-		// PMM - added double damage shell
-		if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
+		// get the vertex count and primitive type
+		count = *order++;
+		if (!count)
+			break;		// done
+		if (count < 0)
 		{
-			qglColor4f( shadelight[0], shadelight[1], shadelight[2], alpha );
+			count = -count;
+			prim = GU_TRIANGLE_FAN;
 		}
 		else
 		{
-			qglEnableClientState( GL_COLOR_ARRAY );
-			qglColorPointer( 3, GL_FLOAT, 0, colorArray );
-
-			//
-			// pre light everything
-			//
-			for ( i = 0; i < paliashdr->num_xyz; i++ )
-			{
-				float l = shadedots[verts[i].lightnormalindex];
-
-				colorArray[i*3+0] = l * shadelight[0];
-				colorArray[i*3+1] = l * shadelight[1];
-				colorArray[i*3+2] = l * shadelight[2];
-			}
+			prim = GU_TRIANGLE_STRIP;
 		}
 
-		if ( qglLockArraysEXT != 0 )
-			qglLockArraysEXT( 0, paliashdr->num_xyz );
+		vertices = sceGuGetMemory(count * sizeof(mtrivertx_t));
+		vertex_end = vertices + count;
+		vertex = vertices;
 
-		while (1)
+		if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM ) )
 		{
-			// get the vertex count and primitive type
-			count = *order++;
-			if (!count)
-				break;		// done
-			if (count < 0)
+			do
 			{
-				count = -count;
-				qglBegin (GL_TRIANGLE_FAN);
-			}
-			else
-			{
-				qglBegin (GL_TRIANGLE_STRIP);
-			}
+				const float *xyz;
 
-			// PMM - added double damage shell
-			if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
-			{
-				do
-				{
-					index_xyz = order[2];
-					order += 3;
+				order += 2;
+				index_xyz = *order++;
+				xyz = &s_lerped[index_xyz][0];
 
-					qglVertex3fv( s_lerped[index_xyz] );
-
-				} while (--count);
-			}
-			else
-			{
-				do
-				{
-					// texture coordinates come from the draw list
-					qglTexCoord2f (((float *)order)[0], ((float *)order)[1]);
-					index_xyz = order[2];
-
-					order += 3;
-
-					// normals and vertexes come from the frame list
-//					l = shadedots[verts[index_xyz].lightnormalindex];
-					
-//					qglColor4f (l* shadelight[0], l*shadelight[1], l*shadelight[2], alpha);
-					qglArrayElement( index_xyz );
-
-				} while (--count);
-			}
-			qglEnd ();
+				vertex->colour = GU_COLOR(shadelight[0], shadelight[1], shadelight[2], alpha);
+				vertex->x = xyz[0];
+				vertex->y = xyz[1];
+				vertex->z = xyz[2];
+				++vertex;
+			} while (vertex != vertex_end);
 		}
-
-		if ( qglUnlockArraysEXT != 0 )
-			qglUnlockArraysEXT();
-	}
-	else
-	{
-		while (1)
+		else
 		{
-			// get the vertex count and primitive type
-			count = *order++;
-			if (!count)
-				break;		// done
-			if (count < 0)
+			do
 			{
-				count = -count;
-				qglBegin (GL_TRIANGLE_FAN);
-			}
-			else
-			{
-				qglBegin (GL_TRIANGLE_STRIP);
-			}
+				const float *xyz;
 
-			if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE ) )
-			{
-				do
-				{
-					index_xyz = order[2];
-					order += 3;
+				vertex->s = *(float *)order++;
+				vertex->t = *(float *)order++;
 
-					qglColor4f( shadelight[0], shadelight[1], shadelight[2], alpha);
-					qglVertex3fv (s_lerped[index_xyz]);
+				index_xyz = *order++;
+				xyz = &s_lerped[index_xyz][0];
 
-				} while (--count);
-			}
-			else
-			{
-				do
-				{
-					// texture coordinates come from the draw list
-					qglTexCoord2f (((float *)order)[0], ((float *)order)[1]);
-					index_xyz = order[2];
-					order += 3;
+				// normals and vertexes come from the frame list
+				l = shadedots[verts[index_xyz].lightnormalindex];
 
-					// normals and vertexes come from the frame list
-					l = shadedots[verts[index_xyz].lightnormalindex];
-					
-					qglColor4f (l* shadelight[0], l*shadelight[1], l*shadelight[2], alpha);
-					qglVertex3fv (s_lerped[index_xyz]);
-				} while (--count);
-			}
-
-			qglEnd ();
+				vertex->colour = GU_COLOR(l * shadelight[0], l * shadelight[1], l * shadelight[2], alpha);
+				vertex->x = xyz[0];
+				vertex->y = xyz[1];
+				vertex->z = xyz[2];
+				++vertex;
+			} while (vertex != vertex_end);
 		}
+
+		sceGumDrawArray(prim, GU_TEXTURE_32BITF | GU_COLOR_8888 | GU_VERTEX_32BITF | GU_TRANSFORM_3D, count, NULL, vertices);
 	}
 
-//	if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE ) )
-	// PMM - added double damage shell
 	if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
-		qglEnable( GL_TEXTURE_2D );
-#endif
+		sceGuEnable(GU_TEXTURE_2D);
 }
 
 
