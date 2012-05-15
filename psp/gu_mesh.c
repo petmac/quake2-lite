@@ -31,49 +31,46 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define NUMVERTEXNORMALS	162
 
-float	r_avertexnormals[NUMVERTEXNORMALS][3] = {
+static const float r_avertexnormals[NUMVERTEXNORMALS][3] = {
 #include "../ref_gl/anorms.h"
 };
 
-typedef float vec4_t[4];
-
-static	vec4_t	s_lerped[MAX_VERTS];
-//static	vec3_t	lerped[MAX_VERTS];
+static	vec3_t	s_lerped[MAX_VERTS];
 
 vec3_t	shadevector;
 float	shadelight[3];
 
 // precalculated dot products for quantized angles
 #define SHADEDOT_QUANT 16
-float	r_avertexnormal_dots[SHADEDOT_QUANT][256] =
+static const float r_avertexnormal_dots[SHADEDOT_QUANT][256] =
 #include "../ref_gl/anormtab.h"
 ;
 
-float	*shadedots = r_avertexnormal_dots[0];
+const float	*shadedots = r_avertexnormal_dots[0];
 
-void GL_LerpVerts( int nverts, dtrivertx_t *v, dtrivertx_t *ov, dtrivertx_t *verts, float *lerp, float move[3], float frontv[3], float backv[3] )
+void GL_LerpVerts( int nverts, dtrivertx_t *v, dtrivertx_t *ov, dtrivertx_t *verts, float *lerp, float frontv[3], float backv[3] )
 {
 	int i;
 
 	//PMM -- added RF_SHELL_DOUBLE, RF_SHELL_HALF_DAM
 	if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
 	{
-		for (i=0 ; i < nverts; i++, v++, ov++, lerp+=4 )
+		for (i=0 ; i < nverts; i++, v++, ov++, lerp+=3 )
 		{
-			float *normal = r_avertexnormals[verts[i].lightnormalindex];
+			const float *const normal = r_avertexnormals[verts[i].lightnormalindex];
 
-			lerp[0] = move[0] + ov->v[0]*backv[0] + v->v[0]*frontv[0] + normal[0] * POWERSUIT_SCALE;
-			lerp[1] = move[1] + ov->v[1]*backv[1] + v->v[1]*frontv[1] + normal[1] * POWERSUIT_SCALE;
-			lerp[2] = move[2] + ov->v[2]*backv[2] + v->v[2]*frontv[2] + normal[2] * POWERSUIT_SCALE; 
+			lerp[0] = ov->v[0]*backv[0] + v->v[0]*frontv[0] + normal[0] * POWERSUIT_SCALE;
+			lerp[1] = ov->v[1]*backv[1] + v->v[1]*frontv[1] + normal[1] * POWERSUIT_SCALE;
+			lerp[2] = ov->v[2]*backv[2] + v->v[2]*frontv[2] + normal[2] * POWERSUIT_SCALE; 
 		}
 	}
 	else
 	{
-		for (i=0 ; i < nverts; i++, v++, ov++, lerp+=4)
+		for (i=0 ; i < nverts; i++, v++, ov++, lerp+=3)
 		{
-			lerp[0] = move[0] + ov->v[0]*backv[0] + v->v[0]*frontv[0];
-			lerp[1] = move[1] + ov->v[1]*backv[1] + v->v[1]*frontv[1];
-			lerp[2] = move[2] + ov->v[2]*backv[2] + v->v[2]*frontv[2];
+			lerp[0] = ov->v[0]*backv[0] + v->v[0]*frontv[0];
+			lerp[1] = ov->v[1]*backv[1] + v->v[1]*frontv[1];
+			lerp[2] = ov->v[2]*backv[2] + v->v[2]*frontv[2];
 		}
 	}
 
@@ -107,6 +104,7 @@ void GL_DrawAliasFrameLerp (mmdl_t *paliashdr, float backlerp)
 	int		i;
 	int		index_xyz;
 	float	*lerp;
+	ScePspFVector3 translation;
 
 	frame = (daliasframe_t *)(paliashdr->frames + currententity->frame * paliashdr->framesize);
 	verts = v = frame->verts;
@@ -138,22 +136,23 @@ void GL_DrawAliasFrameLerp (mmdl_t *paliashdr, float backlerp)
 	move[1] = -DotProduct (delta, vectors[1]);	// left
 	move[2] = DotProduct (delta, vectors[2]);	// up
 
+	// move = ((move + oldframe->translate) * backlerp) + (frontlerp * frame->translate)
 	VectorAdd (move, oldframe->translate, move);
+	VectorScale (move, backlerp, move);
+	VectorMA(move, frontlerp, frame->translate, move);
 
-	for (i=0 ; i<3 ; i++)
-	{
-		move[i] = backlerp*move[i] + frontlerp*frame->translate[i];
-	}
+	// Apply the translation on the GPU.
+	translation.x = move[0];
+	translation.y = move[1];
+	translation.z = move[2];
+	sceGumTranslate(&translation);
 
-	for (i=0 ; i<3 ; i++)
-	{
-		frontv[i] = frontlerp*frame->scale[i];
-		backv[i] = backlerp*oldframe->scale[i];
-	}
+	VectorScale(frame->scale, frontlerp, frontv);
+	VectorScale(oldframe->scale, backlerp, backv);
 
 	lerp = s_lerped[0];
 
-	GL_LerpVerts( paliashdr->num_xyz, v, ov, verts, lerp, move, frontv, backv );
+	GL_LerpVerts( paliashdr->num_xyz, v, ov, verts, lerp, frontv, backv );
 
 	while (1)
 	{
@@ -224,6 +223,8 @@ void GL_DrawAliasFrameLerp (mmdl_t *paliashdr, float backlerp)
 		sceGumDrawArray(prim, GU_TEXTURE_32BITF | GU_COLOR_8888 | GU_VERTEX_32BITF | GU_TRANSFORM_3D, count, NULL, vertices);
 	}
 
+//	if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE ) )
+	// PMM - added double damage shell
 	if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM) )
 		sceGuEnable(GU_TEXTURE_2D);
 }
@@ -701,9 +702,8 @@ void R_DrawAliasModel (entity_t *e)
 				skin = currentmodel->skins[0];
 		}
 	}
-#ifndef PSP
+
 	GL_Bind(skin);
-#endif
 
 	// draw it
 
