@@ -133,17 +133,11 @@ void GL_DrawAliasFrameLerp (mmdl_t *paliashdr, float backlerp)
 	move[2] = DotProduct (delta, vectors[2]);	// up
 
 	VectorAdd (move, oldframe->translate, move);
+	VectorScale (move, backlerp, move);
+	VectorMA(move, frontlerp, frame->translate, move);
 
-	for (i=0 ; i<3 ; i++)
-	{
-		move[i] = backlerp*move[i] + frontlerp*frame->translate[i];
-	}
-
-	for (i=0 ; i<3 ; i++)
-	{
-		frontv[i] = frontlerp*frame->scale[i];
-		backv[i] = backlerp*oldframe->scale[i];
-	}
+	VectorScale(frame->scale, frontlerp, frontv);
+	VectorScale(oldframe->scale, backlerp, backv);
 
 	lerp = s_lerped[0];
 
