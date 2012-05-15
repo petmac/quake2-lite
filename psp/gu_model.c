@@ -48,7 +48,7 @@ mleaf_t *Mod_PointInLeaf (vec3_t p, model_t *model)
 	mnode_t		*node;
 	float		d;
 	cplane_t	*plane;
-	
+
 	if (!model || !model->nodes)
 		ri.Sys_Error (ERR_DROP, "Mod_PointInLeaf: bad model");
 
@@ -64,7 +64,7 @@ mleaf_t *Mod_PointInLeaf (vec3_t p, model_t *model)
 		else
 			node = node->children[1];
 	}
-	
+
 	return NULL;	// never reached
 }
 
@@ -101,7 +101,7 @@ byte *Mod_DecompressVis (byte *in, model_t *model)
 			*out++ = *in++;
 			continue;
 		}
-	
+
 		c = in[1];
 		in += 2;
 		while (c)
@@ -110,7 +110,7 @@ byte *Mod_DecompressVis (byte *in, model_t *model)
 			c--;
 		}
 	} while (out - decompressed < row);
-	
+
 	return decompressed;
 }
 
@@ -180,10 +180,10 @@ model_t *Mod_ForName (char *name, qboolean crash)
 	long base;
 	int type;
 	char *extradata;
-	
+
 	if (!name[0])
 		ri.Sys_Error (ERR_DROP, "Mod_ForName: NULL name");
-		
+
 	//
 	// inline models are grabbed only from worldmodel
 	//
@@ -205,7 +205,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 		if (!strcmp (mod->name, name) )
 			return mod;
 	}
-	
+
 	//
 	// find a free model slot spot
 	//
@@ -221,7 +221,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 		mod_numknown++;
 	}
 	strcpy (mod->name, name);
-	
+
 	//
 	// load the file
 	//
@@ -233,7 +233,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 		memset (mod->name, 0, sizeof(mod->name));
 		return NULL;
 	}
-	
+
 	loadmodel = mod;
 	extradata = Hunk_Alloc(&hunk_ref, 0);
 
@@ -245,7 +245,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 
 	// call the apropriate loader
 	ri.FS_Read(&type, sizeof(type), file);
-	
+
 	fseek(file, base, SEEK_SET);
 
 	switch (LittleLong(type))
@@ -253,11 +253,11 @@ model_t *Mod_ForName (char *name, qboolean crash)
 	case IDALIASHEADER:
 		Mod_LoadAliasModel (mod, file, base);
 		break;
-		
+
 	case IDSPRITEHEADER:
 		{
 			void *buf;
-			
+
 			buf = Z_Malloc(modfilelen); // TODO PeterM This is totally wrong.
 			ri.FS_Read(buf, modfilelen, file); // TODO PeterM This is totally wrong.
 
@@ -266,7 +266,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 			Z_Free(buf); // TODO PeterM This is totally wrong.
 		}
 		break;
-	
+
 	case IDBSPHEADER:
 		Mod_LoadBrushModel (mod, file, base);
 		break;
@@ -286,7 +286,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 /*
 ===============================================================================
 
-					BRUSHMODEL LOADING
+BRUSHMODEL LOADING
 
 ===============================================================================
 */
@@ -494,7 +494,7 @@ void Mod_LoadTexinfo (lump_t *l, FILE *file, long base)
 		if (next > 0)
 			out->next = loadmodel->texinfo + next;
 		else
-		    out->next = NULL;
+			out->next = NULL;
 		Com_sprintf (name, sizeof(name), "textures/%s.wal", in.texture);
 
 		out->image = GL_FindImage (name, it_wall);
@@ -533,7 +533,7 @@ void CalcSurfaceExtents (msurface_t *s)
 	maxs[0] = maxs[1] = -99999;
 
 	tex = s->texinfo;
-	
+
 	for (i=0 ; i<s->numedges ; i++)
 	{
 		e = loadmodel->surfedges[s->firstedge+i];
@@ -541,7 +541,7 @@ void CalcSurfaceExtents (msurface_t *s)
 			v = &loadmodel->vertexes[loadmodel->edges[e].v[0]];
 		else
 			v = &loadmodel->vertexes[loadmodel->edges[-e].v[1]];
-		
+
 		for (j=0 ; j<2 ; j++)
 		{
 			val = v->position[0] * tex->vecs[j][0] + 
@@ -563,8 +563,8 @@ void CalcSurfaceExtents (msurface_t *s)
 		s->texturemins[i] = bmins[i] * 16;
 		s->extents[i] = (bmaxs[i] - bmins[i]) * 16;
 
-//		if ( !(tex->flags & TEX_SPECIAL) && s->extents[i] > 512 /* 256 */ )
-//			ri.Sys_Error (ERR_DROP, "Bad surface extents");
+		//		if ( !(tex->flags & TEX_SPECIAL) && s->extents[i] > 512 /* 256 */ )
+		//			ri.Sys_Error (ERR_DROP, "Bad surface extents");
 	}
 }
 
@@ -623,8 +623,8 @@ void Mod_LoadFaces (lump_t *l, FILE *file, long base)
 		out->texinfo = loadmodel->texinfo + ti;
 
 		CalcSurfaceExtents (out);
-				
-	// lighting info
+
+		// lighting info
 
 		for (i=0 ; i<MAXLIGHTMAPS ; i++)
 			out->styles[i] = in.styles[i];
@@ -633,9 +633,9 @@ void Mod_LoadFaces (lump_t *l, FILE *file, long base)
 			out->samples = NULL;
 		else
 			out->samples = loadmodel->lightdata + i;
-		
-	// set the drawing flags
-		
+
+		// set the drawing flags
+
 		if (out->texinfo->flags & SURF_WARP)
 		{
 			out->flags |= SURF_DRAWTURB;
@@ -704,7 +704,7 @@ void Mod_LoadNodes (lump_t *l, FILE *file, long base)
 			out->minmaxs[j] = LittleShort (in.mins[j]);
 			out->minmaxs[3+j] = LittleShort (in.maxs[j]);
 		}
-	
+
 		p = LittleLong(in.planenum);
 		out->plane = loadmodel->planes + p;
 
@@ -721,7 +721,7 @@ void Mod_LoadNodes (lump_t *l, FILE *file, long base)
 				out->children[j] = (mnode_t *)(loadmodel->leafs + (-1 - p));
 		}
 	}
-	
+
 	Mod_SetParent (loadmodel->nodes, NULL);	// sets nodes and leafs
 }
 
@@ -735,7 +735,7 @@ void Mod_LoadLeafs (lump_t *l, FILE *file, long base)
 	dleaf_t 	in;
 	mleaf_t 	*out;
 	int			i, j, count, p;
-//	glpoly_t	*poly;
+	//	glpoly_t	*poly;
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
@@ -766,7 +766,7 @@ void Mod_LoadLeafs (lump_t *l, FILE *file, long base)
 		out->firstmarksurface = loadmodel->marksurfaces +
 			LittleShort(in.firstleafface);
 		out->nummarksurfaces = LittleShort(in.numleaffaces);
-		
+
 		// gl underwater warp
 #if 0
 		if (out->contents & (CONTENTS_WATER|CONTENTS_SLIME|CONTENTS_LAVA|CONTENTS_THINWATER) )
@@ -794,7 +794,7 @@ void Mod_LoadMarksurfaces (lump_t *l, FILE *file, long base)
 	msurface_t **out;
 
 	fseek(file, base + l->fileofs, SEEK_SET);
-	
+
 	if (l->filelen % sizeof(in))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(in);
@@ -825,7 +825,7 @@ void Mod_LoadSurfedges (lump_t *l, FILE *file, long base)
 	int		in, *out;
 
 	fseek(file, base + l->fileofs, SEEK_SET);
-	
+
 	if (l->filelen % sizeof(in))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(in);
@@ -860,12 +860,12 @@ void Mod_LoadPlanes (lump_t *l, FILE *file, long base)
 	int			count;
 
 	fseek(file, base + l->fileofs, SEEK_SET);
-	
+
 	if (l->filelen % sizeof(in))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(in);
 	out = Hunk_Alloc (&hunk_ref, count*2*sizeof(*out));	
-	
+
 	loadmodel->planes = out;
 	loadmodel->numplanes = count;
 
@@ -892,7 +892,7 @@ void Mod_LoadBrushModel (model_t *mod, FILE *file, long base)
 	int			i;
 	dheader_t	header;
 	mmodel_t 	*bm;
-	
+
 	loadmodel->type = mod_brush;
 	if (loadmodel != mod_known)
 		ri.Sys_Error (ERR_DROP, "Loaded a brush model after the world");
@@ -903,13 +903,13 @@ void Mod_LoadBrushModel (model_t *mod, FILE *file, long base)
 	if (i != BSPVERSION)
 		ri.Sys_Error (ERR_DROP, "Mod_LoadBrushModel: %s has wrong version number (%i should be %i)", mod->name, i, BSPVERSION);
 
-// swap all the lumps
+	// swap all the lumps
 
 	for (i=0 ; i<sizeof(dheader_t)/4 ; i++)
 		((int *)&header)[i] = LittleLong ( ((int *)&header)[i]);
 
-// load into heap
-	
+	// load into heap
+
 	Mod_LoadVertexes (&header.lumps[LUMP_VERTEXES], file, base);
 	Mod_LoadEdges (&header.lumps[LUMP_EDGES], file, base);
 	Mod_LoadSurfedges (&header.lumps[LUMP_SURFEDGES], file, base);
@@ -923,10 +923,10 @@ void Mod_LoadBrushModel (model_t *mod, FILE *file, long base)
 	Mod_LoadNodes (&header.lumps[LUMP_NODES], file, base);
 	Mod_LoadSubmodels (&header.lumps[LUMP_MODELS], file, base);
 	mod->numframes = 2;		// regular and alternate animation
-	
-//
-// set up the submodels
-//
+
+	//
+	// set up the submodels
+	//
 	for (i=0 ; i<mod->numsubmodels ; i++)
 	{
 		model_t	*starmod;
@@ -935,7 +935,7 @@ void Mod_LoadBrushModel (model_t *mod, FILE *file, long base)
 		starmod = &mod_inline[i];
 
 		*starmod = *loadmodel;
-		
+
 		starmod->firstmodelsurface = bm->firstface;
 		starmod->nummodelsurfaces = bm->numfaces;
 		starmod->firstnode = bm->headnode;
@@ -945,7 +945,7 @@ void Mod_LoadBrushModel (model_t *mod, FILE *file, long base)
 		VectorCopy (bm->maxs, starmod->maxs);
 		VectorCopy (bm->mins, starmod->mins);
 		starmod->radius = bm->radius;
-	
+
 		if (i == 0)
 			*loadmodel = *starmod;
 
@@ -973,20 +973,14 @@ void Mod_LoadAliasModel (model_t *mod, FILE *file, long base)
 	mmdl_t			*pheader;
 	daliasframe_t	*poutframe;
 	int				*poutcmd;
-	int				version;
 
 	ri.FS_Read(&inmodel, sizeof(inmodel), file);
 
-	version = LittleLong (inmodel.version);
-	if (version != ALIAS_VERSION)
+	if (inmodel.version != ALIAS_VERSION)
 		ri.Sys_Error (ERR_DROP, "%s has wrong version number (%i should be %i)",
-				 mod->name, version, ALIAS_VERSION);
+		mod->name, inmodel.version, ALIAS_VERSION);
 
 	pheader = &mod->alias;
-
-	// byte swap the header fields and sanity check
-	for (i=0 ; i<sizeof(inmodel)/4 ; i++)
-		((int *)&inmodel)[i] = LittleLong (((int *)&inmodel)[i]);
 
 	pheader->framesize = inmodel.framesize;
 	pheader->num_xyz = inmodel.num_xyz;
@@ -1006,25 +1000,15 @@ void Mod_LoadAliasModel (model_t *mod, FILE *file, long base)
 	if (pheader->num_frames <= 0)
 		ri.Sys_Error (ERR_DROP, "model %s has no frames", mod->name);
 
-//
-// load the frames
-//
+	mod->type = mod_alias;
+
+	//
+	// load the frames
+	//
 	pheader->frames = Hunk_Alloc(&hunk_ref, pheader->num_frames * pheader->framesize);
 
 	fseek(file, base + inmodel.ofs_frames, SEEK_SET);
 	ri.FS_Read(pheader->frames, pheader->num_frames * pheader->framesize, file);
-
-	for (i=0 ; i<pheader->num_frames ; i++)
-	{
-
-		poutframe = (daliasframe_t *) (pheader->frames + i * pheader->framesize);
-
-		for (j=0 ; j<3 ; j++)
-		{
-			poutframe->scale[j] = LittleFloat (poutframe->scale[j]);
-			poutframe->translate[j] = LittleFloat (poutframe->translate[j]);
-		}
-	}
 
 	mod->type = mod_alias;
 
@@ -1036,12 +1020,6 @@ void Mod_LoadAliasModel (model_t *mod, FILE *file, long base)
 
 	fseek(file, base + inmodel.ofs_glcmds, SEEK_SET);
 	ri.FS_Read(pheader->glcmds, pheader->num_glcmds * sizeof(int), file);
-
-	poutcmd = pheader->glcmds;
-	for (i=0 ; i<pheader->num_glcmds ; i++)
-	{
-		poutcmd[i] = LittleLong (poutcmd[i]);
-	}
 
 	// register all skins
 	fseek(file, base + inmodel.ofs_skins, SEEK_SET);
@@ -1094,11 +1072,11 @@ void Mod_LoadSpriteModel (model_t *mod, void *buffer)
 
 	if (sprout->version != SPRITE_VERSION)
 		ri.Sys_Error (ERR_DROP, "%s has wrong version number (%i should be %i)",
-				 mod->name, sprout->version, SPRITE_VERSION);
+		mod->name, sprout->version, SPRITE_VERSION);
 
 	if (sprout->numframes > MAX_MD2SKINS)
 		ri.Sys_Error (ERR_DROP, "%s has too many frames (%i > %i)",
-				 mod->name, sprout->numframes, MAX_MD2SKINS);
+		mod->name, sprout->numframes, MAX_MD2SKINS);
 
 	// byte swap everything
 	for (i=0 ; i<sprout->numframes ; i++)
@@ -1134,13 +1112,13 @@ void R_BeginRegistration (char *model)
 	r_oldviewcluster = -1;		// force markleafs
 
 	Com_sprintf (fullname, sizeof(fullname), "maps/%s.bsp", model);
-	
+
 	Mod_FreeAll ();
 
 	GL_FreeImages();
 
 	Hunk_Begin (&hunk_ref);
-	
+
 	Draw_InitLocal ();
 
 	r_worldmodel = Mod_ForName(fullname, true);

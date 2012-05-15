@@ -124,7 +124,7 @@ PCX LOADING
 LoadPCX
 ==============
 */
-static void LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *height)
+static void LoadPCX (char *filename, byte **pic, byte **palette, short *width, short *height)
 {
 	byte	*raw;
 	pcx_t	*pcx;
@@ -620,7 +620,7 @@ static u32 next_power_of_two(u32 x)
 	return x;
 }
 
-image_t *GL_Upload (image_t *image, byte *pic)
+static void GL_UploadPic (image_t *image, byte *pic)
 {
 	// Calculate buffer size.
 	if (image->width <= 16)
@@ -632,10 +632,6 @@ image_t *GL_Upload (image_t *image, byte *pic)
 		image->buffer_width = next_power_of_two(image->width);
 	}
 	image->buffer_height = next_power_of_two(image->height);
-
-#if 0
-	ri.Con_Printf(PRINT_DEVELOPER, "GL_Upload: %s ... %d x %d (%d x %d), %d bytes.\n", name, width, height, buffer_width, buffer_height, (buffer_width * buffer_height));
-#endif
 
 	image->data = Hunk_AllocAllowFail(&hunk_ref, image->buffer_width * image->height);
 	if (image->data != NULL)
@@ -649,25 +645,104 @@ image_t *GL_Upload (image_t *image, byte *pic)
 			memcpy(dst, src, image->width);
 		}
 
-		sceKernelDcacheWritebackAll();
+		sceKernelDcacheWritebackRange(image->data, image->buffer_width * image->height);
 	}
+
+#if 0
+	ri.Con_Printf(
+		PRINT_DEVELOPER,
+		"GL_Upload: %s ... %d x %d (%d x %d), %d bytes.\n",
+		name,
+		width,
+		height,
+		buffer_width,
+		buffer_height,
+		(buffer_width * height));
+#endif
 }
 
+static void GL_UploadSkin (image_t *image, byte *pic)
+{
+	int bufw;
+	int bufh;
+
+	// Calculate buffer size.
+	if (image->width <= 16)
+	{
+		bufw = 16;
+	}
+	else
+	{
+		bufw = 1 << Q_log2(image->width);
+	}
+	bufh = 1 << Q_log2(image->height);
+
+	image->buffer_width = bufw;
+	image->buffer_height = bufh;
+	image->data = Hunk_AllocAllowFail(&hunk_ref, bufw * bufh);
+	if (image->data != NULL)
+	{
+		const int x_scale = (image->width << 8) / bufw;
+		const int y_scale = (image->height << 8) / bufh;
+		int dst_y;
+
+		for (dst_y = 0; dst_y < bufh; ++dst_y)
+		{
+			const int src_y = (dst_y * y_scale) >> 8;
+			char *const dst = ((char *)(image->data)) + (dst_y * bufw);
+			const char *const src = pic + (src_y * image->width);
+			int dst_x;
+
+			for (dst_x = 0; dst_x < bufw; ++dst_x)
+			{
+				const int src_x = (dst_x * x_scale) >> 8;
+
+				dst[dst_x] = src[src_x];
+			}
+		}
+
+		sceKernelDcacheWritebackRange(image->data, bufw * bufh);
+	}
+
+#if 0
+	ri.Con_Printf(
+		PRINT_DEVELOPER,
+		"GL_Upload: %s ... %d x %d (%d x %d), %d bytes.\n",
+		name,
+		width,
+		height,
+		buffer_width,
+		buffer_height,
+		(buffer_width * height));
+#endif
+}
+
+static void GL_Upload (image_t *image, byte *pic)
+{
+	if (image->type == it_pic)
+	{
+		GL_UploadPic(image, pic);
+	}
+	else
+	{
+		GL_UploadSkin(image, pic);
+	}
+}
 
 /*
 ================
 GL_LoadWal
 ================
 */
-image_t *GL_LoadWal (image_t *image, char *name)
+static image_t *GL_LoadWal (image_t *image)
 {
 	miptex_t	*mt;
 	int			ofs;
 
-	ri.FS_LoadFile (name, (void **)&mt);
+	ri.FS_LoadFile (image->name, (void **)&mt);
 	if (!mt)
 	{
-		ri.Con_Printf (PRINT_ALL, "GL_FindImage: can't load %s\n", name);
+		ri.Con_Printf (PRINT_ALL, "GL_FindImage: can't load %s\n", image->name);
 		return NULL;
 	}
 
@@ -753,7 +828,7 @@ image_t	*GL_FindImage (char *name, imagetype_t type)
 	}
 	else if (!strcmp(ext, ".wal"))
 	{
-		GL_LoadWal (image, image->name);
+		GL_LoadWal (image);
 	}
 	else if (!strcmp(ext, ".tga"))
 	{
@@ -800,7 +875,7 @@ int Draw_GetPalette (void)
 	int		r, g, b;
 	unsigned	v;
 	byte	*pic, *pal;
-	int		width, height;
+	short		width, height;
 
 	// get the palette
 

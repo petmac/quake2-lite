@@ -146,12 +146,12 @@ typedef struct image_s
 	imagetype_t type;
 
 	// Set by GL_LoadPic.
-	int width;
-	int height;
+	short width;
+	short height;
 
 	// Set by GL_Upload.
-	int buffer_width;
-	int buffer_height;
+	short buffer_width;
+	short buffer_height;
 	void *data;						// texture address in VRAM.
 
 	// Set at runtime.
