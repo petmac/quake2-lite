@@ -13,6 +13,7 @@ OBJS = \
 	gu_warp.o \
 	\
 	net_psp.o \
+	snddma_psp.o \
 	sys_psp.o \
 	vid_menu_psp.o \
 	vid_psp.o \
@@ -88,7 +89,6 @@ OBJS = \
 	\
 	../null/cd_null.o \
 	../null/in_null.o \
-	../null/snddma_null.o \
 	\
 	../qcommon/cmd.o \
 	../qcommon/cmodel.o \
@@ -116,7 +116,7 @@ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS = $(CFLAGS)
 
 ;LIBDIR = $(PSPSDK)/lib
-LIBS = -lm -lpsprtc -lpspgum -lpspgu
+LIBS = -lm -lpsprtc -lpspgum -lpspgu -lpspaudiolib -lpspaudio
 LDFLAGS =
 
 EXTRA_TARGETS = EBOOT.PBP

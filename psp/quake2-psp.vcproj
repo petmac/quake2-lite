@@ -639,6 +639,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\snddma_psp.c"
+				>
+			</File>
+			<File
 				RelativePath=".\symbols.txt"
 				>
 			</File>
@@ -704,10 +708,6 @@
 			</File>
 			<File
 				RelativePath="..\null\in_null.c"
-				>
-			</File>
-			<File
-				RelativePath="..\null\snddma_null.c"
 				>
 			</File>
 		</Filter>
