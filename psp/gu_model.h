@@ -173,8 +173,9 @@ typedef struct mmdl_s
 	int			framesize;		// byte size of each frame
 	int			num_xyz;
 	int			num_tris;
-	int			num_glcmds;		// dwords in strip/fan command list
 	int			num_frames;
+
+	int			num_vertices;
 
 	byte		*frames;
 	int			*glcmds;

@@ -985,7 +985,6 @@ void Mod_LoadAliasModel (model_t *mod, FILE *file, long base)
 	pheader->framesize = inmodel.framesize;
 	pheader->num_xyz = inmodel.num_xyz;
 	pheader->num_tris = inmodel.num_tris;
-	pheader->num_glcmds = inmodel.num_glcmds;
 	pheader->num_frames = inmodel.num_frames;
 
 	if (pheader->num_xyz <= 0)
@@ -1016,10 +1015,32 @@ void Mod_LoadAliasModel (model_t *mod, FILE *file, long base)
 	// load the glcmds
 	//
 
-	pheader->glcmds = Hunk_Alloc(&hunk_ref, pheader->num_glcmds * sizeof(int));
+	pheader->glcmds = Hunk_Alloc(&hunk_ref, inmodel.num_glcmds * sizeof(int));
 
 	fseek(file, base + inmodel.ofs_glcmds, SEEK_SET);
-	ri.FS_Read(pheader->glcmds, pheader->num_glcmds * sizeof(int), file);
+	ri.FS_Read(pheader->glcmds, inmodel.num_glcmds * sizeof(int), file);
+
+	// Count the number of vertices.
+	pheader->num_vertices = 0;
+	poutcmd = pheader->glcmds;
+	while (1)
+	{
+		int count;
+		
+		count = *poutcmd;
+		if (count < 0)
+		{
+			count = -count;
+		}
+		else if (count == 0)
+		{
+			break;
+		}
+		
+		pheader->num_vertices += count;
+
+		poutcmd += ((count * 3) + 1);
+	}
 
 	// register all skins
 	fseek(file, base + inmodel.ofs_skins, SEEK_SET);

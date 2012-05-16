@@ -105,6 +105,8 @@ void GL_DrawAliasFrameLerp (mmdl_t *paliashdr, float backlerp)
 	int		index_xyz;
 	float	*lerp;
 	ScePspFVector3 translation;
+	mtrivertx_t *vertices;
+	mtrivertx_t *vertex;
 
 	frame = (daliasframe_t *)(paliashdr->frames + currententity->frame * paliashdr->framesize);
 	verts = v = frame->verts;
@@ -154,13 +156,15 @@ void GL_DrawAliasFrameLerp (mmdl_t *paliashdr, float backlerp)
 
 	GL_LerpVerts( paliashdr->num_xyz, v, ov, verts, lerp, frontv, backv );
 
+	vertices = sceGuGetMemory(paliashdr->num_vertices * sizeof(mtrivertx_t));
+	vertex = vertices;
+
 	while (1)
 	{
 		int count;
 		int prim;
-		mtrivertx_t *vertices;
+		mtrivertx_t *vertex_begin;
 		mtrivertx_t *vertex_end;
-		mtrivertx_t *vertex;
 
 		// get the vertex count and primitive type
 		count = *order++;
@@ -176,9 +180,8 @@ void GL_DrawAliasFrameLerp (mmdl_t *paliashdr, float backlerp)
 			prim = GU_TRIANGLE_STRIP;
 		}
 
-		vertices = sceGuGetMemory(count * sizeof(mtrivertx_t));
-		vertex_end = vertices + count;
-		vertex = vertices;
+		vertex_begin = vertex;
+		vertex_end = vertex_begin + count;
 
 		if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM ) )
 		{
@@ -220,7 +223,7 @@ void GL_DrawAliasFrameLerp (mmdl_t *paliashdr, float backlerp)
 			} while (vertex != vertex_end);
 		}
 
-		sceGumDrawArray(prim, GU_TEXTURE_32BITF | GU_COLOR_8888 | GU_VERTEX_32BITF | GU_TRANSFORM_3D, count, NULL, vertices);
+		sceGumDrawArray(prim, GU_TEXTURE_32BITF | GU_COLOR_8888 | GU_VERTEX_32BITF | GU_TRANSFORM_3D, count, NULL, vertex_begin);
 	}
 
 //	if ( currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE ) )
