@@ -130,14 +130,20 @@ void	MSG_ReadData (sizebuf_t *sb, void *buffer, int size);
 
 //============================================================================
 
-extern	qboolean		bigendien;
+extern	short	ShortSwap(short l);
+extern	int		LongSwap(int l);
+extern	float	FloatSwap(float l);
 
-extern	short	BigShort (short l);
-extern	short	LittleShort (short l);
-extern	int		BigLong (int l);
-extern	int		LittleLong (int l);
-extern	float	BigFloat (float l);
-extern	float	LittleFloat (float l);
+#if (defined PSP) || (defined _M_IX86)
+#	define LittleShort(l) ((short)(l))
+#	define LittleLong(l) ((int)(l))
+#	define LittleFloat(l) ((float)(l))
+#	define BigShort ShortSwap
+#	define BigLong LongSwap
+#	define BigFloat FloatSwap
+#else
+#	error Unhandled machine.
+#endif
 
 //============================================================================
 

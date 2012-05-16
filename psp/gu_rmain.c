@@ -1246,8 +1246,6 @@ refexport_t GetRefAPI (refimport_t rimp )
 
 	re.AppActivate = R_AppActivate;
 
-	Swap_Init ();
-
 	return re;
 }
 

@@ -195,14 +195,21 @@ int Q_strncasecmp (const char *s1, const char *s2, int n);
 
 //=============================================
 
-short	BigShort(short l);
-short	LittleShort(short l);
-int		BigLong (int l);
-int		LittleLong (int l);
-float	BigFloat (float l);
-float	LittleFloat (float l);
+short	ShortSwap(short l);
+int		LongSwap(int l);
+float	FloatSwap(float l);
 
-void	Swap_Init (void);
+#if (defined PSP) || (defined _M_IX86)
+#	define LittleShort(l) ((short)(l))
+#	define LittleLong(l) ((int)(l))
+#	define LittleFloat(l) ((float)(l))
+#	define BigShort ShortSwap
+#	define BigLong LongSwap
+#	define BigFloat FloatSwap
+#else
+#	error Unhandled machine.
+#endif
+
 char	*va(char *format, ...);
 
 //=============================================
