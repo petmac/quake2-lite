@@ -41,12 +41,8 @@ struct hunk_s
 
 #define GAME_HUNK_CAPACITY (1 * 1024 * 1024)
 #define LEVEL_HUNK_CAPACITY (32 * 1024)
-#define REF_HUNK_CAPACITY (12 * 1024 * 1024)
-#ifdef PSP
-#define SND_HUNK_CAPACITY (1 * 1024 * 1024)
-#else
-#define SND_HUNK_CAPACITY (9 * 1024 * 1024)
-#endif
+#define REF_HUNK_CAPACITY (9 * 1024 * 1024)
+#define SND_HUNK_CAPACITY (5 * 1024 * 1024)
 
 hunk_t hunk_game;
 hunk_t hunk_level;

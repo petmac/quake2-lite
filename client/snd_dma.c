@@ -71,11 +71,8 @@ int			s_beginofs;
 
 cvar_t		*s_volume;
 cvar_t		*s_testsound;
-cvar_t		*s_loadas8bit;
-cvar_t		*s_khz;
 cvar_t		*s_show;
 cvar_t		*s_mixahead;
-cvar_t		*s_primary;
 
 
 int		s_rawend;
@@ -123,12 +120,9 @@ void S_Init (void)
 	else
 	{
 		s_volume = Cvar_Get ("s_volume", "0.7", CVAR_ARCHIVE);
-		s_khz = Cvar_Get ("s_khz", "22", CVAR_ARCHIVE);
-		s_loadas8bit = Cvar_Get ("s_loadas8bit", "0", CVAR_ARCHIVE);
 		s_mixahead = Cvar_Get ("s_mixahead", "0.2", CVAR_ARCHIVE);
 		s_show = Cvar_Get ("s_show", "0", 0);
 		s_testsound = Cvar_Get ("s_testsound", "0", 0);
-		s_primary = Cvar_Get ("s_primary", "0", CVAR_ARCHIVE);	// win32 specific
 
 		Cmd_AddCommand("play", S_Play);
 		Cmd_AddCommand("stopsound", S_StopAllSounds);
@@ -1178,7 +1172,7 @@ void S_SoundList(void)
 		sc = sfx->cache;
 		if (sc)
 		{
-			size = sc->length*sc->width*(sc->stereo+1);
+			size = sc->length*sc->width;
 			total += size;
 			if (sc->loopstart >= 0)
 				Com_Printf ("L");

@@ -31,56 +31,74 @@ byte *S_Alloc (int size);
 ResampleSfx
 ================
 */
-void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, byte *data)
+static void ResampleSfx (sfx_t *sfx, const wavinfo_t *info, byte *data)
 {
-	int		outcount;
-	int		srcsample;
-	float	stepscale;
-	int		i;
-	int		sample, samplefrac, fracstep;
-	sfxcache_t	*sc;
-	
-	sc = sfx->cache;
+	float stepscale;
+	int dst_count;
+	int dst_width;
+	int dst_bytes;
+	sfxcache_t *sc;
+
+	// Calculate output format.
+	stepscale = (float)info->rate / dma.speed;	// this is usually 0.5, 1, or 2
+	dst_count = info->samples / stepscale;
+	dst_width = 1; // Load as 8-bit.
+	dst_bytes = (info->samples / stepscale) * dst_width;
+
+	// Allocate the data.
+	sc = sfx->cache = Hunk_Alloc (&hunk_snd, sizeof(sfxcache_t) + dst_bytes - 1);
 	if (!sc)
+	{
 		return;
+	}
 
-	stepscale = (float)inrate / dma.speed;	// this is usually 0.5, 1, or 2
-
-	outcount = sc->length / stepscale;
-	sc->length = outcount;
-	if (sc->loopstart != -1)
-		sc->loopstart = sc->loopstart / stepscale;
-
-	sc->speed = dma.speed;
-	if (s_loadas8bit->value)
-		sc->width = 1;
+	// Fill in the sound cache data.
+	sc->length = dst_count;
+	if (info->loopstart != -1)
+	{
+		sc->loopstart = info->loopstart / stepscale;
+	}
 	else
-		sc->width = inwidth;
-	sc->stereo = 0;
-
+	{
+		sc->loopstart = info->loopstart;
+	}
+	sc->width = dst_width;
+	
 // resample / decimate to the current source rate
 
-	if (stepscale == 1 && inwidth == 1 && sc->width == 1)
+	if (stepscale == 1 && info->width == 1 && dst_width == 1)
 	{
+		int i;
+
 // fast special case
-		for (i=0 ; i<outcount ; i++)
+		for (i=0 ; i<dst_count ; i++)
 			((signed char *)sc->data)[i]
 			= (int)( (unsigned char)(data[i]) - 128);
 	}
 	else
 	{
+		int samplefrac;
+		int fracstep;
+		int inwidth;
+		int i;
+
 // general case
 		samplefrac = 0;
 		fracstep = stepscale*256;
-		for (i=0 ; i<outcount ; i++)
+		inwidth = info->width;
+
+		for (i=0 ; i<dst_count ; i++)
 		{
+			int srcsample;
+			int sample;
+
 			srcsample = samplefrac >> 8;
 			samplefrac += fracstep;
 			if (inwidth == 2)
 				sample = LittleShort ( ((short *)data)[srcsample] );
 			else
 				sample = (int)( (unsigned char)(data[srcsample]) - 128) << 8;
-			if (sc->width == 2)
+			if (dst_width == 2)
 				((short *)sc->data)[i] = sample;
 			else
 				((signed char *)sc->data)[i] = sample >> 8;
@@ -100,9 +118,6 @@ sfxcache_t *S_LoadSound (sfx_t *s)
     char	namebuffer[MAX_QPATH];
 	byte	*data;
 	wavinfo_t	info;
-	int		len;
-	float	stepscale;
-	sfxcache_t	*sc;
 	int		size;
 	char	*name;
 
@@ -110,9 +125,8 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 		return NULL;
 
 // see if still in memory
-	sc = s->cache;
-	if (sc)
-		return sc;
+	if (s->cache)
+		return s->cache;
 
 //Com_Printf ("S_LoadSound: %x\n", (int)stackbuf);
 // load it in
@@ -144,29 +158,11 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 		return NULL;
 	}
 
-	stepscale = (float)info.rate / dma.speed;	
-	len = info.samples / stepscale;
-
-	len = len * info.width * info.channels;
-
-	sc = s->cache = Hunk_Alloc (&hunk_snd, len + sizeof(sfxcache_t));
-	if (!sc)
-	{
-		FS_FreeFile (data);
-		return NULL;
-	}
-	
-	sc->length = info.samples;
-	sc->loopstart = info.loopstart;
-	sc->speed = info.rate;
-	sc->width = info.width;
-	sc->stereo = info.channels;
-
-	ResampleSfx (s, sc->speed, sc->width, data + info.dataofs);
+	ResampleSfx (s, &info, data + info.dataofs);
 
 	FS_FreeFile (data);
 
-	return sc;
+	return s->cache;
 }
 
 

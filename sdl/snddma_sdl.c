@@ -58,8 +58,8 @@ qboolean SNDDMA_Init(void)
 
 	// Set up the desired audio spec.
 	memset(&desired, 0, sizeof(desired));
-	desired.freq = (s_khz->value * 44100) / 44;
-	desired.format = AUDIO_S16;
+	desired.freq = 22050;
+	desired.format = AUDIO_S16SYS;
 	desired.channels = 2;
 	desired.samples = 512;
 	desired.callback = &Callback;
