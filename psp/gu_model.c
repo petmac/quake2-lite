@@ -331,13 +331,6 @@ void Mod_LoadVisibility (lump_t *l, FILE *file, long base)
 
 	loadmodel->vis = Hunk_Alloc (&hunk_ref, l->filelen);
 	ri.FS_Read (loadmodel->vis, l->filelen, file);
-
-	loadmodel->vis->numclusters = LittleLong (loadmodel->vis->numclusters);
-	for (i=0 ; i<loadmodel->vis->numclusters ; i++)
-	{
-		loadmodel->vis->bitofs[i][0] = LittleLong (loadmodel->vis->bitofs[i][0]);
-		loadmodel->vis->bitofs[i][1] = LittleLong (loadmodel->vis->bitofs[i][1]);
-	}
 }
 
 
@@ -348,28 +341,29 @@ Mod_LoadVertexes
 */
 void Mod_LoadVertexes (lump_t *l, FILE *file, long base)
 {
-	dvertex_t	in;
+	dvertex_t	*in;
 	mvertex_t	*out;
 	int			i, count;
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
-	if (l->filelen % sizeof(in))
+	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
-	count = l->filelen / sizeof(in);
+	count = l->filelen / sizeof(*in);
 	out = Hunk_Alloc (&hunk_ref, count*sizeof(*out));	
 
 	loadmodel->vertexes = out;
 	loadmodel->numvertexes = count;
 
-	for ( i=0 ; i<count ; i++, out++)
+	in = Z_Malloc(l->filelen);
+	ri.FS_Read(in, l->filelen, file);
+	
+	for ( i=0 ; i<count ; i++)
 	{
-		ri.FS_Read(&in, sizeof(in), file);
-
-		out->position[0] = LittleFloat (in.point[0]);
-		out->position[1] = LittleFloat (in.point[1]);
-		out->position[2] = LittleFloat (in.point[2]);
+		VectorCopy(in[i].point, out[i].position);
 	}
+
+	Z_Free(in);
 }
 
 /*
@@ -398,34 +392,34 @@ Mod_LoadSubmodels
 */
 void Mod_LoadSubmodels (lump_t *l, FILE *file, long base)
 {
-	dmodel_t	in;
+	dmodel_t	in[MAX_MAP_MODELS];
 	mmodel_t	*out;
 	int			i, j, count;
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
-	if (l->filelen % sizeof(in))
+	if (l->filelen % sizeof(dmodel_t))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
-	count = l->filelen / sizeof(in);
+	count = l->filelen / sizeof(dmodel_t);
 	out = Hunk_Alloc (&hunk_ref, count*sizeof(*out));	
 
 	loadmodel->submodels = out;
 	loadmodel->numsubmodels = count;
 
+	ri.FS_Read(in, l->filelen, file);
+
 	for ( i=0 ; i<count ; i++, out++)
 	{
-		ri.FS_Read(&in, sizeof(in), file);
-
 		for (j=0 ; j<3 ; j++)
 		{	// spread the mins / maxs by a pixel
-			out->mins[j] = LittleFloat (in.mins[j]) - 1;
-			out->maxs[j] = LittleFloat (in.maxs[j]) + 1;
-			out->origin[j] = LittleFloat (in.origin[j]);
+			out->mins[j] = LittleFloat (in[i].mins[j]) - 1;
+			out->maxs[j] = LittleFloat (in[i].maxs[j]) + 1;
+			out->origin[j] = LittleFloat (in[i].origin[j]);
 		}
 		out->radius = RadiusFromBounds (out->mins, out->maxs);
-		out->headnode = LittleLong (in.headnode);
-		out->firstface = LittleLong (in.firstface);
-		out->numfaces = LittleLong (in.numfaces);
+		out->headnode = LittleLong (in[i].headnode);
+		out->firstface = LittleLong (in[i].firstface);
+		out->numfaces = LittleLong (in[i].numfaces);
 	}
 }
 
@@ -436,27 +430,20 @@ Mod_LoadEdges
 */
 void Mod_LoadEdges (lump_t *l, FILE *file, long base)
 {
-	dedge_t in;
-	medge_t *out;
+	dedge_t *out;
 	int 	i, count;
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
-	if (l->filelen % sizeof(in))
+	if (l->filelen % sizeof(dedge_t))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
-	count = l->filelen / sizeof(in);
-	out = Hunk_Alloc (&hunk_ref, (count + 1) * sizeof(*out));	
+	count = l->filelen / sizeof(dedge_t);
+	out = Hunk_Alloc (&hunk_ref, l->fileofs);	
 
 	loadmodel->edges = out;
 	loadmodel->numedges = count;
 
-	for ( i=0 ; i<count ; i++, out++)
-	{
-		ri.FS_Read(&in, sizeof(in), file);
-
-		out->v[0] = (unsigned short)LittleShort(in.v[0]);
-		out->v[1] = (unsigned short)LittleShort(in.v[1]);
-	}
+	ri.FS_Read(out, l->fileofs, file);
 }
 
 /*
@@ -466,7 +453,7 @@ Mod_LoadTexinfo
 */
 void Mod_LoadTexinfo (lump_t *l, FILE *file, long base)
 {
-	texinfo_t in;
+	texinfo_t in[MAX_MAP_TEXINFO];
 	mtexinfo_t *out, *step;
 	int 	i, j, count;
 	char	name[MAX_QPATH];
@@ -474,28 +461,28 @@ void Mod_LoadTexinfo (lump_t *l, FILE *file, long base)
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
-	if (l->filelen % sizeof(in))
+	if (l->filelen % sizeof(texinfo_t))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
-	count = l->filelen / sizeof(in);
+	count = l->filelen / sizeof(texinfo_t);
 	out = Hunk_Alloc (&hunk_ref, count*sizeof(*out));	
 
 	loadmodel->texinfo = out;
 	loadmodel->numtexinfo = count;
 
+	ri.FS_Read(in, l->filelen, file);
+
 	for ( i=0 ; i<count ; i++, out++)
 	{
-		ri.FS_Read(&in, sizeof(in), file);
-
 		for (j=0 ; j<8 ; j++)
-			out->vecs[0][j] = LittleFloat (in.vecs[0][j]);
+			out->vecs[0][j] = LittleFloat (in[i].vecs[0][j]);
 
-		out->flags = LittleLong (in.flags);
-		next = LittleLong (in.nexttexinfo);
+		out->flags = LittleLong (in[i].flags);
+		next = LittleLong (in[i].nexttexinfo);
 		if (next > 0)
 			out->next = loadmodel->texinfo + next;
 		else
 			out->next = NULL;
-		Com_sprintf (name, sizeof(name), "textures/%s.wal", in.texture);
+		Com_sprintf (name, sizeof(name), "textures/%s.wal", in[i].texture);
 
 		out->image = GL_FindImage (name, it_wall);
 		if (!out->image)
@@ -521,7 +508,7 @@ CalcSurfaceExtents
 Fills in s->texturemins[] and s->extents[]
 ================
 */
-void CalcSurfaceExtents (msurface_t *s)
+static void CalcSurfaceExtents (msurface_t *s)
 {
 	float	mins[2], maxs[2], val;
 	int		i,j, e;
@@ -581,7 +568,7 @@ Mod_LoadFaces
 */
 void Mod_LoadFaces (lump_t *l, FILE *file, long base)
 {
-	dface_t		in;
+	dface_t		*in;
 	msurface_t 	*out;
 	int			i, count, surfnum;
 	int			planenum, side;
@@ -589,9 +576,9 @@ void Mod_LoadFaces (lump_t *l, FILE *file, long base)
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
-	if (l->filelen % sizeof(in))
+	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
-	count = l->filelen / sizeof(in);
+	count = l->filelen / sizeof(*in);
 	out = Hunk_Alloc (&hunk_ref, count*sizeof(*out));	
 
 	loadmodel->surfaces = out;
@@ -599,25 +586,26 @@ void Mod_LoadFaces (lump_t *l, FILE *file, long base)
 
 	currentmodel = loadmodel;
 
+	in = Z_Malloc(l->filelen);
+	ri.FS_Read(in, l->filelen, file);
+
 	GL_BeginBuildingLightmaps (loadmodel);
 
 	for ( surfnum=0 ; surfnum<count ; surfnum++, out++)
 	{
-		ri.FS_Read(&in, sizeof(in), file);
-
-		out->firstedge = LittleLong(in.firstedge);
-		out->numedges = LittleShort(in.numedges);		
+		out->firstedge = LittleLong(in[surfnum].firstedge);
+		out->numedges = LittleShort(in[surfnum].numedges);		
 		out->flags = 0;
 		out->polys = NULL;
 
-		planenum = LittleShort(in.planenum);
-		side = LittleShort(in.side);
+		planenum = LittleShort(in[surfnum].planenum);
+		side = LittleShort(in[surfnum].side);
 		if (side)
 			out->flags |= SURF_PLANEBACK;			
 
 		out->plane = loadmodel->planes + planenum;
 
-		ti = LittleShort (in.texinfo);
+		ti = LittleShort (in[surfnum].texinfo);
 		if (ti < 0 || ti >= loadmodel->numtexinfo)
 			ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: bad texinfo number");
 		out->texinfo = loadmodel->texinfo + ti;
@@ -627,8 +615,8 @@ void Mod_LoadFaces (lump_t *l, FILE *file, long base)
 		// lighting info
 
 		for (i=0 ; i<MAXLIGHTMAPS ; i++)
-			out->styles[i] = in.styles[i];
-		i = LittleLong(in.lightofs);
+			out->styles[i] = in[surfnum].styles[i];
+		i = LittleLong(in[surfnum].lightofs);
 		if (i == -1)
 			out->samples = NULL;
 		else
@@ -657,6 +645,8 @@ void Mod_LoadFaces (lump_t *l, FILE *file, long base)
 	}
 
 	GL_EndBuildingLightmaps ();
+
+	Z_Free(in);
 }
 
 

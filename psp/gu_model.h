@@ -65,12 +65,6 @@ typedef struct
 #define SURF_DRAWBACKGROUND	0x40
 #define SURF_UNDERWATER		0x80
 
-// !!! if this is changed, it must be changed in asm_draw.h too !!!
-typedef struct
-{
-	unsigned short	v[2];
-} medge_t;
-
 typedef struct mtexinfo_s
 {
 	float		vecs[2][4];
@@ -221,7 +215,7 @@ typedef struct model_s
 	mvertex_t	*vertexes;
 
 	int			numedges;
-	medge_t		*edges;
+	dedge_t		*edges;
 
 	int			numnodes;
 	int			firstnode;

@@ -1241,7 +1241,7 @@ GL_BuildPolygonFromSurface
 void GL_BuildPolygonFromSurface(msurface_t *fa)
 {
 	int			i, lindex, lnumverts;
-	medge_t		*pedges, *r_pedge;
+	dedge_t		*pedges, *r_pedge;
 	int			vertpage;
 	float		*vec;
 	float		s, t;
