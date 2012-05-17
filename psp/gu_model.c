@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 model_t	*loadmodel;
 int		modfilelen;
 
-void Mod_LoadSpriteModel (model_t *mod, void *buffer);
+void Mod_LoadSpriteModel (model_t *mod, FILE *file, long base);
 void Mod_LoadBrushModel (model_t *mod, FILE *file, long base);
 void Mod_LoadAliasModel (model_t *mod, FILE *file, long base);
 model_t *Mod_LoadModel (model_t *mod, qboolean crash);
@@ -255,16 +255,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 		break;
 
 	case IDSPRITEHEADER:
-		{
-			void *buf;
-
-			buf = Z_Malloc(modfilelen); // TODO PeterM This is totally wrong.
-			ri.FS_Read(buf, modfilelen, file); // TODO PeterM This is totally wrong.
-
-			Mod_LoadSpriteModel (mod, buf);
-
-			Z_Free(buf); // TODO PeterM This is totally wrong.
-		}
+		Mod_LoadSpriteModel (mod, file, base);
 		break;
 
 	case IDBSPHEADER:
@@ -1073,35 +1064,27 @@ SPRITE MODELS
 Mod_LoadSpriteModel
 =================
 */
-void Mod_LoadSpriteModel (model_t *mod, void *buffer)
+void Mod_LoadSpriteModel (model_t *mod, FILE *file, long base)
 {
-	dsprite_t	*sprin, *sprout;
+	dsprite_t	*sprout;
 	int			i;
 
-	sprin = (dsprite_t *)buffer;
 	sprout = Hunk_Alloc (&hunk_ref, modfilelen);
-	mod->sprite = sprout;
+	ri.FS_Read(sprout, modfilelen, file);
 
-	sprout->ident = LittleLong (sprin->ident);
-	sprout->version = LittleLong (sprin->version);
-	sprout->numframes = LittleLong (sprin->numframes);
+	mod->sprite = sprout;
 
 	if (sprout->version != SPRITE_VERSION)
 		ri.Sys_Error (ERR_DROP, "%s has wrong version number (%i should be %i)",
-		mod->name, sprout->version, SPRITE_VERSION);
+				 mod->name, sprout->version, SPRITE_VERSION);
 
 	if (sprout->numframes > MAX_MD2SKINS)
 		ri.Sys_Error (ERR_DROP, "%s has too many frames (%i > %i)",
-		mod->name, sprout->numframes, MAX_MD2SKINS);
+				 mod->name, sprout->numframes, MAX_MD2SKINS);
 
-	// byte swap everything
+	// load the images.
 	for (i=0 ; i<sprout->numframes ; i++)
 	{
-		sprout->frames[i].width = LittleLong (sprin->frames[i].width);
-		sprout->frames[i].height = LittleLong (sprin->frames[i].height);
-		sprout->frames[i].origin_x = LittleLong (sprin->frames[i].origin_x);
-		sprout->frames[i].origin_y = LittleLong (sprin->frames[i].origin_y);
-		memcpy (sprout->frames[i].name, sprin->frames[i].name, MAX_SKINNAME);
 		mod->skins[i] = GL_FindImage (sprout->frames[i].name,
 			it_sprite);
 	}
