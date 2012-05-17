@@ -41,7 +41,7 @@ struct hunk_s
 
 #define GAME_HUNK_CAPACITY (1 * 1024 * 1024)
 #define LEVEL_HUNK_CAPACITY (32 * 1024)
-#define REF_HUNK_CAPACITY (9 * 1024 * 1024)
+#define REF_HUNK_CAPACITY (10 * 1024 * 1024)
 #define SND_HUNK_CAPACITY (5 * 1024 * 1024)
 
 hunk_t hunk_game;
@@ -50,7 +50,7 @@ hunk_t hunk_ref;
 hunk_t hunk_snd;
 
 #if HUNK_STATS
-#define MAX_HUNK_STATS 16384
+#define MAX_HUNK_STATS 256
 
 typedef struct hunk_stat_s
 {

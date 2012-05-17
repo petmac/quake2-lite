@@ -399,8 +399,10 @@ void Mod_LoadSubmodels (lump_t *l, FILE *file, long base)
 	fseek(file, base + l->fileofs, SEEK_SET);
 
 	if (l->filelen % sizeof(dmodel_t))
-		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
+		ri.Sys_Error (ERR_DROP, "Mod_LoadSubmodels: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(dmodel_t);
+	if (count > MAX_MAP_MODELS)
+		ri.Sys_Error(ERR_DROP, "%s: Too many (%d) in %s", __FUNCTION__, count, loadmodel->name);
 	out = Hunk_Alloc (&hunk_ref, count*sizeof(*out));	
 
 	loadmodel->submodels = out;
@@ -464,6 +466,8 @@ void Mod_LoadTexinfo (lump_t *l, FILE *file, long base)
 	if (l->filelen % sizeof(texinfo_t))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(texinfo_t);
+	if (count > MAX_MAP_TEXINFO)
+		ri.Sys_Error(ERR_DROP, "%s: Too many (%d) in %s", __FUNCTION__, count, loadmodel->name);
 	out = Hunk_Alloc (&hunk_ref, count*sizeof(*out));	
 
 	loadmodel->texinfo = out;
@@ -672,39 +676,43 @@ Mod_LoadNodes
 void Mod_LoadNodes (lump_t *l, FILE *file, long base)
 {
 	int			i, j, count, p;
-	dnode_t		in;
+	dnode_t		in[MAX_MAP_NODES];
 	mnode_t 	*out;
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
-	if (l->filelen % sizeof(in))
+	if (l->filelen % sizeof(dnode_t))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
-	count = l->filelen / sizeof(in);
+	count = l->filelen / sizeof(dnode_t);
+	if (count > MAX_MAP_NODES)
+		ri.Sys_Error(ERR_DROP, "%s: Too many (%d) in %s", __FUNCTION__, count, loadmodel->name);
 	out = Hunk_Alloc (&hunk_ref, count*sizeof(*out));	
 
 	loadmodel->nodes = out;
 	loadmodel->numnodes = count;
 
+	ri.FS_Read(in, l->filelen, file);
+
 	for ( i=0 ; i<count ; i++, out++)
 	{
-		ri.FS_Read(&in, sizeof(in), file);
+		dnode_t *pin = &in[i];
 
 		for (j=0 ; j<3 ; j++)
 		{
-			out->minmaxs[j] = LittleShort (in.mins[j]);
-			out->minmaxs[3+j] = LittleShort (in.maxs[j]);
+			out->minmaxs[j] = LittleShort (pin->mins[j]);
+			out->minmaxs[3+j] = LittleShort (pin->maxs[j]);
 		}
 
-		p = LittleLong(in.planenum);
+		p = LittleLong(pin->planenum);
 		out->plane = loadmodel->planes + p;
 
-		out->firstsurface = LittleShort (in.firstface);
-		out->numsurfaces = LittleShort (in.numfaces);
+		out->firstsurface = LittleShort (pin->firstface);
+		out->numsurfaces = LittleShort (pin->numfaces);
 		out->contents = -1;	// differentiate from leafs
 
 		for (j=0 ; j<2 ; j++)
 		{
-			p = LittleLong (in.children[j]);
+			p = LittleLong (pin->children[j]);
 			if (p >= 0)
 				out->children[j] = loadmodel->nodes + p;
 			else
@@ -722,40 +730,44 @@ Mod_LoadLeafs
 */
 void Mod_LoadLeafs (lump_t *l, FILE *file, long base)
 {
-	dleaf_t 	in;
+	dleaf_t 	in[MAX_MAP_LEAFS];
 	mleaf_t 	*out;
 	int			i, j, count, p;
 	//	glpoly_t	*poly;
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
-	if (l->filelen % sizeof(in))
+	if (l->filelen % sizeof(dleaf_t))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
-	count = l->filelen / sizeof(in);
+	count = l->filelen / sizeof(dleaf_t);
+	if (count > MAX_MAP_LEAFS)
+		ri.Sys_Error(ERR_DROP, "%s: Too many (%d) in %s", __FUNCTION__, count, loadmodel->name);
 	out = Hunk_Alloc (&hunk_ref, count*sizeof(*out));	
 
 	loadmodel->leafs = out;
 	loadmodel->numleafs = count;
 
+	ri.FS_Read(in, l->filelen, file);
+
 	for ( i=0 ; i<count ; i++, out++)
 	{
-		ri.FS_Read(&in, sizeof(in), file);
+		const dleaf_t *const pin = &in[i];
 
 		for (j=0 ; j<3 ; j++)
 		{
-			out->minmaxs[j] = LittleShort (in.mins[j]);
-			out->minmaxs[3+j] = LittleShort (in.maxs[j]);
+			out->minmaxs[j] = LittleShort (pin->mins[j]);
+			out->minmaxs[3+j] = LittleShort (pin->maxs[j]);
 		}
 
-		p = LittleLong(in.contents);
+		p = LittleLong(pin->contents);
 		out->contents = p;
 
-		out->cluster = LittleShort(in.cluster);
-		out->area = LittleShort(in.area);
+		out->cluster = LittleShort(pin->cluster);
+		out->area = LittleShort(pin->area);
 
 		out->firstmarksurface = loadmodel->marksurfaces +
-			LittleShort(in.firstleafface);
-		out->nummarksurfaces = LittleShort(in.numleaffaces);
+			LittleShort(pin->firstleafface);
+		out->nummarksurfaces = LittleShort(pin->numleaffaces);
 
 		// gl underwater warp
 #if 0
@@ -780,28 +792,31 @@ Mod_LoadMarksurfaces
 void Mod_LoadMarksurfaces (lump_t *l, FILE *file, long base)
 {	
 	int		i, j, count;
-	short		in;
+	short		*in;
 	msurface_t **out;
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
-	if (l->filelen % sizeof(in))
+	if (l->filelen % sizeof(short))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
-	count = l->filelen / sizeof(in);
+	count = l->filelen / sizeof(short);
 	out = Hunk_Alloc (&hunk_ref, count*sizeof(*out));	
 
 	loadmodel->marksurfaces = out;
 	loadmodel->nummarksurfaces = count;
 
+	in = Z_Malloc(l->filelen);
+	ri.FS_Read(in, l->filelen, file);
+
 	for ( i=0 ; i<count ; i++)
 	{
-		ri.FS_Read(&in, sizeof(in), file);
-
-		j = LittleShort(in);
+		j = LittleShort(in[i]);
 		if (j < 0 ||  j >= loadmodel->numsurfaces)
 			ri.Sys_Error (ERR_DROP, "Mod_ParseMarksurfaces: bad surface number");
 		out[i] = loadmodel->surfaces + j;
 	}
+
+	Z_Free(in);
 }
 
 /*
@@ -812,28 +827,20 @@ Mod_LoadSurfedges
 void Mod_LoadSurfedges (lump_t *l, FILE *file, long base)
 {	
 	int		i, count;
-	int		in, *out;
+	int		*out;
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
-	if (l->filelen % sizeof(in))
+	if (l->filelen % sizeof(int))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
-	count = l->filelen / sizeof(in);
-	if (count < 1 || count >= MAX_MAP_SURFEDGES)
-		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: bad surfedges count in %s: %i",
-		loadmodel->name, count);
+	count = l->filelen / sizeof(int);
 
-	out = Hunk_Alloc (&hunk_ref, count*sizeof(*out));	
+	out = Hunk_Alloc (&hunk_ref, l->filelen);	
 
 	loadmodel->surfedges = out;
 	loadmodel->numsurfedges = count;
 
-	for ( i=0 ; i<count ; i++)
-	{
-		ri.FS_Read(&in, sizeof(in), file);
-
-		out[i] = LittleLong (in);
-	}
+	ri.FS_Read(out, l->filelen, file);
 }
 
 
@@ -846,29 +853,27 @@ void Mod_LoadPlanes (lump_t *l, FILE *file, long base)
 {
 	int			i, j;
 	cplane_t	*out;
-	dplane_t 	in;
+	dplane_t 	in[MAX_MAP_PLANES];
 	int			count;
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
-	if (l->filelen % sizeof(in))
+	if (l->filelen % sizeof(dplane_t))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
-	count = l->filelen / sizeof(in);
-	out = Hunk_Alloc (&hunk_ref, count*2*sizeof(*out));	
+	count = l->filelen / sizeof(dplane_t);
+	if (count > MAX_MAP_PLANES)
+		ri.Sys_Error(ERR_DROP, "%s: Too many (%d) in %s", __FUNCTION__, count, loadmodel->name);
+	out = Hunk_Alloc (&hunk_ref, count * sizeof(*out));	
 
 	loadmodel->planes = out;
 	loadmodel->numplanes = count;
 
+	ri.FS_Read(in, l->filelen, file);
+
 	for ( i=0 ; i<count ; i++, out++)
 	{
-		ri.FS_Read(&in, sizeof(in), file);
-
-		for (j=0 ; j<3 ; j++)
-		{
-			out->normal[j] = LittleFloat (in.normal[j]);
-		}
-
-		out->dist = LittleFloat (in.dist);
+		VectorCopy(in[i].normal, out->normal);
+		out->dist = LittleFloat (in[i].dist);
 	}
 }
 

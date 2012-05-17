@@ -234,7 +234,6 @@ typedef struct miptex_s
 #define	MAX_MAP_BRUSHSIDES	32768
 #define	MAX_MAP_LEAFS		8192
 #define	MAX_MAP_LEAFBRUSHES 16384
-#define	MAX_MAP_SURFEDGES	256000
 #define	MAX_MAP_VISIBILITY	(256 * 1024)
 
 // key / value pair sizes

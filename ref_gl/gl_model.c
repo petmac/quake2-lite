@@ -832,9 +832,6 @@ void Mod_LoadSurfedges (lump_t *l, FILE *file, long base)
 	if (l->filelen % sizeof(in))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(in);
-	if (count < 1 || count >= MAX_MAP_SURFEDGES)
-		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: bad surfedges count in %s: %i",
-		loadmodel->name, count);
 
 	out = Hunk_Alloc (&hunk_ref, count*sizeof(*out));	
 
