@@ -59,7 +59,7 @@ void vectoangles2 (vec3_t value1, vec3_t angles)
 		if (yaw < 0)
 			yaw += 360;
 
-		forward = sqrt (value1[0]*value1[0] + value1[1]*value1[1]);
+		forward = sqrtf (value1[0]*value1[0] + value1[1]*value1[1]);
 		pitch = (atan2(value1[2], forward) * 180 / Q_PI);
 		if (pitch < 0)
 			pitch += 360;
@@ -465,7 +465,7 @@ void CL_Heatbeam (vec3_t start, vec3_t end)
 //	for (i=0 ; i<len ; i++)
 	for (i=0 ; i<len ; i+=step)
 	{
-		d = i * 0.1f - fmod(ltime,16.0)*Q_PI;
+		d = i * 0.1f - fmodf(ltime,16.0)*Q_PI;
 		c = cosf(d)/1.75;
 		s = sinf(d)/1.75;
 #ifdef DOUBLE_SCREW		
@@ -557,7 +557,7 @@ void CL_Heatbeam (vec3_t start, vec3_t forward)
 	// otherwise assume SOFT
 
 	ltime = (float) cl.time/1000.0;
-	start_pt = fmod(ltime*96.0,step);
+	start_pt = fmodf(ltime*96.0,step);
 	VectorMA (move, start_pt, vec, move);
 
 	VectorScale (vec, step, vec);
@@ -582,7 +582,7 @@ void CL_Heatbeam (vec3_t start, vec3_t forward)
 			
 			p->time = cl.time;
 			VectorClear (p->accel);
-//			rot+= fmod(ltime, 12.0)*Q_PI;
+//			rot+= fmodf(ltime, 12.0)*Q_PI;
 //			c = cosf(rot)/2.0;
 //			s = sinf(rot)/2.0;
 //			variance = 0.4f + ((float)rand()/(float)RAND_MAX) *0.2f;
@@ -678,7 +678,7 @@ void CL_Heatbeam (vec3_t start, vec3_t end)
 /*
 
 	ltime = (float) cl.time/1000.0;
-	start_pt = fmod(ltime*16.0,step);
+	start_pt = fmodf(ltime*16.0,step);
 	VectorMA (move, start_pt, vec, move);
 
 	VectorScale (vec, step, vec);
@@ -702,7 +702,7 @@ void CL_Heatbeam (vec3_t start, vec3_t end)
 			
 			p->time = cl.time;
 			VectorClear (p->accel);
-//			rot+= fmod(ltime, 12.0)*Q_PI;
+//			rot+= fmodf(ltime, 12.0)*Q_PI;
 //			c = cosf(rot)/2.0;
 //			s = sinf(rot)/2.0;
 			c = cosf(rot)/1.5;

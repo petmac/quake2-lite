@@ -1473,7 +1473,7 @@ void	GL_InitImages (void)
 		{
 			float inf;
 
-			inf = 255 * pow ( (i+0.5)/255.5 , g ) + 0.5;
+			inf = 255 * powf ( (i+0.5)/255.5 , g ) + 0.5;
 			if (inf < 0)
 				inf = 0;
 			if (inf > 255)
