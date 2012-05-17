@@ -124,7 +124,7 @@ char *Sys_ConsoleInput (void)
 
 void	Sys_ConsoleOutput (char *string)
 {
-#if 1
+#if 0
 	FILE *file = NULL;
 
 	file = fopen("log.txt", "a");
