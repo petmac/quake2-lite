@@ -710,18 +710,15 @@ void R_DrawAliasModel (entity_t *e)
 
 	// draw it
 
-#ifndef PSP
-	qglShadeModel (GL_SMOOTH);
-
-	GL_TexEnv( GU_TFX_MODULATE );
-#endif
 	if ( currententity->flags & RF_TRANSLUCENT )
 	{
-#ifndef PSP
-		qglEnable (GU_BLEND);
-#endif
+		sceGuEnable(GU_BLEND);
+		sceGuTexFunc(GU_TFX_MODULATE, GU_TCC_RGBA);
 	}
-
+	else
+	{
+		sceGuTexFunc(GU_TFX_MODULATE, GU_TCC_RGB);
+	}
 
 	if ( (currententity->frame >= paliashdr->num_frames) 
 		|| (currententity->frame < 0) )
@@ -745,10 +742,7 @@ void R_DrawAliasModel (entity_t *e)
 		currententity->backlerp = 0;
 	GL_DrawAliasFrameLerp (paliashdr, currententity->backlerp);
 
-#ifndef PSP
-	GL_TexEnv( GU_TFX_REPLACE );
-	qglShadeModel (GL_FLAT);
-#endif
+	sceGuTexFunc(GU_TFX_REPLACE, GU_TCC_RGBA);
 
 	sceGumPopMatrix();
 
@@ -762,12 +756,12 @@ void R_DrawAliasModel (entity_t *e)
 #endif
 	}
 
-#ifndef PSP
 	if ( currententity->flags & RF_TRANSLUCENT )
 	{
-		qglDisable (GU_BLEND);
+		sceGuDisable(GU_BLEND);
 	}
 
+#ifndef PSP
 	if (currententity->flags & RF_DEPTHHACK)
 		qglDepthRange (gldepthmin, gldepthmax);
 
