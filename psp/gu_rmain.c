@@ -77,7 +77,6 @@ cvar_t	*r_lightlevel;	// FIXME: This is a HACK to get the client's light level
 cvar_t	*gl_lightmap;
 cvar_t	*gl_shadows;
 cvar_t	*gl_dynamic;
-cvar_t  *gl_monolightmap;
 cvar_t	*gl_modulate;
 cvar_t	*gl_picmip;
 cvar_t	*gl_skymip;
@@ -87,7 +86,6 @@ cvar_t	*gl_cull;
 cvar_t	*gl_polyblend;
 cvar_t	*gl_flashblend;
 cvar_t	*gl_playermip;
-cvar_t  *gl_saturatelighting;
 cvar_t	*gl_lockpvs;
 
 /*
@@ -909,10 +907,7 @@ void R_Register( void )
 	gl_polyblend = ri.Cvar_Get ("gl_polyblend", "1", 0);
 	gl_flashblend = ri.Cvar_Get ("gl_flashblend", "0", 0);
 	gl_playermip = ri.Cvar_Get ("gl_playermip", "0", 0);
-	gl_monolightmap = ri.Cvar_Get( "gl_monolightmap", "0", 0 );
 	gl_lockpvs = ri.Cvar_Get( "gl_lockpvs", "0", 0 );
-
-	gl_saturatelighting = ri.Cvar_Get( "gl_saturatelighting", "0", 0 );
 
 	ri.Cmd_AddCommand( "imagelist", GL_ImageList_f );
 	ri.Cmd_AddCommand( "screenshot", GL_ScreenShot_f );
@@ -962,25 +957,6 @@ int R_Init( void *hinstance, void *hWnd )
 	sceGuDisplay(GU_TRUE);
 
 	ri.Vid_MenuInit();
-
-#ifndef PSP
-	if ( toupper( gl_monolightmap->string[1] ) != 'F' )
-	{
-		if ( gl_config.renderer == GL_RENDERER_PERMEDIA2 )
-		{
-			ri.Cvar_Set( "gl_monolightmap", "A" );
-			ri.Con_Printf( PRINT_ALL, "...using gl_monolightmap 'a'\n" );
-		}
-		else if ( gl_config.renderer & GL_RENDERER_POWERVR ) 
-		{
-			ri.Cvar_Set( "gl_monolightmap", "0" );
-		}
-		else
-		{
-			ri.Cvar_Set( "gl_monolightmap", "0" );
-		}
-	}
-#endif
 
 #ifndef PSP
 	// power vr can't have anything stay in the framebuffer, so

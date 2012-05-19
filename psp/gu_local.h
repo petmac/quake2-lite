@@ -235,7 +235,6 @@ extern	cvar_t	*r_lightlevel;	// FIXME: This is a HACK to get the client's light 
 extern	cvar_t	*gl_lightmap;
 extern	cvar_t	*gl_shadows;
 extern	cvar_t	*gl_dynamic;
-extern  cvar_t  *gl_monolightmap;
 extern	cvar_t	*gl_picmip;
 extern	cvar_t	*gl_skymip;
 extern	cvar_t	*gl_showtris;
@@ -243,10 +242,8 @@ extern	cvar_t	*gl_clear;
 extern	cvar_t	*gl_cull;
 extern	cvar_t	*gl_polyblend;
 extern	cvar_t	*gl_flashblend;
-extern	cvar_t	*gl_lightmaptype;
 extern	cvar_t	*gl_modulate;
 extern	cvar_t	*gl_playermip;
-extern  cvar_t  *gl_saturatelighting;
 extern  cvar_t  *gl_lockpvs;
 
 extern	cvar_t		*intensity;
@@ -343,8 +340,6 @@ typedef struct
 	float inverse_intensity;
 
 	unsigned char *d_16to8table;
-
-	int lightmap_textures;
 
 	const image_t *currenttexture;
 
