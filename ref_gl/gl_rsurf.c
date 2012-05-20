@@ -753,7 +753,7 @@ void R_DrawBrushModel (entity_t *e)
 		VectorAdd (e->origin, currentmodel->maxs, maxs);
 	}
 
-	if (R_CullBox (mins, maxs))
+	if (R_CullBox (mins, maxs) == 2)
 		return;
 
 	qglColor3f (1,1,1);
@@ -800,7 +800,7 @@ e->angles[2] = -e->angles[2];	// stupid quake bug
 R_RecursiveWorldNode
 ================
 */
-void R_RecursiveWorldNode (mnode_t *node)
+static void R_RecursiveWorldNode (mnode_t *node, int cull)
 {
 	int			c, side, sidebit;
 	cplane_t	*plane;
@@ -814,8 +814,12 @@ void R_RecursiveWorldNode (mnode_t *node)
 
 	if (node->visframe != r_visframecount)
 		return;
-	if (R_CullBox (node->minmaxs, node->minmaxs+3))
-		return;
+	if (cull != 1)
+	{
+		cull = R_CullBox (node->minmaxs, node->minmaxs+3);
+		if (cull == 2)
+			return;
+	}
 	
 // if a leaf node, draw stuff
 	if (node->contents != -1)
@@ -863,7 +867,7 @@ void R_RecursiveWorldNode (mnode_t *node)
 	}
 
 // recurse down the children, front side first
-	R_RecursiveWorldNode (node->children[side]);
+	R_RecursiveWorldNode (node->children[side], cull);
 
 	// draw stuff
 	for ( c = node->numsurfaces, surf = r_worldmodel->surfaces + node->firstsurface; c ; c--, surf++)
@@ -873,6 +877,8 @@ void R_RecursiveWorldNode (mnode_t *node)
 
 		if ( (surf->flags & SURF_PLANEBACK) != sidebit )
 			continue;		// wrong side
+
+		surf->cull = cull;
 
 		if (surf->texinfo->flags & SURF_SKY)
 		{	// just adds to visible sky bounds
@@ -895,7 +901,7 @@ void R_RecursiveWorldNode (mnode_t *node)
 	}
 
 	// recurse down the back side
-	R_RecursiveWorldNode (node->children[!side]);
+	R_RecursiveWorldNode (node->children[!side], cull);
 }
 
 
@@ -929,7 +935,7 @@ void R_DrawWorld (void)
 	memset (gl_lms.lightmap_surfaces, 0, sizeof(gl_lms.lightmap_surfaces));
 	R_ClearSkyBox ();
 
-	R_RecursiveWorldNode (r_worldmodel->nodes);
+	R_RecursiveWorldNode (r_worldmodel->nodes, 3);
 
 	/*
 	** theoretically nothing should happen in the next two functions

@@ -139,17 +139,28 @@ R_CullBox
 Returns true if the box is completely outside the frustom
 =================
 */
-qboolean R_CullBox (vec3_t mins, vec3_t maxs)
+int R_CullBox (vec3_t mins, vec3_t maxs)
 {
+	int		result = 1; // Default to "all inside".
 	int		i;
 
 	if (r_nocull->value)
-		return false;
+		return 2;
 
 	for (i=0 ; i<4 ; i++)
-		if ( BOX_ON_PLANE_SIDE(mins, maxs, &frustum[i]) == 2)
-			return true;
-	return false;
+	{
+		const int plane_result = BoxOnPlaneSide(mins, maxs, &frustum[i]);
+		if (plane_result == 2)
+		{
+			return 2;
+		}
+		else if (plane_result == 3)
+		{
+			result = 3;
+		}
+	}
+
+	return result;
 }
 
 
@@ -1002,7 +1013,7 @@ void R_Register( void )
 	gl_showtris = ri.Cvar_Get ("gl_showtris", "0", 0);
 	gl_ztrick = ri.Cvar_Get ("gl_ztrick", "0", 0);
 	gl_finish = ri.Cvar_Get ("gl_finish", "0", CVAR_ARCHIVE);
-	gl_clear = ri.Cvar_Get ("gl_clear", "0", 0);
+	gl_clear = ri.Cvar_Get ("gl_clear", "1", 0);
 	gl_cull = ri.Cvar_Get ("gl_cull", "1", 0);
 	gl_polyblend = ri.Cvar_Get ("gl_polyblend", "1", 0);
 	gl_flashblend = ri.Cvar_Get ("gl_flashblend", "0", 0);
