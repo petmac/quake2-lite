@@ -380,17 +380,16 @@ void R_BlendLightmaps (void)
 	/*
 	** render dynamic lightmaps
 	*/
-#ifndef PSP // gl_dynamic
 	if ( gl_dynamic->value )
 	{
 		LM_InitBlock();
-
-		sceGuTexImage(0, BLOCK_WIDTH, BLOCK_HEIGHT, BLOCK_WIDTH, &lightmap_textures[0][0]);
 
 		if (currentmodel == r_worldmodel)
 			c_visible_lightmaps++;
 
 		newdrawsurf = gl_lms.lightmap_surfaces[0];
+
+		sceGuTexImage(0, BLOCK_WIDTH, BLOCK_HEIGHT, BLOCK_WIDTH, &lightmap_textures[0][0]);
 
 		for ( surf = gl_lms.lightmap_surfaces[0]; surf != 0; surf = surf->lightmapchain )
 		{
@@ -411,8 +410,15 @@ void R_BlendLightmaps (void)
 			{
 				msurface_t *drawsurf;
 
+				// Finish drawing.
+				// TODO Is this right?
+				sceGuSync(GU_SYNC_DONE, GU_SYNC_WHAT_DONE);
+
 				// upload what we have so far
 				LM_UploadBlock( true );
+
+				// Flush texture cache.
+				sceGuTexFlush();
 
 				// draw all surfaces that use this lightmap
 				for ( drawsurf = newdrawsurf; drawsurf != surf; drawsurf = drawsurf->lightmapchain )
@@ -453,7 +459,6 @@ void R_BlendLightmaps (void)
 				DrawGLPolyChain( surf->polys, ( surf->light_s - surf->dlight_s ) * ( 1.0 / 128.0 ), ( surf->light_t - surf->dlight_t ) * ( 1.0 / 128.0 ) );
 		}
 	}
-#endif // PSP gl_dynamic
 
 	/*
 	** restore state
@@ -527,12 +532,10 @@ void R_RenderBrushPoly (msurface_t *fa)
 dynamic:
 		if ( gl_dynamic->value )
 		{
-#ifndef PSP // gl_dynamic
 			if (!( fa->texinfo->flags & (SURF_SKY|SURF_TRANS33|SURF_TRANS66|SURF_WARP ) ) )
 			{
 				is_dynamic = true;
 			}
-#endif // PSP gl_dynamic
 		}
 	}
 
