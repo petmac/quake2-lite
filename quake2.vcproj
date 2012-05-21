@@ -661,6 +661,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\qcommon\profiler.c"
+				>
+			</File>
+			<File
 				RelativePath=".\qcommon\qcommon.h"
 				>
 			</File>

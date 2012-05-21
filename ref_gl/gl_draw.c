@@ -175,10 +175,13 @@ void Draw_Pic (int x, int y, char *pic)
 {
 	image_t *gl;
 
+	Prof_Begin(__FUNCTION__);
+
 	gl = Draw_FindPic (pic);
 	if (!gl)
 	{
 		ri.Con_Printf (PRINT_ALL, "Can't find pic: %s\n", pic);
+		Prof_End();
 		return;
 	}
 	if (scrap_dirty)
@@ -201,6 +204,8 @@ void Draw_Pic (int x, int y, char *pic)
 
 	if ( ( ( gl_config.renderer == GL_RENDERER_MCD ) || ( gl_config.renderer & GL_RENDERER_RENDITION ) )  && !gl->has_alpha)
 		qglEnable (GL_ALPHA_TEST);
+
+	Prof_End();
 }
 
 /*

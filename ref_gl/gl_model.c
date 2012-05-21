@@ -1121,6 +1121,8 @@ void R_BeginRegistration (char *model)
 {
 	char	fullname[MAX_QPATH];
 
+	Prof_Begin(__FUNCTION__);
+
 	registration_sequence++;
 	r_oldviewcluster = -1;		// force markleafs
 
@@ -1133,6 +1135,8 @@ void R_BeginRegistration (char *model)
 	r_worldmodel = Mod_ForName(fullname, true);
 
 	r_viewcluster = -1;
+
+	Prof_End();
 }
 
 
@@ -1168,9 +1172,13 @@ R_EndRegistration
 */
 void R_EndRegistration (void)
 {
+	Prof_Begin(__FUNCTION__);
+
 	Hunk_End (&hunk_ref);
 
 	GL_FreeUnusedImages ();
+
+	Prof_End();
 }
 
 

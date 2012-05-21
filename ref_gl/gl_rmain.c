@@ -196,6 +196,8 @@ void R_DrawSpriteModel (entity_t *e)
 	float		*up, *right;
 	dsprite_t		*psprite;
 
+	Prof_Begin(__FUNCTION__);
+
 	// don't even bother culling, because it's just a single
 	// polygon without a surface cache
 
@@ -276,6 +278,8 @@ void R_DrawSpriteModel (entity_t *e)
 		qglDisable( GL_BLEND );
 
 	qglColor4f( 1, 1, 1, 1 );
+
+	Prof_End();
 }
 
 //==================================================================================
@@ -329,6 +333,8 @@ void R_DrawEntitiesOnList (void)
 
 	if (!r_drawentities->value)
 		return;
+
+	Prof_Begin(__FUNCTION__);
 
 	// draw non-transparent first
 	for (i=0 ; i<r_newrefdef.num_entities ; i++)
@@ -408,6 +414,7 @@ void R_DrawEntitiesOnList (void)
 	}
 	qglDepthMask (1);		// back to writing
 
+	Prof_End();
 }
 
 /*
@@ -421,6 +428,8 @@ void GL_DrawParticles( int num_particles, const particle_t particles[], const un
 	vec3_t			up, right;
 	float			scale;
 	byte			color[4];
+
+	Prof_Begin(__FUNCTION__);
 
     GL_Bind(r_particletexture->texnum);
 	qglDepthMask( GL_FALSE );		// no z buffering
@@ -467,6 +476,8 @@ void GL_DrawParticles( int num_particles, const particle_t particles[], const un
 	qglColor4f( 1,1,1,1 );
 	qglDepthMask( 1 );		// back to normal Z buffering
 	GL_TexEnv( GL_REPLACE );
+
+	Prof_End();
 }
 
 /*
@@ -476,6 +487,8 @@ R_DrawParticles
 */
 void R_DrawParticles (void)
 {
+	Prof_Begin(__FUNCTION__);
+
 	if ( gl_ext_pointparameters->value && qglPointParameterfEXT )
 	{
 		int i;
@@ -510,6 +523,8 @@ void R_DrawParticles (void)
 	{
 		GL_DrawParticles( r_newrefdef.num_particles, r_newrefdef.particles, d_8to24table );
 	}
+
+	Prof_End();
 }
 
 /*
@@ -523,6 +538,8 @@ void R_PolyBlend (void)
 		return;
 	if (!v_blend[3])
 		return;
+
+	Prof_Begin(__FUNCTION__);
 
 	qglDisable (GL_ALPHA_TEST);
 	qglEnable (GL_BLEND);
@@ -550,6 +567,8 @@ void R_PolyBlend (void)
 	qglEnable (GL_ALPHA_TEST);
 
 	qglColor4f(1,1,1,1);
+
+	Prof_End();
 }
 
 //=======================================================================
@@ -620,6 +639,8 @@ void R_SetupFrame (void)
 	int i;
 	mleaf_t	*leaf;
 
+	Prof_Begin(__FUNCTION__);
+
 	r_framecount++;
 
 // build the transformation matrix for the given view angles
@@ -676,6 +697,8 @@ void R_SetupFrame (void)
 		qglClearColor( 1, 0, 0.5, 0.5 );
 		qglDisable( GL_SCISSOR_TEST );
 	}
+
+	Prof_End();
 }
 
 
@@ -683,6 +706,8 @@ void MYgluPerspective( GLdouble fovy, GLdouble aspect,
 		     GLdouble zNear, GLdouble zFar )
 {
    GLdouble xmin, xmax, ymin, ymax;
+
+	Prof_Begin(__FUNCTION__);
 
    ymax = zNear * tanf( fovy * Q_PI / 360.0 );
    ymin = -ymax;
@@ -694,6 +719,8 @@ void MYgluPerspective( GLdouble fovy, GLdouble aspect,
    xmax += -( 2 * gl_state.camera_separation ) / zNear;
 
    qglFrustum( xmin, xmax, ymin, ymax, zNear, zFar );
+
+   Prof_End();
 }
 
 
@@ -707,6 +734,8 @@ void R_SetupGL (void)
 	float	screenaspect;
 //	float	yfov;
 	int		x, x2, y2, y, w, h;
+
+	Prof_Begin(__FUNCTION__);
 
 	//
 	// set up viewport
@@ -745,7 +774,11 @@ void R_SetupGL (void)
 //	if ( gl_state.camera_separation != 0 && gl_state.stereo_enabled )
 //		qglTranslatef ( gl_state.camera_separation, 0, 0 );
 
+	Prof_Begin(__FUNCTION__ " get world matrix");
+
 	qglGetFloatv (GL_MODELVIEW_MATRIX, r_world_matrix);
+
+	Prof_End();
 
 	//
 	// set drawing parms
@@ -758,6 +791,8 @@ void R_SetupGL (void)
 	qglDisable(GL_BLEND);
 	qglDisable(GL_ALPHA_TEST);
 	qglEnable(GL_DEPTH_TEST);
+
+	Prof_End();
 }
 
 /*
@@ -767,6 +802,8 @@ R_Clear
 */
 void R_Clear (void)
 {
+	Prof_Begin(__FUNCTION__);
+
 	if (gl_ztrick->value)
 	{
 		static int trickframe;
@@ -801,6 +838,7 @@ void R_Clear (void)
 
 	qglDepthRange (gldepthmin, gldepthmax);
 
+	Prof_End();
 }
 
 void R_Flash( void )
@@ -819,6 +857,8 @@ void R_RenderView (refdef_t *fd)
 {
 	if (r_norefresh->value)
 		return;
+
+	Prof_Begin(__FUNCTION__);
 
 	r_newrefdef = *fd;
 
@@ -864,11 +904,15 @@ void R_RenderView (refdef_t *fd)
 			c_visible_textures, 
 			c_visible_lightmaps); 
 	}
+
+	Prof_End();
 }
 
 
 void	R_SetGL2D (void)
 {
+	Prof_Begin(__FUNCTION__);
+
 	// set 2D virtual screen size
 	qglViewport (0,0, vid.width, vid.height);
 	qglMatrixMode(GL_PROJECTION);
@@ -881,6 +925,8 @@ void	R_SetGL2D (void)
 	qglDisable (GL_BLEND);
 	qglEnable (GL_ALPHA_TEST);
 	qglColor4f (1,1,1,1);
+
+	Prof_End();
 }
 
 static void GL_DrawColoredStereoLinePair( float r, float g, float b, float y )
@@ -969,9 +1015,13 @@ R_RenderFrame
 */
 void R_RenderFrame (refdef_t *fd)
 {
+	Prof_Begin(__FUNCTION__);
+
 	R_RenderView( fd );
 	R_SetLightLevel ();
 	R_SetGL2D ();
+
+	Prof_End();
 }
 
 
@@ -1410,6 +1460,7 @@ R_BeginFrame
 */
 void R_BeginFrame( float camera_separation )
 {
+	Prof_Begin(__FUNCTION__);
 
 	gl_state.camera_separation = camera_separation;
 
@@ -1519,6 +1570,8 @@ void R_BeginFrame( float camera_separation )
 	// clear screen if desired
 	//
 	R_Clear ();
+
+	Prof_End();
 }
 
 /*

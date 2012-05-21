@@ -31,8 +31,12 @@ Draw_InitLocal
 */
 void Draw_InitLocal (void)
 {
+	Prof_Begin(__FUNCTION__);
+
 	// load console characters (don't bilerp characters)
 	draw_chars = GL_FindImage ("pics/conchars.pcx", it_pic);
+
+	Prof_End();
 }
 
 
@@ -52,20 +56,21 @@ void Draw_Char (int x, int y, int num)
 	int v;
 	gu_2d_vertex_t *vertices;
 
-	LOG_FUNCTION_ENTRY;
+	Prof_Begin(__FUNCTION__);
+
 	ASSERT(GU_IsInDisplayList());
 
 	// Skip spaces.
 	if ((num & 127) == 32)
 	{
-		LOG_FUNCTION_EXIT;
+		Prof_End();
 		return;
 	}
 
 	// Skip characters off the top of the screen.
 	if (y <= -8)
 	{
-		LOG_FUNCTION_EXIT;
+		Prof_End();
 		return;
 	}
 
@@ -95,7 +100,7 @@ void Draw_Char (int x, int y, int num)
 	// Draw the character.
 	sceGumDrawArray(GU_SPRITES, GU_2D_VERTEX_TYPE, 2, NULL, vertices);
 
-	LOG_FUNCTION_EXIT;
+	Prof_End();
 }
 
 /*
@@ -108,7 +113,7 @@ image_t	*Draw_FindPic (char *name)
 	image_t *gl;
 	char	fullname[MAX_QPATH];
 
-	LOG_FUNCTION_ENTRY;
+	Prof_Begin(__FUNCTION__);
 
 	if (name[0] != '/' && name[0] != '\\')
 	{
@@ -118,7 +123,7 @@ image_t	*Draw_FindPic (char *name)
 	else
 		gl = GL_FindImage (name+1, it_pic);
 
-	LOG_FUNCTION_EXIT;
+	Prof_End();
 
 	return gl;
 }
@@ -132,21 +137,21 @@ void Draw_GetPicSize (int *w, int *h, char *pic)
 {
 	image_t *gl;
 
-	LOG_FUNCTION_ENTRY;
+	Prof_Begin(__FUNCTION__);
 
 	gl = Draw_FindPic (pic);
 	if (!gl)
 	{
 		*w = *h = -1;
 
-		LOG_FUNCTION_EXIT;
+		Prof_End();
 
 		return;
 	}
 	*w = gl->width;
 	*h = gl->height;
 
-	LOG_FUNCTION_EXIT;
+	Prof_End();
 }
 
 /*
@@ -159,7 +164,7 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 	image_t *gl;
 	gu_2d_vertex_t *vertices;
 
-	LOG_FUNCTION_ENTRY;
+	Prof_Begin(__FUNCTION__);
 
 	ASSERT(GU_IsInDisplayList());
 
@@ -193,7 +198,7 @@ void Draw_StretchPic (int x, int y, int w, int h, char *pic)
 		sceGuEnable(GU_TEXTURE_2D);
 	}
 
-	LOG_FUNCTION_EXIT;
+	Prof_End();
 }
 
 
@@ -207,7 +212,7 @@ void Draw_Pic (int x, int y, char *pic)
 	image_t *gl;
 	gu_2d_vertex_t *vertices;
 
-	LOG_FUNCTION_ENTRY;
+	Prof_Begin(__FUNCTION__);
 
 	ASSERT(GU_IsInDisplayList());
 
@@ -241,7 +246,7 @@ void Draw_Pic (int x, int y, char *pic)
 		sceGuEnable(GU_TEXTURE_2D);
 	}
 
-	LOG_FUNCTION_EXIT;
+	Prof_End();
 }
 
 /*
@@ -270,7 +275,7 @@ void Draw_Fill (int x, int y, int w, int h, int c)
 {
 	gu_2d_vertex_t *vertices;
 
-	LOG_FUNCTION_ENTRY;
+	Prof_Begin(__FUNCTION__);
 	ASSERT(GU_IsInDisplayList());
 
 	if ( (unsigned)c > 255)
@@ -300,7 +305,7 @@ void Draw_Fill (int x, int y, int w, int h, int c)
 	sceGuColor(0xffffffff);
 	sceGuEnable(GU_TEXTURE_2D);
 
-	LOG_FUNCTION_EXIT;
+	Prof_End();
 }
 
 //=============================================================================
@@ -313,7 +318,7 @@ Draw_FadeScreen
 */
 void Draw_FadeScreen (void)
 {
-	LOG_FUNCTION_ENTRY;
+	Prof_Begin(__FUNCTION__);
 
 #ifndef PSP
 	qglEnable (GU_BLEND);
@@ -332,7 +337,7 @@ void Draw_FadeScreen (void)
 	qglDisable (GU_BLEND);
 #endif
 
-	LOG_FUNCTION_EXIT;
+	Prof_End();
 }
 
 
@@ -353,7 +358,7 @@ void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 	int dst_row;
 	int src_row;
 
-	LOG_FUNCTION_ENTRY;
+	Prof_Begin(__FUNCTION__);
 
 	// Finish up any previous drawing commands.
 	GU_FinishDisplayList();
@@ -391,5 +396,5 @@ void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 	// Start a new display list.
 	GU_StartDisplayList();
 
-	LOG_FUNCTION_EXIT;
+	Prof_End();
 }

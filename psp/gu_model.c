@@ -181,6 +181,8 @@ model_t *Mod_ForName (char *name, qboolean crash)
 	int type;
 	char *extradata;
 
+	Prof_Begin(__FUNCTION__);
+
 	if (!name[0])
 		ri.Sys_Error (ERR_DROP, "Mod_ForName: NULL name");
 
@@ -192,6 +194,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 		i = atoi(name+1);
 		if (i < 1 || !r_worldmodel || i >= r_worldmodel->numsubmodels)
 			ri.Sys_Error (ERR_DROP, "bad inline model number");
+		Prof_End();
 		return &mod_inline[i];
 	}
 
@@ -203,7 +206,10 @@ model_t *Mod_ForName (char *name, qboolean crash)
 		if (!mod->name[0])
 			continue;
 		if (!strcmp (mod->name, name) )
+		{
+			Prof_End();
 			return mod;
+		}
 	}
 
 	//
@@ -231,6 +237,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 		if (crash)
 			ri.Sys_Error (ERR_DROP, "Mod_NumForName: %s not found", mod->name);
 		memset (mod->name, 0, sizeof(mod->name));
+		Prof_End();
 		return NULL;
 	}
 
@@ -270,6 +277,8 @@ model_t *Mod_ForName (char *name, qboolean crash)
 	loadmodel->extradatasize = (char *)Hunk_Alloc (&hunk_ref, 0) - extradata;
 
 	ri.FS_FCloseFile(file);
+
+	Prof_End();
 
 	return mod;
 }
@@ -879,6 +888,8 @@ void Mod_LoadBrushModel (model_t *mod, FILE *file, long base)
 	dheader_t	header;
 	mmodel_t 	*bm;
 
+	Prof_Begin(__FUNCTION__);
+
 	loadmodel->type = mod_brush;
 	if (loadmodel != mod_known)
 		ri.Sys_Error (ERR_DROP, "Loaded a brush model after the world");
@@ -937,6 +948,8 @@ void Mod_LoadBrushModel (model_t *mod, FILE *file, long base)
 
 		starmod->numleafs = bm->visleafs;
 	}
+
+	Prof_End();
 }
 
 /*
@@ -959,6 +972,8 @@ void Mod_LoadAliasModel (model_t *mod, FILE *file, long base)
 	mmdl_t			*pheader;
 	daliasframe_t	*poutframe;
 	int				*poutcmd;
+
+	Prof_Begin(__FUNCTION__);
 
 	ri.FS_Read(&inmodel, sizeof(inmodel), file);
 
@@ -1049,6 +1064,8 @@ void Mod_LoadAliasModel (model_t *mod, FILE *file, long base)
 	mod->maxs[0] = 32;
 	mod->maxs[1] = 32;
 	mod->maxs[2] = 32;
+
+	Prof_End();
 }
 
 /*
@@ -1068,6 +1085,8 @@ void Mod_LoadSpriteModel (model_t *mod, FILE *file, long base)
 {
 	dsprite_t	*sprout;
 	int			i;
+
+	Prof_Begin(__FUNCTION__);
 
 	sprout = Hunk_Alloc (&hunk_ref, modfilelen);
 	ri.FS_Read(sprout, modfilelen, file);
@@ -1090,6 +1109,8 @@ void Mod_LoadSpriteModel (model_t *mod, FILE *file, long base)
 	}
 
 	mod->type = mod_sprite;
+
+	Prof_End();
 }
 
 //=============================================================================
@@ -1106,7 +1127,7 @@ void R_BeginRegistration (char *model)
 {
 	char	fullname[MAX_QPATH];
 
-	LOG_FUNCTION_ENTRY;
+	Prof_Begin(__FUNCTION__);
 
 	r_oldviewcluster = -1;		// force markleafs
 
@@ -1124,7 +1145,7 @@ void R_BeginRegistration (char *model)
 
 	r_viewcluster = -1;
 
-	LOG_FUNCTION_EXIT;
+	Prof_End();
 }
 
 
@@ -1139,7 +1160,7 @@ struct model_s *R_RegisterModel (char *name)
 	model_t	*mod;
 	int		i;
 
-	LOG_FUNCTION_ENTRY;
+	Prof_Begin(__FUNCTION__);
 
 	mod = Mod_ForName (name, false);
 	if (mod)
@@ -1154,7 +1175,7 @@ struct model_s *R_RegisterModel (char *name)
 		}
 	}
 
-	LOG_FUNCTION_EXIT;
+	Prof_End();
 
 	return mod;
 }
@@ -1168,11 +1189,11 @@ R_EndRegistration
 */
 void R_EndRegistration (void)
 {
-	LOG_FUNCTION_ENTRY;
+	Prof_Begin(__FUNCTION__);
 
 	Hunk_End(&hunk_ref);
 
-	LOG_FUNCTION_EXIT;
+	Prof_End();
 }
 
 

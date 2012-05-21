@@ -851,3 +851,28 @@ void Hunk_End (hunk_t *hunk);
 
 #define Hunk_Alloc(hunk, size) Hunk_AllocEx(hunk, size, __FILE__, __LINE__, __FUNCTION__)
 #define Hunk_AllocAllowFail(hunk, size) Hunk_AllocAllowFailEx(hunk, size, __FILE__, __LINE__, __FUNCTION__)
+
+
+/*
+==============================================================
+
+PROFILER
+
+==============================================================
+*/
+
+#define ENABLE_PROFILER 0
+
+#if ENABLE_PROFILER
+
+void Prof_Init(void);
+void Prof_Begin(const char *name);
+void Prof_End(void);
+void Prof_Print(void);
+
+#else
+#	define Prof_Init() do { } while (0)
+#	define Prof_Begin(name) do { } while (0)
+#	define Prof_End() do { } while (0)
+#	define Prof_Print() do { } while (0)
+#endif

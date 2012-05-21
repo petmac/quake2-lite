@@ -32,10 +32,14 @@ ScePspRGBA8888 __attribute__((aligned(16))) d_8to24table[256];
 
 void GL_SetTexturePalette(const ScePspRGBA8888 *palette)
 {
+	Prof_Begin(__FUNCTION__);
+
 	ASSERT(GU_IsInDisplayList());
 
 	sceKernelDcacheWritebackAll();
 	sceGuClutLoad(32, palette);
+
+	Prof_End();
 }
 
 void GL_TexEnv( int mode )
@@ -51,6 +55,8 @@ void GL_TexEnv( int mode )
 
 void GL_Bind (const image_t *texnum)
 {
+	Prof_Begin(__FUNCTION__);
+
 	ASSERT(GU_IsInDisplayList());
 
 #ifndef PSP
@@ -63,6 +69,8 @@ void GL_Bind (const image_t *texnum)
 	{
 		sceGuTexImage(0, texnum->buffer_width, texnum->buffer_height, texnum->buffer_width, texnum->data);
 	}
+
+	Prof_End();
 }
 
 /*
@@ -133,6 +141,8 @@ static void LoadPCX (char *filename, byte **pic, byte **palette, short *width, s
 	int		dataByte, runLength;
 	byte	*out, *pix;
 
+	Prof_Begin(__FUNCTION__);
+
 	*pic = NULL;
 	if (palette)
 	{
@@ -146,6 +156,7 @@ static void LoadPCX (char *filename, byte **pic, byte **palette, short *width, s
 	if (!raw)
 	{
 		ri.Con_Printf (PRINT_DEVELOPER, "Bad pcx file %s\n", filename);
+		Prof_End();
 		return;
 	}
 
@@ -173,6 +184,7 @@ static void LoadPCX (char *filename, byte **pic, byte **palette, short *width, s
 		|| pcx->ymax >= 480)
 	{
 		ri.Con_Printf (PRINT_ALL, "Bad pcx file %s\n", filename);
+		Prof_End();
 		return;
 	}
 
@@ -221,6 +233,8 @@ static void LoadPCX (char *filename, byte **pic, byte **palette, short *width, s
 	}
 
 	ri.FS_FreeFile (pcx);
+
+	Prof_End();
 }
 
 /*
@@ -257,6 +271,8 @@ void LoadTGA (char *name, byte **pic, int *width, int *height)
 	byte			*targa_rgba;
 	byte tmp[2];
 
+	Prof_Begin(__FUNCTION__);
+
 	*pic = NULL;
 
 	//
@@ -266,6 +282,7 @@ void LoadTGA (char *name, byte **pic, int *width, int *height)
 	if (!buffer)
 	{
 		ri.Con_Printf (PRINT_DEVELOPER, "Bad tga file %s\n", name);
+		Prof_End();
 		return;
 	}
 
@@ -427,6 +444,8 @@ void LoadTGA (char *name, byte **pic, int *width, int *height)
 	}
 
 	ri.FS_FreeFile (buffer);
+
+	Prof_End();
 }
 
 
@@ -622,6 +641,8 @@ static u32 next_power_of_two(u32 x)
 
 static void GL_UploadPic (image_t *image, byte *pic)
 {
+	Prof_Begin(__FUNCTION__);
+
 	// Calculate buffer size.
 	if (image->width <= 16)
 	{
@@ -659,12 +680,16 @@ static void GL_UploadPic (image_t *image, byte *pic)
 		buffer_height,
 		(buffer_width * height));
 #endif
+
+	Prof_End();
 }
 
 static void GL_UploadSkin (image_t *image, byte *pic)
 {
 	int bufw;
 	int bufh;
+
+	Prof_Begin(__FUNCTION__);
 
 	// Calculate buffer size.
 	if (image->width <= 16)
@@ -715,6 +740,8 @@ static void GL_UploadSkin (image_t *image, byte *pic)
 		buffer_height,
 		(buffer_width * height));
 #endif
+
+	Prof_End();
 }
 
 static void GL_Upload (image_t *image, byte *pic)
@@ -739,6 +766,8 @@ static image_t *GL_LoadWal (image_t *image)
 	miptex_t	*mt;
 	int			ofs;
 
+	Prof_Begin(__FUNCTION__);
+
 	ri.FS_LoadFile (image->name, (void **)&mt);
 	if (!mt)
 	{
@@ -753,6 +782,8 @@ static image_t *GL_LoadWal (image_t *image)
 	GL_Upload(image, (byte *)mt + ofs);
 
 	ri.FS_FreeFile ((void *)mt);
+
+	Prof_End();
 
 	return image;
 }
@@ -854,11 +885,11 @@ struct image_s *R_RegisterSkin (char *name)
 {
 	struct image_s *s;
 
-	LOG_FUNCTION_ENTRY;
+	Prof_Begin(__FUNCTION__);
 
 	s = GL_FindImage (name, it_skin);
 
-	LOG_FUNCTION_EXIT;
+	Prof_End();
 
 	return s;
 }
@@ -876,6 +907,8 @@ int Draw_GetPalette (void)
 	unsigned	v;
 	byte	*pic, *pal;
 	short		width, height;
+
+	Prof_Begin(__FUNCTION__);
 
 	// get the palette
 
@@ -896,6 +929,8 @@ int Draw_GetPalette (void)
 	Z_Free (pic);
 	Z_Free (pal);
 
+	Prof_End();
+
 	return 0;
 }
 
@@ -908,6 +943,8 @@ GL_InitImages
 void	GL_InitImages (void)
 {
 	int		i, j;
+
+	Prof_Begin(__FUNCTION__);
 
 	// init intensity conversions
 	intensity = ri.Cvar_Get ("intensity", "2", 0);
@@ -933,6 +970,8 @@ void	GL_InitImages (void)
 			j = 255;
 		intensitytable[i] = j;
 	}
+
+	Prof_End();
 }
 
 /*
@@ -942,9 +981,13 @@ GL_ShutdownImages
 */
 void	GL_ShutdownImages (void)
 {
+	Prof_Begin(__FUNCTION__);
+
 	GL_FreeImages();
 
 	ri.FS_FreeFile(gl_state.d_16to8table);
+
+	Prof_End();
 }
 
 void GL_FreeImages (void)

@@ -618,6 +618,8 @@ void R_SetupGL (void)
 	int		x, x2, y2, y, w, h;
 	ScePspFVector3 view_translation;
 
+	Prof_Begin(__FUNCTION__);
+
 	ASSERT(GU_IsInDisplayList());
 
 	//
@@ -679,6 +681,8 @@ void R_SetupGL (void)
 
 	sceGuDisable(GU_BLEND);
 	sceGuEnable(GU_DEPTH_TEST);
+
+	Prof_End();
 }
 
 /*
@@ -688,6 +692,8 @@ R_Clear
 */
 void R_Clear (void)
 {
+	Prof_Begin(__FUNCTION__);
+
 	ASSERT(GU_IsInDisplayList());
 
 	if (gl_clear->value)
@@ -698,6 +704,8 @@ void R_Clear (void)
 	{
 		sceGuClear(GU_DEPTH_BUFFER_BIT);
 	}
+
+	Prof_End();
 }
 
 void R_Flash( void )
@@ -716,6 +724,8 @@ void R_RenderView (refdef_t *fd)
 {
 	if (r_norefresh->value)
 		return;
+
+	Prof_Begin(__FUNCTION__);
 
 	r_newrefdef = *fd;
 
@@ -763,11 +773,15 @@ void R_RenderView (refdef_t *fd)
 			c_visible_textures, 
 			c_visible_lightmaps); 
 	}
+
+	Prof_End();
 }
 
 
 void	R_SetGL2D (void)
 {
+	Prof_Begin(__FUNCTION__);
+
 	ASSERT(GU_IsInDisplayList());
 
 	sceGumMatrixMode(GU_PROJECTION);
@@ -781,6 +795,8 @@ void	R_SetGL2D (void)
 	sceGuDisable(GU_CULL_FACE);
 	sceGuEnable(GU_BLEND);
 	sceGuColor(0xffffffff);
+
+	Prof_End();
 }
 
 static void GL_DrawColoredStereoLinePair( float r, float g, float b, float y )
@@ -873,13 +889,13 @@ R_RenderFrame
 */
 void R_RenderFrame (refdef_t *fd)
 {
-	LOG_FUNCTION_ENTRY;
+	Prof_Begin(__FUNCTION__);
 
 	R_RenderView( fd );
 	R_SetLightLevel ();
 	R_SetGL2D ();
 
-	LOG_FUNCTION_EXIT;
+	Prof_End();
 }
 
 
@@ -936,7 +952,7 @@ int R_Init( void *hinstance, void *hWnd )
 	int		j;
 	extern float r_turbsin[256];
 
-	LOG_FUNCTION_ENTRY;
+	Prof_Begin(__FUNCTION__);
 
 	// TODO PeterM This may get done more than once.
 	for ( j = 0; j < 256; j++ )
@@ -1003,7 +1019,7 @@ int R_Init( void *hinstance, void *hWnd )
 		ri.Con_Printf (PRINT_ALL, "glGetError() = 0x%x\n", err);
 #endif
 
-	LOG_FUNCTION_EXIT;
+	Prof_End();
 
 	return true;
 }
@@ -1015,7 +1031,7 @@ R_Shutdown
 */
 void R_Shutdown (void)
 {
-	LOG_FUNCTION_ENTRY;
+	Prof_Begin(__FUNCTION__);
 
 	ri.Cmd_RemoveCommand ("modellist");
 	ri.Cmd_RemoveCommand ("screenshot");
@@ -1028,7 +1044,7 @@ void R_Shutdown (void)
 
 	sceGuTerm();
 
-	LOG_FUNCTION_EXIT;
+	Prof_End();
 }
 
 
@@ -1040,7 +1056,7 @@ R_BeginFrame
 */
 void R_BeginFrame( float camera_separation )
 {
-	LOG_FUNCTION_ENTRY;
+	Prof_Begin(__FUNCTION__);
 
 	gl_state.camera_separation = camera_separation;
 
@@ -1056,7 +1072,7 @@ void R_BeginFrame( float camera_separation )
 	//
 	R_Clear ();
 
-	LOG_FUNCTION_EXIT;
+	Prof_End();
 }
 
 /*
@@ -1070,7 +1086,7 @@ void R_SetPalette ( const unsigned char *palette)
 {
 	int		i;
 
-	LOG_FUNCTION_ENTRY;
+	Prof_Begin(__FUNCTION__);
 
 	if ( palette )
 	{
@@ -1083,7 +1099,7 @@ void R_SetPalette ( const unsigned char *palette)
 		}
 	}
 
-	LOG_FUNCTION_EXIT;
+	Prof_End();
 }
 
 /*
@@ -1186,11 +1202,15 @@ GetRefAPI
 */
 static void R_EndFrame (void)
 {
+	Prof_Begin(__FUNCTION__);
+
 	GU_FinishDisplayList();
 	GU_SyncDisplayList();
 
 	sceDisplayWaitVblankStart();
 	gu_back_buffer = (gu_pixel_t *)((u32)sceGeEdramGetAddr() + (u32)sceGuSwapBuffers());
+
+	Prof_End();
 }
 
 static void R_AppActivate (qboolean activate)

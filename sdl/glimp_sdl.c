@@ -27,7 +27,11 @@ void		GLimp_BeginFrame( float camera_separation )
 
 void		GLimp_EndFrame( void )
 {
+	Prof_Begin(__FUNCTION__);
+
 	SDL_GL_SwapBuffers();
+
+	Prof_End();
 }
 
 qboolean	GLimp_Init( void *hinstance, void *hWnd )

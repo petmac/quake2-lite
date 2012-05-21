@@ -100,6 +100,7 @@ OBJS = \
 	../qcommon/mem.o \
 	../qcommon/net_chan.o \
 	../qcommon/pmove.o \
+	../qcommon/profiler.o \
 	\
 	../server/sv_ccmds.o \
 	../server/sv_ents.o \

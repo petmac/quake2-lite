@@ -1383,6 +1383,8 @@ void Qcommon_Init (int argc, char **argv)
 	if (setjmp (abortframe) )
 		Sys_Error ("Error during initialization");
 
+	Prof_Init ();
+
 	z_chain.next = z_chain.prev = &z_chain;
 
 	Mem_Init ();
@@ -1475,8 +1477,13 @@ void Qcommon_Frame (int msec)
 	char	*s;
 	int		time_before, time_between, time_after;
 
+	Prof_Begin(__FUNCTION__);
+
 	if (setjmp (abortframe) )
+	{
+		Prof_End();
 		return;			// an ERR_DROP was thrown
+	}
 
 	if ( log_stats->modified )
 	{
@@ -1557,7 +1564,10 @@ void Qcommon_Frame (int msec)
 		cl -= rf;
 		Com_Printf ("all:%3i sv:%3i gm:%3i cl:%3i rf:%3i\n",
 			all, sv, gm, cl, rf);
-	}	
+	}
+	
+	Prof_End();
+	Prof_Print();
 }
 
 /*
