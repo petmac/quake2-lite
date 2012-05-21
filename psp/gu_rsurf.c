@@ -176,29 +176,143 @@ void DrawGLWaterPolyLightmap (glpoly_t *p)
 DrawGLPoly
 ================
 */
-void DrawGLPoly (glpoly_t *p)
+static inline void Intersect(float *dst, const float *a, const float *b, float dist_a, float dist_b)
 {
-	int		i;
+	const float f = dist_a / (dist_a - dist_b);
+	int i;
+
+	for (i = 0; i < VERTEXSIZE; ++i)
+	{
+		dst[i] = a[i] + (f * (b[i] - a[i]));
+	}
+}
+
+static int ClipAgainstPlane(float *dst, const float *src, int numverts, const cplane_t *plane)
+{
+	const float *const end = &src[numverts * VERTEXSIZE];
+
+	const float *a = &src[0];
+	const float *b = &src[(numverts - 1) * VERTEXSIZE];
+	int num_clipped_verts = 0;
+
+	while (a != end)
+	{
+		const float dist_a = DotProduct(a, plane->normal) - plane->dist;
+		const float dist_b = DotProduct(b, plane->normal) - plane->dist;
+		int i;
+
+		// A inside?
+		if (dist_a > 0)
+		{
+			// B outside?
+			if (dist_b <= 0)
+			{
+				// Add intersection.
+				Intersect(dst, a, b, dist_a, dist_b);
+				dst += VERTEXSIZE;
+				++num_clipped_verts;
+			}
+
+			// Add a.
+			for (i = 0; i < VERTEXSIZE; ++i)
+			{
+				*dst++ = a[i];
+			}
+			++num_clipped_verts;
+		}
+		else
+		{
+			// B inside?
+			if (dist_b > 0)
+			{
+				// Add intersection.
+				Intersect(dst, a, b, dist_a, dist_b);
+				dst += VERTEXSIZE;
+				++num_clipped_verts;
+			}
+		}
+
+		// Move on to the next edge.
+		b = a;
+		a += VERTEXSIZE;
+	}
+
+	return num_clipped_verts;
+}
+
+static int ClipAgainstFrustum(float *dst, const float *src, int numverts)
+{
+	float tmp[R_MAX_CLIPPED_VERTS * VERTEXSIZE];
+
+	numverts = ClipAgainstPlane(tmp, src, numverts, &frustum[0]);
+	if (numverts == 0)
+	{
+		return 0;
+	}
+
+	numverts = ClipAgainstPlane(dst, tmp, numverts, &frustum[1]);
+	if (numverts == 0)
+	{
+		return 0;
+	}
+
+	numverts = ClipAgainstPlane(tmp, dst, numverts, &frustum[2]);
+	if (numverts == 0)
+	{
+		return 0;
+	}
+
+	numverts = ClipAgainstPlane(dst, tmp, numverts, &frustum[3]);
+	if (numverts == 0)
+	{
+		return 0;
+	}
+
+	return numverts;
+}
+
+static void DrawGLPoly (glpoly_t *p, int cull)
+{
+	float	clipped[R_MAX_CLIPPED_VERTS * VERTEXSIZE];
+	int		numverts;
+	const float	*v;
 	glvert_t *out;
+	int		i;
+
+	if (cull == 3)
+	{
+		numverts = ClipAgainstFrustum(clipped, p->verts[0], p->numverts);
+		if (numverts == 0)
+		{
+			return;
+		}
+		v = clipped;
+	}
+	else
+	{
+		numverts = p->numverts;
+		v = p->verts[0];
+	}
 
 	// Allocate vertices.
-	out = sceGuGetMemory(p->numverts * sizeof(glvert_t));
+	out = sceGuGetMemory(numverts * sizeof(glvert_t));
 
 	// Fill vertices.
-	for (i = 0; i < p->numverts; ++i)
+	for (i = 0; i < numverts; ++i)
 	{
-		const float *const src = p->verts[i];
 		glvert_t *const dst = &out[i];
 
-		dst->x = src[0];
-		dst->y = src[1];
-		dst->z = src[2];
-		dst->s = src[3];
-		dst->t = src[4];
+		dst->x = *v++;
+		dst->y = *v++;
+		dst->z = *v++;
+		dst->s = *v++;
+		dst->t = *v;
+
+		v += (VERTEXSIZE - 4);
 	}
 
 	// Draw.
-	sceGumDrawArray(GU_TRIANGLE_FAN, GLVERT_TYPE, p->numverts, NULL, out);
+	sceGumDrawArray(GU_TRIANGLE_FAN, GLVERT_TYPE, numverts, NULL, out);
 }
 
 //============
@@ -278,50 +392,49 @@ void R_DrawTriangleOutlines (void)
 /*
 ** DrawGLPolyChain
 */
-void DrawGLPolyChain( glpoly_t *p, float soffset, float toffset )
+static void DrawGLPolyChain( glpoly_t *p, float soffset, float toffset, int cull )
 {
+	float	clipped[R_MAX_CLIPPED_VERTS * VERTEXSIZE];
+	int		numverts;
+	const float	*v;
 	glvert_t *out;
+	int		i;
 
-	// Allocate vertices.
-	out = sceGuGetMemory(p->numverts * sizeof(glvert_t));
-
-	if ( soffset == 0 && toffset == 0 )
+	if (cull == 3)
 	{
-		int		i;
-
-		// Fill vertices.
-		for (i = 0; i < p->numverts; ++i)
+		numverts = ClipAgainstFrustum(clipped, p->verts[0], p->numverts);
+		if (numverts == 0)
 		{
-			const float *const src = p->verts[i];
-			glvert_t *const dst = &out[i];
-
-			dst->x = src[0];
-			dst->y = src[1];
-			dst->z = src[2];
-			dst->s = src[5];
-			dst->t = src[6];
+			return;
 		}
+		v = clipped;
 	}
 	else
 	{
-		int		i;
+		numverts = p->numverts;
+		v = p->verts[0];
+	}
 
-		// Fill vertices.
-		for (i = 0; i < p->numverts; ++i)
-		{
-			const float *const src = p->verts[i];
-			glvert_t *const dst = &out[i];
+	// Allocate vertices.
+	out = sceGuGetMemory(numverts * sizeof(glvert_t));
 
-			dst->x = src[0];
-			dst->y = src[1];
-			dst->z = src[2];
-			dst->s = src[5] - soffset;
-			dst->t = src[6] - toffset;
-		}
+	// Fill vertices.
+	for (i = 0; i < numverts; ++i)
+	{
+		glvert_t *const dst = &out[i];
+
+		dst->x = *v++;
+		dst->y = *v++;
+		dst->z = *v;
+
+		v += 3;
+
+		dst->s = *v++ - soffset;
+		dst->t = *v++ - toffset;
 	}
 
 	// Draw.
-	sceGumDrawArray(GU_TRIANGLE_FAN, GLVERT_TYPE, p->numverts, NULL, out);
+	sceGumDrawArray(GU_TRIANGLE_FAN, GLVERT_TYPE, numverts, NULL, out);
 }
 
 /*
@@ -330,7 +443,7 @@ void DrawGLPolyChain( glpoly_t *p, float soffset, float toffset )
 ** This routine takes all the given light mapped surfaces in the world and
 ** blends them into the framebuffer.
 */
-void R_BlendLightmaps (void)
+static void R_BlendLightmaps (void)
 {
 	int			i;
 	msurface_t	*surf, *newdrawsurf = 0;
@@ -372,7 +485,7 @@ void R_BlendLightmaps (void)
 			for ( surf = gl_lms.lightmap_surfaces[i]; surf != 0; surf = surf->lightmapchain )
 			{
 				if ( surf->polys )
-					DrawGLPolyChain( surf->polys, 0, 0 );
+					DrawGLPolyChain( surf->polys, 0, 0, surf->cull );
 			}
 		}
 	}
@@ -424,9 +537,13 @@ void R_BlendLightmaps (void)
 				for ( drawsurf = newdrawsurf; drawsurf != surf; drawsurf = drawsurf->lightmapchain )
 				{
 					if ( drawsurf->polys )
-						DrawGLPolyChain( drawsurf->polys, 
-							              ( drawsurf->light_s - drawsurf->dlight_s ) * ( 1.0 / 128.0 ), 
-										( drawsurf->light_t - drawsurf->dlight_t ) * ( 1.0 / 128.0 ) );
+					{
+						DrawGLPolyChain(
+							drawsurf->polys,
+							( drawsurf->light_s - drawsurf->dlight_s ) * ( 1.0 / 128.0 ),
+							( drawsurf->light_t - drawsurf->dlight_t ) * ( 1.0 / 128.0 ),
+							surf->cull);
+					}
 				}
 
 				newdrawsurf = drawsurf;
@@ -456,7 +573,13 @@ void R_BlendLightmaps (void)
 		for ( surf = newdrawsurf; surf != 0; surf = surf->lightmapchain )
 		{
 			if ( surf->polys )
-				DrawGLPolyChain( surf->polys, ( surf->light_s - surf->dlight_s ) * ( 1.0 / 128.0 ), ( surf->light_t - surf->dlight_t ) * ( 1.0 / 128.0 ) );
+			{
+				DrawGLPolyChain(
+					surf->polys,
+					( surf->light_s - surf->dlight_s ) * ( 1.0 / 128.0 ),
+					( surf->light_t - surf->dlight_t ) * ( 1.0 / 128.0 ),
+					surf->cull);
+			}
 		}
 	}
 
@@ -513,7 +636,7 @@ void R_RenderBrushPoly (msurface_t *fa)
 	if(fa->texinfo->flags & SURF_FLOWING)
 		DrawGLFlowingPoly (fa);
 	else
-		DrawGLPoly (fa->polys);
+		DrawGLPoly (fa->polys, fa->cull);
 //PGM
 //======
 
@@ -621,7 +744,7 @@ void R_DrawAlphaSurfaces (void)
 		else if(s->texinfo->flags & SURF_FLOWING)			// PGM	9/16/98
 			DrawGLFlowingPoly (s);							// PGM
 		else
-			DrawGLPoly (s->polys);
+			DrawGLPoly (s->polys, s->cull);
 	}
 
 #ifndef PSP
@@ -773,7 +896,7 @@ void R_DrawBrushModel (entity_t *e)
 		VectorAdd (e->origin, currentmodel->maxs, maxs);
 	}
 
-	if (R_CullBox (mins, maxs))
+	if (R_CullBox (mins, maxs) == 2)
 		return;
 
 #ifndef PSP
@@ -825,7 +948,7 @@ e->angles[2] = -e->angles[2];	// stupid quake bug
 R_RecursiveWorldNode
 ================
 */
-void R_RecursiveWorldNode (mnode_t *node)
+static void R_RecursiveWorldNode (mnode_t *node, int cull)
 {
 	int			c, side, sidebit;
 	cplane_t	*plane;
@@ -839,8 +962,12 @@ void R_RecursiveWorldNode (mnode_t *node)
 
 	if (node->visframe != r_visframecount)
 		return;
-	if (R_CullBox (node->minmaxs, node->minmaxs+3))
-		return;
+	if (cull != 1)
+	{
+		cull = R_CullBox (node->minmaxs, node->minmaxs+3);
+		if (cull == 2)
+			return;
+	}
 	
 // if a leaf node, draw stuff
 	if (node->contents != -1)
@@ -888,7 +1015,7 @@ void R_RecursiveWorldNode (mnode_t *node)
 	}
 
 // recurse down the children, front side first
-	R_RecursiveWorldNode (node->children[side]);
+	R_RecursiveWorldNode (node->children[side], cull);
 
 	// draw stuff
 	for ( c = node->numsurfaces, surf = r_worldmodel->surfaces + node->firstsurface; c ; c--, surf++)
@@ -898,6 +1025,8 @@ void R_RecursiveWorldNode (mnode_t *node)
 
 		if ( (surf->flags & SURF_PLANEBACK) != sidebit )
 			continue;		// wrong side
+
+		surf->cull = cull;
 
 		if (surf->texinfo->flags & SURF_SKY)
 		{	// just adds to visible sky bounds
@@ -920,7 +1049,7 @@ void R_RecursiveWorldNode (mnode_t *node)
 	}
 
 	// recurse down the back side
-	R_RecursiveWorldNode (node->children[!side]);
+	R_RecursiveWorldNode (node->children[!side], cull);
 /*
 	for ( ; c ; c--, surf++)
 	{
@@ -992,7 +1121,7 @@ void R_DrawWorld (void)
 	memset (gl_lms.lightmap_surfaces, 0, sizeof(gl_lms.lightmap_surfaces));
 	R_ClearSkyBox ();
 
-	R_RecursiveWorldNode (r_worldmodel->nodes);
+	R_RecursiveWorldNode (r_worldmodel->nodes, 3);
 
 	/*
 	** theoretically nothing should happen in the next two functions
@@ -1221,6 +1350,11 @@ void GL_BuildPolygonFromSurface(msurface_t *fa)
 	pedges = currentmodel->edges;
 	lnumverts = fa->numedges;
 	vertpage = 0;
+	
+	if (lnumverts > R_MAX_BSP_FACE_VERTS)
+	{
+		ri.Sys_Error(ERR_DROP, "%s: Poly has too many vertices for clipping. %d > %d", __FUNCTION__, lnumverts, R_MAX_BSP_FACE_VERTS);
+	}
 
 	//
 	// draw texture
@@ -1272,9 +1406,6 @@ void GL_BuildPolygonFromSurface(msurface_t *fa)
 		poly->verts[i][5] = s;
 		poly->verts[i][6] = t;
 	}
-
-	poly->numverts = lnumverts;
-
 }
 
 /*
