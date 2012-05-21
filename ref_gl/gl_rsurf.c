@@ -177,19 +177,132 @@ void DrawGLWaterPolyLightmap (glpoly_t *p)
 DrawGLPoly
 ================
 */
-void DrawGLPoly (glpoly_t *p)
-{
-	int		i;
-	float	*v;
 
-	qglBegin (GL_POLYGON);
-	v = p->verts[0];
-	for (i=0 ; i<p->numverts ; i++, v+= VERTEXSIZE)
+static void Intersect(float *dst, const float *a, const float *b, float dist_a, float dist_b)
+{
+	const float f = dist_a / (dist_a - dist_b);
+	int i;
+
+	for (i = 0; i < VERTEXSIZE; ++i)
 	{
-		qglTexCoord2f (v[3], v[4]);
-		qglVertex3fv (v);
+		dst[i] = a[i] + (f * (b[i] - a[i]));
 	}
-	qglEnd ();
+}
+
+static int ClipAgainstPlane(float *dst, const float *src, int numverts, const cplane_t *plane)
+{
+	const float *const end = &src[numverts * VERTEXSIZE];
+
+	const float *a = &src[0];
+	const float *b = &src[(numverts - 1) * VERTEXSIZE];
+	int num_clipped_verts = 0;
+
+	while (a != end)
+	{
+		const float dist_a = DotProduct(a, plane->normal) - plane->dist;
+		const float dist_b = DotProduct(b, plane->normal) - plane->dist;
+		int i;
+
+		// A inside?
+		if (dist_a > 0)
+		{
+			// B outside?
+			if (dist_b <= 0)
+			{
+				// Add intersection.
+				Intersect(dst, a, b, dist_a, dist_b);
+				dst += VERTEXSIZE;
+				++num_clipped_verts;
+			}
+
+			// Add a.
+			for (i = 0; i < VERTEXSIZE; ++i)
+			{
+				*dst++ = a[i];
+			}
+			++num_clipped_verts;
+		}
+		else
+		{
+			// B inside?
+			if (dist_b > 0)
+			{
+				// Add intersection.
+				Intersect(dst, a, b, dist_a, dist_b);
+				dst += VERTEXSIZE;
+				++num_clipped_verts;
+			}
+		}
+
+		// Move on to the next edge.
+		b = a;
+		a += VERTEXSIZE;
+	}
+
+	assert(num_clipped_verts >= 0);
+	assert(num_clipped_verts <= R_MAX_CLIPPED_VERTS);
+
+	return num_clipped_verts;
+}
+
+static int ClipAgainstFrustum(float *dst, const float *src, int numverts)
+{
+	float tmp[R_MAX_CLIPPED_VERTS * VERTEXSIZE];
+
+	numverts = ClipAgainstPlane(tmp, src, numverts, &frustum[0]);
+	if (numverts == 0)
+	{
+		return 0;
+	}
+
+	numverts = ClipAgainstPlane(dst, tmp, numverts, &frustum[1]);
+	if (numverts == 0)
+	{
+		return 0;
+	}
+
+	numverts = ClipAgainstPlane(tmp, dst, numverts, &frustum[2]);
+	if (numverts == 0)
+	{
+		return 0;
+	}
+
+	numverts = ClipAgainstPlane(dst, tmp, numverts, &frustum[3]);
+	if (numverts == 0)
+	{
+		return 0;
+	}
+
+	return numverts;
+}
+
+static void DrawGLPoly (glpoly_t *p, int cull)
+{
+	int		numverts = p->numverts;
+	float	*v = p->verts[0];
+	int		i;
+
+#if R_MANUAL_CLIPPING
+	float	clipped[R_MAX_CLIPPED_VERTS * VERTEXSIZE];
+
+	if (cull == 3)
+	{
+		numverts = ClipAgainstFrustum(clipped, v, numverts);
+		if (numverts == 0)
+		{
+			return;
+		}
+		v = clipped;
+	}
+#endif // R_MANUAL_CLIPPING
+
+	qglBegin(GL_POLYGON);
+	for (i = 0; i < numverts ; ++i, v += VERTEXSIZE)
+	{
+		qglTexCoord2f(v[3], v[4]);
+		qglVertex3fv(v);
+	}
+	qglEnd();
 }
 
 //============
@@ -265,36 +378,33 @@ void R_DrawTriangleOutlines (void)
 /*
 ** DrawGLPolyChain
 */
-void DrawGLPolyChain( glpoly_t *p, float soffset, float toffset )
+static void DrawGLPolyChain( glpoly_t *p, float soffset, float toffset, int cull )
 {
-	if ( soffset == 0 && toffset == 0 )
-	{
-		float *v;
-		int j;
+	int		numverts = p->numverts;
+	float	*v = p->verts[0];
+	int		i;
 
-		qglBegin (GL_POLYGON);
-		v = p->verts[0];
-		for (j=0 ; j<p->numverts ; j++, v+= VERTEXSIZE)
-		{
-			qglTexCoord2f (v[5], v[6] );
-			qglVertex3fv (v);
-		}
-		qglEnd ();
-	}
-	else
-	{
-		float *v;
-		int j;
+#if R_MANUAL_CLIPPING
+	float	clipped[R_MAX_CLIPPED_VERTS * VERTEXSIZE];
 
-		qglBegin (GL_POLYGON);
-		v = p->verts[0];
-		for (j=0 ; j<p->numverts ; j++, v+= VERTEXSIZE)
+	if (cull == 3)
+	{
+		numverts = ClipAgainstFrustum(clipped, v, numverts);
+		if (numverts == 0)
 		{
-			qglTexCoord2f (v[5] - soffset, v[6] - toffset );
-			qglVertex3fv (v);
+			return;
 		}
-		qglEnd ();
+		v = clipped;
 	}
+#endif // R_MANUAL_CLIPPING
+
+	qglBegin (GL_POLYGON);
+	for (i=0 ; i<numverts ; i++, v+= VERTEXSIZE)
+	{
+		qglTexCoord2f (v[5] - soffset, v[6] - toffset );
+		qglVertex3fv (v);
+	}
+	qglEnd ();
 }
 
 /*
@@ -371,7 +481,13 @@ void R_BlendLightmaps (void)
 			for ( surf = gl_lms.lightmap_surfaces[i]; surf != 0; surf = surf->lightmapchain )
 			{
 				if ( surf->polys )
-					DrawGLPolyChain( surf->polys, 0, 0 );
+				{
+#if R_MANUAL_CLIPPING
+					DrawGLPolyChain( surf->polys, 0, 0, surf->cull );
+#else
+					DrawGLPolyChain( surf->polys, 0, 0, 0 );
+#endif
+				}
 			}
 		}
 	}
@@ -416,9 +532,18 @@ void R_BlendLightmaps (void)
 				for ( drawsurf = newdrawsurf; drawsurf != surf; drawsurf = drawsurf->lightmapchain )
 				{
 					if ( drawsurf->polys )
-						DrawGLPolyChain( drawsurf->polys, 
-							              ( drawsurf->light_s - drawsurf->dlight_s ) * ( 1.0f / 128.0 ), 
-										( drawsurf->light_t - drawsurf->dlight_t ) * ( 1.0f / 128.0 ) );
+					{
+						DrawGLPolyChain(
+							drawsurf->polys, 
+							( drawsurf->light_s - drawsurf->dlight_s ) * ( 1.0f / 128.0 ), 
+							( drawsurf->light_t - drawsurf->dlight_t ) * ( 1.0f / 128.0 ),
+#if R_MANUAL_CLIPPING
+							drawsurf->cull
+#else
+							0
+#endif
+							);
+					}
 				}
 
 				newdrawsurf = drawsurf;
@@ -448,7 +573,18 @@ void R_BlendLightmaps (void)
 		for ( surf = newdrawsurf; surf != 0; surf = surf->lightmapchain )
 		{
 			if ( surf->polys )
-				DrawGLPolyChain( surf->polys, ( surf->light_s - surf->dlight_s ) * ( 1.0f / 128.0 ), ( surf->light_t - surf->dlight_t ) * ( 1.0f / 128.0 ) );
+			{
+				DrawGLPolyChain(
+					surf->polys,
+					( surf->light_s - surf->dlight_s ) * ( 1.0f / 128.0 ),
+					( surf->light_t - surf->dlight_t ) * ( 1.0f / 128.0 ),
+#if R_MANUAL_CLIPPING
+					surf->cull
+#else
+					0
+#endif
+					);
+			}
 		}
 	}
 
@@ -502,7 +638,13 @@ void R_RenderBrushPoly (msurface_t *fa)
 	if(fa->texinfo->flags & SURF_FLOWING)
 		DrawGLFlowingPoly (fa);
 	else
-		DrawGLPoly (fa->polys);
+	{
+#if R_MANUAL_CLIPPING
+		DrawGLPoly (fa->polys, fa->cull);
+#else // R_MANUAL_CLIPPING
+		DrawGLPoly (fa->polys, 0);
+#endif // R_MANUAL_CLIPPING
+	}
 //PGM
 //======
 
@@ -607,7 +749,13 @@ void R_DrawAlphaSurfaces (void)
 		else if(s->texinfo->flags & SURF_FLOWING)			// PGM	9/16/98
 			DrawGLFlowingPoly (s);							// PGM
 		else
-			DrawGLPoly (s->polys);
+		{
+#if R_MANUAL_CLIPPING
+			DrawGLPoly (s->polys, s->cull);
+#else // R_MANUAL_CLIPPING
+			DrawGLPoly (s->polys, 0);
+#endif // R_MANUAL_CLIPPING
+		}
 	}
 
 	GL_TexEnv( GL_REPLACE );
@@ -878,7 +1026,9 @@ static void R_RecursiveWorldNode (mnode_t *node, int cull)
 		if ( (surf->flags & SURF_PLANEBACK) != sidebit )
 			continue;		// wrong side
 
+#if R_MANUAL_CLIPPING
 		surf->cull = cull;
+#endif // R_MANUAL_CLIPPING
 
 		if (surf->texinfo->flags & SURF_SKY)
 		{	// just adds to visible sky bounds
@@ -1209,7 +1359,10 @@ void GL_BuildPolygonFromSurface(msurface_t *fa)
 	}
 
 	poly->numverts = lnumverts;
-
+	if (poly->numverts > R_MAX_BSP_FACE_VERTS)
+	{
+		ri.Sys_Error(ERR_DROP, "%s: Poly has too many vertices for clipping. %d > %d", __FUNCTION__, poly->numverts, R_MAX_BSP_FACE_VERTS);
+	}
 }
 
 /*

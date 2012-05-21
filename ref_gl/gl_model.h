@@ -89,6 +89,10 @@ typedef struct glpoly_s
 	float	verts[4][VERTEXSIZE];	// variable sized (xyz s1t1 s2t2)
 } glpoly_t;
 
+#define R_MANUAL_CLIPPING 1
+#define R_MAX_BSP_FACE_VERTS 20
+#define R_MAX_CLIPPED_VERTS (R_MAX_BSP_FACE_VERTS + 4)
+
 typedef struct msurface_s
 {
 	int			visframe;		// should be drawn when node is crossed
@@ -108,7 +112,9 @@ typedef struct msurface_s
 	glpoly_t	*polys;				// multiple if warped
 	struct	msurface_s	*texturechain;
 	struct  msurface_s	*lightmapchain;
+#if R_MANUAL_CLIPPING
 	int cull;
+#endif // R_MANUAL_CLIPPING
 
 	mtexinfo_t	*texinfo;
 	
