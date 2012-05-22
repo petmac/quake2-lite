@@ -32,6 +32,7 @@ typedef struct prof_stack_s
 
 typedef struct prof_block_s
 {
+	unsigned int hash;
 	const char *name;
 	int exclusive;
 } prof_block_t;
@@ -44,20 +45,44 @@ static int stack_size;
 static prof_block_t blocks[MAX_PROF_BLOCK];
 static int block_count;
 
+static unsigned int Prof_Hash(const char *name)
+{
+	unsigned int hash = 2166136261u;
+
+	while (1)
+	{
+		const unsigned int c = *name;
+		if (!c)
+		{
+			break;
+		}
+
+        hash = hash ^ c;
+        hash = hash * 16777619u;
+
+		++name;
+	}
+
+	return hash;
+}
+
 static int Prof_CompareName(const void *a, const void *b)
 {
-	const prof_block_t *const ba = (const prof_block_t *)a;
-	const prof_block_t *const bb = (const prof_block_t *)b;
+	const unsigned int *const ba = (const unsigned int *)a;
+	const unsigned int *const bb = (const unsigned int *)b;
 
-	return strcmp(ba->name, bb->name);
+	return *bb - *ba;
 }
 
 static prof_block_t *Prof_Find(const char *name)
 {
+	unsigned int hash;
 	prof_block_t *block;
 
+	hash = Prof_Hash(name);
+
 	// Find existing block.
-	block = bsearch(&name, blocks, block_count, sizeof(blocks[0]), &Prof_CompareName);
+	block = bsearch(&hash, blocks, block_count, sizeof(blocks[0]), &Prof_CompareName);
 	if (block != NULL)
 	{
 		return block;
@@ -68,6 +93,7 @@ static prof_block_t *Prof_Find(const char *name)
 	{
 		block = &blocks[block_count];
 
+		block->hash = hash;
 		block->name = name;
 		block->exclusive = 0;
 
