@@ -861,7 +861,7 @@ PROFILER
 ==============================================================
 */
 
-#define ENABLE_PROFILER 0
+#define ENABLE_PROFILER 1
 
 #if ENABLE_PROFILER
 

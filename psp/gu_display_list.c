@@ -27,17 +27,23 @@ static qboolean pending_finish;
 
 void GU_StartDisplayList(void)
 {
+	Prof_Begin(__FUNCTION__);
+
 	GU_SyncDisplayList();
 
 	sceGuStart(GU_DIRECT, vram->display_list);
 
 	in_display_list = true;
+
+	Prof_End();
 }
 
 void GU_FinishDisplayList(void)
 {
 	int size;
 	
+	Prof_Begin(__FUNCTION__);
+
 	if (!in_display_list)
 	{
 		Sys_Error("%s: Missing call to GU_StartDisplayList.", __FUNCTION__);
@@ -51,15 +57,21 @@ void GU_FinishDisplayList(void)
 
 	pending_finish = true;
 	in_display_list = false;
+
+	Prof_End();
 }
 
 void GU_SyncDisplayList(void)
 {
+	Prof_Begin(__FUNCTION__);
+
 	if (pending_finish)
 	{
 		sceGuSync(GU_SYNC_FINISH, GU_SYNC_WHAT_DONE);
 		pending_finish = false;
 	}
+
+	Prof_End();
 }
 
 qboolean GU_IsInDisplayList(void)

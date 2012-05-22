@@ -23,18 +23,35 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #if ENABLE_PROFILER
 
+#if defined _WIN32
+#	include <windows.h>
+#	define Prof_Tick(tick) QueryPerformanceCounter((LARGE_INTEGER *)(tick))
+
+typedef ULONGLONG prof_tick_t;
+
+#elif defined PSP
+#	include <psptypes.h>
+#	include <psprtc.h>
+#	define Prof_Tick(tick) sceRtcGetCurrentTick(tick)
+
+typedef u64 prof_tick_t;
+
+#else
+#	error Unhandled platform.
+#endif
+
 typedef struct prof_stack_s
 {
+	prof_tick_t start;
+	prof_tick_t children;
 	const char *name;
-	int start;
-	int children;
 } prof_stack_t;
 
 typedef struct prof_block_s
 {
 	unsigned int hash;
 	const char *name;
-	int exclusive;
+	prof_tick_t exclusive;
 } prof_block_t;
 
 #define MAX_PROF_STACK 1024
@@ -141,7 +158,7 @@ void Prof_Begin(const char *name)
 
 		stack_frame->name = name;
 		stack_frame->children = 0;
-		stack_frame->start = Sys_Milliseconds();
+		Prof_Tick(&stack_frame->start);
 	}
 
 	++stack_size;
@@ -149,14 +166,16 @@ void Prof_Begin(const char *name)
 
 void Prof_End(void)
 {
-	const int end = Sys_Milliseconds();
+	prof_tick_t end;
+
+	Prof_Tick(&end);
 
 	--stack_size;
 
 	if (stack_size < MAX_PROF_STACK)
 	{
 		const prof_stack_t *const stack_frame = &stack[stack_size];
-		const int delta = end - stack_frame->start;
+		const prof_tick_t delta = end - stack_frame->start;
 		
 		Prof_Store(stack_frame->name, delta - stack_frame->children);
 
@@ -191,7 +210,7 @@ void Prof_Print(void)
 
 		if (block->exclusive > 0)
 		{
-			Com_Printf("\t%-32s:%10d\n", block->name, block->exclusive);
+			Com_Printf("\t%-32s:%10u\n", block->name, (unsigned int)block->exclusive);
 		}
 	}
 

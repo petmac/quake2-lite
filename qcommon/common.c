@@ -1472,6 +1472,8 @@ void Qcommon_Init (int argc, char **argv)
 Qcommon_Frame
 =================
 */
+static int frames_since_prof_print;
+
 void Qcommon_Frame (int msec)
 {
 	char	*s;
@@ -1567,7 +1569,13 @@ void Qcommon_Frame (int msec)
 	}
 	
 	Prof_End();
-	Prof_Print();
+
+	frames_since_prof_print++;
+	if (frames_since_prof_print > 60)
+	{
+		Prof_Print();
+		frames_since_prof_print = 0;
+	}
 }
 
 /*
