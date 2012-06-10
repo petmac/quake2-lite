@@ -159,7 +159,7 @@ static int MapKey(SDLKey k)
 
 void Sys_SendKeyEvents (void)
 {
-	const int t = SDL_GetTicks();
+	const int t = sys_frame_time;
 	SDL_Event e;
 
 	while (SDL_PollEvent(&e))
@@ -237,6 +237,7 @@ int main (int argc, char **argv)
 		while (go)
 		{
 			curtime = SDL_GetTicks();
+			sys_frame_time = curtime;
 
 			Qcommon_Frame (curtime - oldtime);
 

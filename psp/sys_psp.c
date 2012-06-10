@@ -229,6 +229,7 @@ int main (int argc, char **argv)
 		SceCtrlData pad;
 
 		curtime = Sys_Milliseconds();
+		sys_frame_time = curtime;
 
 		if (curtime < oldtime)
 		{
