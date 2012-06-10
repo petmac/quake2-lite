@@ -76,7 +76,7 @@ static int MapKey(SDLKey k)
 	{
 	case SDLK_BACKSPACE: return K_BACKSPACE;
 
-		//case SDLK_KP0: return K_;
+	case SDLK_KP0: return K_KP_INS;
 	case SDLK_KP1: return K_KP_END;
 	case SDLK_KP2: return K_KP_DOWNARROW;
 	case SDLK_KP3: return K_KP_PGDN;
@@ -86,13 +86,13 @@ static int MapKey(SDLKey k)
 	case SDLK_KP7: return K_KP_HOME;
 	case SDLK_KP8: return K_KP_UPARROW;
 	case SDLK_KP9: return K_KP_PGUP;
-		//case SDLK_KP_PERIOD: return K_;
+	case SDLK_KP_PERIOD: return K_KP_DEL;
 	case SDLK_KP_DIVIDE: return K_KP_SLASH;
-		//case SDLK_KP_MULTIPLY: return K_;
+	//case SDLK_KP_MULTIPLY: return K_KP_;
 	case SDLK_KP_MINUS: return K_KP_MINUS;
 	case SDLK_KP_PLUS: return K_KP_PLUS;
 	case SDLK_KP_ENTER: return K_KP_ENTER;
-		//case SDLK_KP_EQUALS: return K_;
+	//case SDLK_KP_EQUALS: return K_KP_;
 
 	case SDLK_UP: return K_UPARROW;
 	case SDLK_DOWN: return K_DOWNARROW;
@@ -166,9 +166,30 @@ void Sys_SendKeyEvents (void)
 	{
 		switch (e.type)
 		{
+		case SDL_ACTIVEEVENT:
+			if (e.active.state & SDL_APPINPUTFOCUS)
+			{
+				if (e.active.gain)
+				{
+					SDL_WM_GrabInput(SDL_GRAB_ON);
+					SDL_ShowCursor(0);
+				}
+				else
+				{
+					SDL_WM_GrabInput(SDL_GRAB_OFF);
+					SDL_ShowCursor(1);
+				}
+			}
+			break;
+
 		case SDL_KEYDOWN:
 		case SDL_KEYUP:
 			Key_Event(MapKey(e.key.keysym.sym), e.type == SDL_KEYDOWN, t);
+			break;
+
+		case SDL_MOUSEBUTTONDOWN:
+		case SDL_MOUSEBUTTONUP:
+			Key_Event(K_MOUSE1 + e.button.button - 1, e.type == SDL_MOUSEBUTTONDOWN, t);
 			break;
 
 		case SDL_QUIT:
@@ -216,6 +237,11 @@ void	Sys_FindClose (void)
 
 void	Sys_Init (void)
 {
+	if (SDL_GetAppState() & SDL_APPINPUTFOCUS)
+	{
+		SDL_WM_GrabInput(SDL_GRAB_ON);
+		SDL_ShowCursor(0);
+	}
 }
 
 

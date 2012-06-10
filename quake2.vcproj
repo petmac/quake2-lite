@@ -745,6 +745,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sdl\in_sdl.c"
+				>
+			</File>
+			<File
 				RelativePath=".\sdl\qgl_sdl.c"
 				>
 			</File>
@@ -814,10 +818,6 @@
 			>
 			<File
 				RelativePath=".\null\cd_null.c"
-				>
-			</File>
-			<File
-				RelativePath=".\null\in_null.c"
 				>
 			</File>
 		</Filter>
