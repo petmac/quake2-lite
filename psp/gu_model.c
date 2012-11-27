@@ -182,6 +182,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 	char *extradata;
 
 	Prof_Begin(__FUNCTION__);
+	Com_DPrintf("Loading model %s\n", name);
 
 	if (!name[0])
 		ri.Sys_Error (ERR_DROP, "Mod_ForName: NULL name");
@@ -194,6 +195,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 		i = atoi(name+1);
 		if (i < 1 || !r_worldmodel || i >= r_worldmodel->numsubmodels)
 			ri.Sys_Error (ERR_DROP, "bad inline model number");
+		Com_DPrintf("Loaded model %s (inline)\n", name);
 		Prof_End();
 		return &mod_inline[i];
 	}
@@ -207,6 +209,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 			continue;
 		if (!strcmp (mod->name, name) )
 		{
+			Com_DPrintf("Loaded model %s (already loaded)\n", name);
 			Prof_End();
 			return mod;
 		}
@@ -234,6 +237,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 	modfilelen = ri.FS_FOpenFile (mod->name, &file);
 	if (modfilelen < 0)
 	{
+		Com_DPrintf("Couldn't find model file %s\n", name);
 		if (crash)
 			ri.Sys_Error (ERR_DROP, "Mod_NumForName: %s not found", mod->name);
 		memset (mod->name, 0, sizeof(mod->name));
@@ -278,6 +282,8 @@ model_t *Mod_ForName (char *name, qboolean crash)
 
 	ri.FS_FCloseFile(file);
 
+	Com_DPrintf("Loaded model %s\n", name);
+
 	Prof_End();
 
 	return mod;
@@ -298,9 +304,12 @@ Mod_LoadLighting
 */
 void Mod_LoadLighting (lump_t *l, FILE *file, long base)
 {
+	Com_DPrintf("%s...\n", __FUNCTION__);
+
 	if (!l->filelen)
 	{
 		loadmodel->lightdata = NULL;
+		Com_DPrintf("%s NULL\n", __FUNCTION__);
 		return;
 	}
 
@@ -309,6 +318,8 @@ void Mod_LoadLighting (lump_t *l, FILE *file, long base)
 	loadmodel->lightdata = Hunk_Alloc (&hunk_ref, l->filelen);
 
 	ri.FS_Read(loadmodel->lightdata, l->filelen, file);
+	
+	Com_DPrintf("%s OK\n", __FUNCTION__);
 }
 
 
@@ -326,11 +337,14 @@ void Mod_LoadVisibility (lump_t *l, FILE *file, long base)
 	if (!l->filelen)
 	{
 		loadmodel->vis = NULL;
+		Com_DPrintf("%s NULL\n", __FUNCTION__);
 		return;
 	}
 
 	loadmodel->vis = Hunk_Alloc (&hunk_ref, l->filelen);
 	ri.FS_Read (loadmodel->vis, l->filelen, file);
+
+	Com_DPrintf("%s OK\n", __FUNCTION__);
 }
 
 
@@ -344,6 +358,8 @@ void Mod_LoadVertexes (lump_t *l, FILE *file, long base)
 	dvertex_t	*in;
 	mvertex_t	*out;
 	int			i, count;
+	
+	Com_DPrintf("%s\n", __FUNCTION__);
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
@@ -364,6 +380,8 @@ void Mod_LoadVertexes (lump_t *l, FILE *file, long base)
 	}
 
 	Z_Free(in);
+	
+	Com_DPrintf("%s OK\n", __FUNCTION__);
 }
 
 /*
@@ -371,7 +389,7 @@ void Mod_LoadVertexes (lump_t *l, FILE *file, long base)
 RadiusFromBounds
 =================
 */
-float RadiusFromBounds (vec3_t mins, vec3_t maxs)
+static float RadiusFromBounds (vec3_t mins, vec3_t maxs)
 {
 	int		i;
 	vec3_t	corner;
@@ -395,6 +413,8 @@ void Mod_LoadSubmodels (lump_t *l, FILE *file, long base)
 	dmodel_t	in[MAX_MAP_MODELS];
 	mmodel_t	*out;
 	int			i, j, count;
+	
+	Com_DPrintf("%s\n", __FUNCTION__);
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
@@ -423,6 +443,8 @@ void Mod_LoadSubmodels (lump_t *l, FILE *file, long base)
 		out->firstface = LittleLong (in[i].firstface);
 		out->numfaces = LittleLong (in[i].numfaces);
 	}
+	
+	Com_DPrintf("%s OK\n", __FUNCTION__);
 }
 
 /*
@@ -434,6 +456,8 @@ void Mod_LoadEdges (lump_t *l, FILE *file, long base)
 {
 	dedge_t *out;
 	int 	i, count;
+	
+	Com_DPrintf("%s\n", __FUNCTION__);
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
@@ -446,6 +470,8 @@ void Mod_LoadEdges (lump_t *l, FILE *file, long base)
 	loadmodel->numedges = count;
 
 	ri.FS_Read(out, l->fileofs, file);
+	
+	Com_DPrintf("%s OK\n", __FUNCTION__);
 }
 
 /*
@@ -460,6 +486,8 @@ void Mod_LoadTexinfo (lump_t *l, FILE *file, long base)
 	int 	i, j, count;
 	char	name[MAX_QPATH];
 	int		next;
+	
+	Com_DPrintf("%s\n", __FUNCTION__);
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
@@ -503,6 +531,8 @@ void Mod_LoadTexinfo (lump_t *l, FILE *file, long base)
 		for (step = out->next ; step && step != out ; step=step->next)
 			out->numframes++;
 	}
+	
+	Com_DPrintf("%s OK\n", __FUNCTION__);
 }
 
 /*
@@ -577,6 +607,8 @@ void Mod_LoadFaces (lump_t *l, FILE *file, long base)
 	int			i, count, surfnum;
 	int			planenum, side;
 	int			ti;
+	
+	Com_DPrintf("%s\n", __FUNCTION__);
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
@@ -651,6 +683,8 @@ void Mod_LoadFaces (lump_t *l, FILE *file, long base)
 	GL_EndBuildingLightmaps ();
 
 	Z_Free(in);
+	
+	Com_DPrintf("%s OK\n", __FUNCTION__);
 }
 
 
@@ -659,7 +693,7 @@ void Mod_LoadFaces (lump_t *l, FILE *file, long base)
 Mod_SetParent
 =================
 */
-void Mod_SetParent (mnode_t *node, mnode_t *parent)
+static void Mod_SetParent (mnode_t *node, mnode_t *parent)
 {
 	node->parent = parent;
 	if (node->contents != -1)
@@ -678,6 +712,8 @@ void Mod_LoadNodes (lump_t *l, FILE *file, long base)
 	int			i, j, count, p;
 	dnode_t		in[MAX_MAP_NODES];
 	mnode_t 	*out;
+	
+	Com_DPrintf("%s\n", __FUNCTION__);
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
@@ -721,6 +757,8 @@ void Mod_LoadNodes (lump_t *l, FILE *file, long base)
 	}
 
 	Mod_SetParent (loadmodel->nodes, NULL);	// sets nodes and leafs
+	
+	Com_DPrintf("%s OK\n", __FUNCTION__);
 }
 
 /*
@@ -734,6 +772,8 @@ void Mod_LoadLeafs (lump_t *l, FILE *file, long base)
 	mleaf_t 	*out;
 	int			i, j, count, p;
 	//	glpoly_t	*poly;
+	
+	Com_DPrintf("%s\n", __FUNCTION__);
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
@@ -781,7 +821,9 @@ void Mod_LoadLeafs (lump_t *l, FILE *file, long base)
 			}
 		}
 #endif
-	}	
+	}
+	
+	Com_DPrintf("%s OK\n", __FUNCTION__);
 }
 
 /*
@@ -794,6 +836,8 @@ void Mod_LoadMarksurfaces (lump_t *l, FILE *file, long base)
 	int		i, j, count;
 	short		*in;
 	msurface_t **out;
+	
+	Com_DPrintf("%s\n", __FUNCTION__);
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
@@ -817,6 +861,8 @@ void Mod_LoadMarksurfaces (lump_t *l, FILE *file, long base)
 	}
 
 	Z_Free(in);
+	
+	Com_DPrintf("%s OK\n", __FUNCTION__);
 }
 
 /*
@@ -828,6 +874,8 @@ void Mod_LoadSurfedges (lump_t *l, FILE *file, long base)
 {	
 	int		i, count;
 	int		*out;
+	
+	Com_DPrintf("%s\n", __FUNCTION__);
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
@@ -841,6 +889,8 @@ void Mod_LoadSurfedges (lump_t *l, FILE *file, long base)
 	loadmodel->numsurfedges = count;
 
 	ri.FS_Read(out, l->filelen, file);
+	
+	Com_DPrintf("%s OK\n", __FUNCTION__);
 }
 
 
@@ -849,12 +899,16 @@ void Mod_LoadSurfedges (lump_t *l, FILE *file, long base)
 Mod_LoadPlanes
 =================
 */
+#define MAX_MAP_PLANES_ON_STACK 4096
+
 void Mod_LoadPlanes (lump_t *l, FILE *file, long base)
 {
 	int			i, j;
 	cplane_t	*out;
-	dplane_t 	in[MAX_MAP_PLANES];
+	dplane_t 	in[MAX_MAP_PLANES_ON_STACK];
 	int			count;
+	
+	Com_DPrintf("%s\n", __FUNCTION__);
 
 	fseek(file, base + l->fileofs, SEEK_SET);
 
@@ -868,13 +922,36 @@ void Mod_LoadPlanes (lump_t *l, FILE *file, long base)
 	loadmodel->planes = out;
 	loadmodel->numplanes = count;
 
-	ri.FS_Read(in, l->filelen, file);
-
-	for ( i=0 ; i<count ; i++, out++)
+	while (count > 0)
 	{
-		VectorCopy(in[i].normal, out->normal);
-		out->dist = LittleFloat (in[i].dist);
+		if (count > MAX_MAP_PLANES_ON_STACK)
+		{
+			ri.FS_Read(in, sizeof(in), file);
+
+			for (i = 0; i < count; i++, out++)
+			{
+				VectorCopy(in[i].normal, out->normal);
+				out->dist = in[i].dist;
+			}
+
+			count -= MAX_MAP_PLANES_ON_STACK;
+		}
+		else
+		{
+			ri.FS_Read(in, count * sizeof(dplane_t), file);
+
+			for (i = 0; i < count; i++, out++)
+			{
+				VectorCopy(in[i].normal, out->normal);
+				out->dist = in[i].dist;
+			}
+
+			out += count;
+			count = 0;
+		}
 	}
+
+	Com_DPrintf("%s OK\n", __FUNCTION__);
 }
 
 /*
@@ -894,6 +971,8 @@ void Mod_LoadBrushModel (model_t *mod, FILE *file, long base)
 	if (loadmodel != mod_known)
 		ri.Sys_Error (ERR_DROP, "Loaded a brush model after the world");
 
+	Com_DPrintf("Loading header.\n");
+
 	ri.FS_Read(&header, sizeof(header), file);
 
 	i = LittleLong (header.version);
@@ -901,6 +980,8 @@ void Mod_LoadBrushModel (model_t *mod, FILE *file, long base)
 		ri.Sys_Error (ERR_DROP, "Mod_LoadBrushModel: %s has wrong version number (%i should be %i)", mod->name, i, BSPVERSION);
 
 	// swap all the lumps
+
+	Com_DPrintf("Swapping lumps.\n");
 
 	for (i=0 ; i<sizeof(dheader_t)/4 ; i++)
 		((int *)&header)[i] = LittleLong ( ((int *)&header)[i]);
@@ -924,6 +1005,9 @@ void Mod_LoadBrushModel (model_t *mod, FILE *file, long base)
 	//
 	// set up the submodels
 	//
+	
+	Com_DPrintf("Loading submodels\n");
+
 	for (i=0 ; i<mod->numsubmodels ; i++)
 	{
 		model_t	*starmod;
@@ -948,6 +1032,8 @@ void Mod_LoadBrushModel (model_t *mod, FILE *file, long base)
 
 		starmod->numleafs = bm->visleafs;
 	}
+
+	Com_DPrintf("Finished loading submodels\n");
 
 	Prof_End();
 }

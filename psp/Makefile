@@ -126,11 +126,13 @@ PSP_EBOOT_TITLE = Quake 2 ported by Peter Mackay
 PSPSDK=$(shell psp-config --pspsdk-path)
 include $(PSPSDK)/lib/build.mak
 
+DEPLOY_DIR := P:/PSP/GAME/Quake2
+
 deploy: all
 	@echo Analysing...
 	@psp-readelf --sections --wide $(TARGET).elf >sections.txt
 	@psp-nm --size-sort --reverse-sort --radix=d $(TARGET).elf >symbols.txt
 	@echo Deploying...
-	@$(MKDIR) -p G:/PSP/GAME/Quake2
-	@$(CP) EBOOT.PBP G:/PSP/GAME/Quake2/EBOOT.PBP
-	@$(CP) PARAM.SFO G:/PSP/GAME/Quake2/PARAM.SFO
+	@$(MKDIR) -p $(DEPLOY_DIR)
+	@$(CP) EBOOT.PBP $(DEPLOY_DIR)/EBOOT.PBP
+	@$(CP) PARAM.SFO $(DEPLOY_DIR)/PARAM.SFO

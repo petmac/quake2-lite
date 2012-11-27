@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="quake2-psp"
 	ProjectGUID="{1F0F9675-48A5-4127-94C5-69BF508486E0}"
+	RootNamespace="quake2-psp"
 	Keyword="MakeFileProj"
 	TargetFrameworkVersion="196613"
 	>
@@ -627,7 +628,7 @@
 				>
 			</File>
 			<File
-				RelativePath="G:\PSP\GAME\Quake2\log.txt"
+				RelativePath="P:\PSP\GAME\Quake2\log.txt"
 				>
 			</File>
 			<File

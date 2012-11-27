@@ -1423,7 +1423,7 @@ void Qcommon_Init (int argc, char **argv)
 
 	host_speeds = Cvar_Get ("host_speeds", "0", 0);
 	log_stats = Cvar_Get ("log_stats", "0", 0);
-	developer = Cvar_Get ("developer", "0", 0);
+	developer = Cvar_Get ("developer", "1", 0);
 	timescale = Cvar_Get ("timescale", "1", 0);
 	fixedtime = Cvar_Get ("fixedtime", "0", 0);
 	logfile_active = Cvar_Get ("logfile", "0", 0);
