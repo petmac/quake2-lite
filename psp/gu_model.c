@@ -924,11 +924,11 @@ void Mod_LoadPlanes (lump_t *l, FILE *file, long base)
 
 	while (count > 0)
 	{
-		if (count > MAX_MAP_PLANES_ON_STACK)
+		if (count >= MAX_MAP_PLANES_ON_STACK)
 		{
 			ri.FS_Read(in, sizeof(in), file);
 
-			for (i = 0; i < count; i++, out++)
+			for (i = 0; i < MAX_MAP_PLANES_ON_STACK; i++, out++)
 			{
 				VectorCopy(in[i].normal, out->normal);
 				out->dist = in[i].dist;
@@ -946,7 +946,6 @@ void Mod_LoadPlanes (lump_t *l, FILE *file, long base)
 				out->dist = in[i].dist;
 			}
 
-			out += count;
 			count = 0;
 		}
 	}
