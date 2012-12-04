@@ -33,6 +33,8 @@ PSP_MODULE_INFO("Quake 2", 0, 1, 1);
 /* Define the main thread's attribute value (optional) */
 PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
 
+#define WRITE_LOG 1
+
 void *GetGameAPI (void *import);
 
 int	curtime;
@@ -124,14 +126,13 @@ char *Sys_ConsoleInput (void)
 
 void	Sys_ConsoleOutput (char *string)
 {
-#if 1
+#if WRITE_LOG
 	FILE *file = NULL;
 
 	file = fopen("log.txt", "a");
 	if (file != NULL)
 	{
 		fputs(string, file);
-		//fflush(file);
 		fclose(file);
 		file = NULL;
 	}
@@ -194,12 +195,15 @@ void	Sys_Init (void)
 
 int main (int argc, char **argv)
 {
+#if WRITE_LOG
 	FILE *log = NULL;
+#endif
 	u32 ticks_per_s;
 	int oldtime;
 
 	SetupCallbacks();
 
+#if WRITE_LOG
 	// Wipe log file.
 	log = fopen("log.txt", "w");
 	if (log != NULL)
@@ -208,6 +212,7 @@ int main (int argc, char **argv)
 		fclose(log);
 		log = NULL;
 	}
+#endif
 
 	// Calculate the clock resolution.
 	sceRtcGetCurrentTick(&first_ticks);
