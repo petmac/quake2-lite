@@ -792,10 +792,8 @@ void QGL_Shutdown( void )
 ** might be.
 ** 
 */
-qboolean QGL_Init( const char *dllname )
+qboolean QGL_Init( void )
 {
-	static qboolean loaded = false;
-
 	// update 3Dfx gamma irrespective of underlying DLL
 	{
 		char envbuffer[1024];
@@ -806,16 +804,6 @@ qboolean QGL_Init( const char *dllname )
 		_putenv( envbuffer );
 		Com_sprintf( envbuffer, sizeof(envbuffer), "SST_GAMMA=%f", g );
 		_putenv( envbuffer );
-	}
-
-	if (!loaded)
-	{
-		if (SDL_GL_LoadLibrary(dllname) < 0)
-		{
-			return false;
-		}
-
-		loaded = true;
 	}
 
 	gl_config.allow_cds = true;

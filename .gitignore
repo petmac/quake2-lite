@@ -1,3 +1,8 @@
 # Subversion
 
 .svn
+Debug/
+*.opensdf
+*.sdf
+*.suo
+*.user

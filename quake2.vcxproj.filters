@@ -452,9 +452,6 @@
     <ClCompile Include="sdl\qgl_sdl.c">
       <Filter>sdl</Filter>
     </ClCompile>
-    <ClCompile Include="sdl\SDL_win32_main.c">
-      <Filter>sdl</Filter>
-    </ClCompile>
     <ClCompile Include="sdl\snddma_sdl.c">
       <Filter>sdl</Filter>
     </ClCompile>

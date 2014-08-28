@@ -100,7 +100,6 @@ cvar_t	*gl_ext_compiled_vertex_array;
 cvar_t	*gl_log;
 cvar_t	*gl_bitdepth;
 cvar_t	*gl_drawbuffer;
-cvar_t  *gl_driver;
 cvar_t	*gl_lightmap;
 cvar_t	*gl_shadows;
 cvar_t	*gl_mode;
@@ -1069,7 +1068,6 @@ void R_Register( void )
 	gl_flashblend = ri.Cvar_Get ("gl_flashblend", "0", 0);
 	gl_playermip = ri.Cvar_Get ("gl_playermip", "0", 0);
 	gl_monolightmap = ri.Cvar_Get( "gl_monolightmap", "0", 0 );
-	gl_driver = ri.Cvar_Get( "gl_driver", "opengl32", CVAR_ARCHIVE );
 	gl_texturemode = ri.Cvar_Get( "gl_texturemode", "GL_LINEAR_MIPMAP_NEAREST", CVAR_ARCHIVE );
 	gl_texturealphamode = ri.Cvar_Get( "gl_texturealphamode", "default", CVAR_ARCHIVE );
 	gl_texturesolidmode = ri.Cvar_Get( "gl_texturesolidmode", "default", CVAR_ARCHIVE );
@@ -1177,10 +1175,9 @@ int R_Init( void *hinstance, void *hWnd )
 	R_Register();
 
 	// initialize our QGL dynamic bindings
-	if ( !QGL_Init( gl_driver->string ) )
+	if ( !QGL_Init() )
 	{
 		QGL_Shutdown();
-        ri.Con_Printf (PRINT_ALL, "ref_gl::R_Init() - could not load \"%s\"\n", gl_driver->string );
 		return -1;
 	}
 

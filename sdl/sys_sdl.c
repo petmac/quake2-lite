@@ -24,6 +24,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <SDL.h>
 #include <Windows.h>
 
+SDL_Window *window;
+
 void *GetGameAPI (void *import);
 
 int	curtime;
@@ -70,22 +72,22 @@ void	Sys_ConsoleOutput (char *string)
 	OutputDebugStringA(string);
 }
 
-static int MapKey(SDLKey k)
+static int MapKey(SDL_Keycode k)
 {
 	switch (k)
 	{
 	case SDLK_BACKSPACE: return K_BACKSPACE;
 
-	case SDLK_KP0: return K_KP_INS;
-	case SDLK_KP1: return K_KP_END;
-	case SDLK_KP2: return K_KP_DOWNARROW;
-	case SDLK_KP3: return K_KP_PGDN;
-	case SDLK_KP4: return K_KP_LEFTARROW;
-	case SDLK_KP5: return K_KP_5;
-	case SDLK_KP6: return K_KP_RIGHTARROW;
-	case SDLK_KP7: return K_KP_HOME;
-	case SDLK_KP8: return K_KP_UPARROW;
-	case SDLK_KP9: return K_KP_PGUP;
+	case SDLK_KP_0: return K_KP_INS;
+	case SDLK_KP_1: return K_KP_END;
+	case SDLK_KP_2: return K_KP_DOWNARROW;
+	case SDLK_KP_3: return K_KP_PGDN;
+	case SDLK_KP_4: return K_KP_LEFTARROW;
+	case SDLK_KP_5: return K_KP_5;
+	case SDLK_KP_6: return K_KP_RIGHTARROW;
+	case SDLK_KP_7: return K_KP_HOME;
+	case SDLK_KP_8: return K_KP_UPARROW;
+	case SDLK_KP_9: return K_KP_PGUP;
 	case SDLK_KP_PERIOD: return K_KP_DEL;
 	case SDLK_KP_DIVIDE: return K_KP_SLASH;
 	//case SDLK_KP_MULTIPLY: return K_KP_;
@@ -166,19 +168,18 @@ void Sys_SendKeyEvents (void)
 	{
 		switch (e.type)
 		{
-		case SDL_ACTIVEEVENT:
-			if (e.active.state & SDL_APPINPUTFOCUS)
+		case SDL_WINDOWEVENT:
+			switch (e.window.type)
 			{
-				if (e.active.gain)
-				{
-					SDL_WM_GrabInput(SDL_GRAB_ON);
-					SDL_ShowCursor(0);
-				}
-				else
-				{
-					SDL_WM_GrabInput(SDL_GRAB_OFF);
-					SDL_ShowCursor(1);
-				}
+			case SDL_WINDOWEVENT_FOCUS_GAINED:
+				SDL_SetWindowGrab(window, SDL_TRUE);
+				SDL_ShowCursor(0);
+				break;
+
+			case SDL_WINDOWEVENT_FOCUS_LOST:
+				SDL_SetWindowGrab(window, SDL_FALSE);
+				SDL_ShowCursor(1);
+				break;
 			}
 			break;
 
@@ -237,11 +238,6 @@ void	Sys_FindClose (void)
 
 void	Sys_Init (void)
 {
-	if (SDL_GetAppState() & SDL_APPINPUTFOCUS)
-	{
-		SDL_WM_GrabInput(SDL_GRAB_ON);
-		SDL_ShowCursor(0);
-	}
 }
 
 
@@ -252,26 +248,34 @@ int main (int argc, char **argv)
 	const char *const caption = "Quake 2 Lite";
 	int oldtime;
 
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) >= 0)
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
 	{
-		SDL_WM_SetCaption(caption, caption);
+		return 1;
+	}
 
-		Qcommon_Init (argc, argv);
+	window = SDL_CreateWindow(caption, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 320, 240, SDL_WINDOW_OPENGL);
+	if (window == NULL)
+	{
+		return 1;
+	}
 
-		oldtime = SDL_GetTicks();
+	Qcommon_Init (argc, argv);
 
-		while (go)
+	oldtime = SDL_GetTicks();
+
+	while (go)
+	{
+		curtime = SDL_GetTicks();
+		sys_frame_time = curtime;
+
+		if (curtime != oldtime)
 		{
-			curtime = SDL_GetTicks();
-			sys_frame_time = curtime;
-
-			Qcommon_Frame (curtime - oldtime);
-
+			Qcommon_Frame(curtime - oldtime);
 			oldtime = curtime;
 		}
-
-		SDL_Quit();
 	}
+
+	SDL_Quit();
 
 	return 0;
 }

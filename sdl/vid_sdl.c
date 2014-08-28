@@ -24,6 +24,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "SDL_video.h"
 
+extern SDL_Window *window;
+
 // Console variables that we need to access from this module
 extern cvar_t *vid_ref;
 cvar_t		*vid_gamma;
@@ -177,7 +179,7 @@ qboolean VID_LoadRefresh()
 		Com_Error (ERR_FATAL, "Refresh has incompatible api_version");
 	}
 
-	if ( re.Init( NULL, NULL ) == -1 )
+	if ( re.Init( NULL, window ) == -1 )
 	{
 		re.Shutdown();
 		return false;
@@ -196,29 +198,18 @@ qboolean VID_LoadRefresh()
 
 void	VID_Init (void)
 {
-	SDL_Rect **modes;
+	int i;
 
 	// Enumerate modes.
-	modes = SDL_ListModes(NULL, SDL_OPENGL | SDL_FULLSCREEN);
-	if (modes == NULL)
+	vid_num_modes = SDL_min(VID_MAX_MODES, SDL_GetNumDisplayModes(0));
+	
+	for (i = 0; i < vid_num_modes; ++i)
 	{
-        Com_Error (ERR_FATAL, "SDL_ListModes returned no modes.");
-		return;
-	}
-	else if (modes == (SDL_Rect **)-1)
-	{
-		vid_modes[0].width = 480;
-		vid_modes[0].height = 272;
-		vid_num_modes = 1;
-	}
-	else
-	{
-		while ((vid_num_modes < VID_MAX_MODES) && (modes[vid_num_modes] != NULL))
-		{
-			vid_modes[vid_num_modes].width = modes[vid_num_modes]->w;
-			vid_modes[vid_num_modes].height = modes[vid_num_modes]->h;
-			++vid_num_modes;
-		}
+		SDL_DisplayMode mode = { 0 };
+		SDL_GetDisplayMode(0, i, &mode);
+
+		vid_modes[i].width = mode.w;
+		vid_modes[i].height = mode.h;
 	}
 
 	qsort(&vid_modes[0], vid_num_modes, sizeof(vidmode_t), &CompareModes);
