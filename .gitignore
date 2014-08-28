@@ -1,7 +1,6 @@
-# Subversion
+/bin/
+/obj/
 
-.svn
-Debug/
 *.opensdf
 *.sdf
 *.suo
