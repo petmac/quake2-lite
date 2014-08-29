@@ -20,6 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "gu_local.h"
 
+#include <pspkernel.h>
+
 image_t		gltextures[MAX_GLTEXTURES];
 int			numgltextures;
 

@@ -176,7 +176,7 @@ void DrawGLWaterPolyLightmap (glpoly_t *p)
 DrawGLPoly
 ================
 */
-static inline void Intersect(float *dst, const float *a, const float *b, float dist_a, float dist_b)
+static void Intersect(float *dst, const float *a, const float *b, float dist_a, float dist_b)
 {
 	const float f = dist_a / (dist_a - dist_b);
 	int i;

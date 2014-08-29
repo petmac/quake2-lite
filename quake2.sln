@@ -1,9 +1,13 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C++ Express 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2013 for Windows Desktop
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "quake2", "quake2.vcxproj", "{210D5FE9-1DE7-4437-BC19-159F1AF5E920}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "quake2-psp", "psp\quake2-psp.vcxproj", "{1F0F9675-48A5-4127-94C5-69BF508486E0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "quake2-psp-sim", "quake2-psp-sim.vcxproj", "{8E86BF5D-C01B-4324-B7E0-744F270FAE29}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,6 +23,10 @@ Global
 		{1F0F9675-48A5-4127-94C5-69BF508486E0}.Debug|Win32.Build.0 = Debug|Win32
 		{1F0F9675-48A5-4127-94C5-69BF508486E0}.Release|Win32.ActiveCfg = Release|Win32
 		{1F0F9675-48A5-4127-94C5-69BF508486E0}.Release|Win32.Build.0 = Release|Win32
+		{8E86BF5D-C01B-4324-B7E0-744F270FAE29}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8E86BF5D-C01B-4324-B7E0-744F270FAE29}.Debug|Win32.Build.0 = Debug|Win32
+		{8E86BF5D-C01B-4324-B7E0-744F270FAE29}.Release|Win32.ActiveCfg = Release|Win32
+		{8E86BF5D-C01B-4324-B7E0-744F270FAE29}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

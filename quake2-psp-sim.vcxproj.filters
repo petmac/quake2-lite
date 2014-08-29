@@ -1,0 +1,537 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="client">
+      <UniqueIdentifier>{4aa4a314-9d2f-4554-bbd7-a539e70ad8a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="game">
+      <UniqueIdentifier>{e08a9f81-1d9b-4f80-a254-1724b69f845e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="null">
+      <UniqueIdentifier>{412043a6-46a9-4c91-a554-eda9ffa202cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="qcommon">
+      <UniqueIdentifier>{e3dbb8ff-3f09-4f0c-9ba6-a92199df8821}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="psp">
+      <UniqueIdentifier>{fcd938ce-f5b6-4ea7-804a-6752e725de1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="server">
+      <UniqueIdentifier>{d4e73ac2-e17a-438f-8897-c6ea046871a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="psp-sim">
+      <UniqueIdentifier>{a808f964-599c-4daf-ae36-a031c966a1a7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="client\adivtab.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="client\anorms.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="client\block8.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="client\block16.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="client\cdaudio.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="client\client.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="client\console.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="client\input.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="client\keys.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="client\qmenu.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="client\ref.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="client\screen.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="client\snd_loc.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="client\sound.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="client\vid.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="game\g_local.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\game.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_actor.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_berserk.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_boss2.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_boss31.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_boss32.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_brain.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_chick.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_flipper.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_float.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_flyer.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_gladiator.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_gunner.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_hover.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_infantry.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_insane.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_medic.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_mutant.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_parasite.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_player.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_rider.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_soldier.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_supertank.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\m_tank.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="game\q_shared.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="server\server.h">
+      <Filter>server</Filter>
+    </ClInclude>
+    <ClInclude Include="psp\gu_local.h">
+      <Filter>psp</Filter>
+    </ClInclude>
+    <ClInclude Include="psp\gu_model.h">
+      <Filter>psp</Filter>
+    </ClInclude>
+    <ClInclude Include="qcommon\crc.h">
+      <Filter>qcommon</Filter>
+    </ClInclude>
+    <ClInclude Include="qcommon\qcommon.h">
+      <Filter>qcommon</Filter>
+    </ClInclude>
+    <ClInclude Include="qcommon\qfiles.h">
+      <Filter>qcommon</Filter>
+    </ClInclude>
+    <ClInclude Include="psp-sim\pspdisplay.h">
+      <Filter>psp-sim</Filter>
+    </ClInclude>
+    <ClInclude Include="psp-sim\pspgum.h">
+      <Filter>psp-sim</Filter>
+    </ClInclude>
+    <ClInclude Include="psp-sim\psputils.h">
+      <Filter>psp-sim</Filter>
+    </ClInclude>
+    <ClInclude Include="psp-sim\pspaudiolib.h">
+      <Filter>psp-sim</Filter>
+    </ClInclude>
+    <ClInclude Include="psp-sim\pspctrl.h">
+      <Filter>psp-sim</Filter>
+    </ClInclude>
+    <ClInclude Include="psp-sim\pspge.h">
+      <Filter>psp-sim</Filter>
+    </ClInclude>
+    <ClInclude Include="psp-sim\pspgu.h">
+      <Filter>psp-sim</Filter>
+    </ClInclude>
+    <ClInclude Include="psp-sim\pspkernel.h">
+      <Filter>psp-sim</Filter>
+    </ClInclude>
+    <ClInclude Include="psp-sim\psprtc.h">
+      <Filter>psp-sim</Filter>
+    </ClInclude>
+    <ClInclude Include="psp-sim\psptypes.h">
+      <Filter>psp-sim</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="client\cl_cin.c">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="client\cl_ents.c">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="client\cl_fx.c">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="client\cl_input.c">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="client\cl_inv.c">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="client\cl_main.c">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="client\cl_newfx.c">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="client\cl_parse.c">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="client\cl_pred.c">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="client\cl_scrn.c">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="client\cl_tent.c">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="client\cl_view.c">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="client\console.c">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="client\keys.c">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="client\menu.c">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="client\qmenu.c">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="client\snd_dma.c">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="client\snd_mem.c">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="client\snd_mix.c">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="game\g_ai.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\g_chase.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\g_cmds.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\g_combat.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\g_func.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\g_items.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\g_main.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\g_misc.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\g_monster.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\g_phys.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\g_save.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\g_spawn.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\g_svcmds.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\g_target.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\g_trigger.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\g_turret.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\g_utils.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\g_weapon.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_actor.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_berserk.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_boss2.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_boss3.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_boss31.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_boss32.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_brain.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_chick.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_flash.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_flipper.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_float.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_flyer.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_gladiator.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_gunner.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_hover.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_infantry.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_insane.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_medic.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_move.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_mutant.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_parasite.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_soldier.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_supertank.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\m_tank.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\p_client.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\p_hud.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\p_trail.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\p_view.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\p_weapon.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="game\q_shared.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="server\sv_ccmds.c">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="server\sv_ents.c">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="server\sv_game.c">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="server\sv_init.c">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="server\sv_main.c">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="server\sv_send.c">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="server\sv_user.c">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="server\sv_world.c">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="psp\gu_display_list.c">
+      <Filter>psp</Filter>
+    </ClCompile>
+    <ClCompile Include="psp\gu_draw.c">
+      <Filter>psp</Filter>
+    </ClCompile>
+    <ClCompile Include="psp\gu_image.c">
+      <Filter>psp</Filter>
+    </ClCompile>
+    <ClCompile Include="psp\gu_light.c">
+      <Filter>psp</Filter>
+    </ClCompile>
+    <ClCompile Include="psp\gu_mesh.c">
+      <Filter>psp</Filter>
+    </ClCompile>
+    <ClCompile Include="psp\gu_model.c">
+      <Filter>psp</Filter>
+    </ClCompile>
+    <ClCompile Include="psp\gu_rmain.c">
+      <Filter>psp</Filter>
+    </ClCompile>
+    <ClCompile Include="psp\gu_rmisc.c">
+      <Filter>psp</Filter>
+    </ClCompile>
+    <ClCompile Include="psp\gu_rsurf.c">
+      <Filter>psp</Filter>
+    </ClCompile>
+    <ClCompile Include="psp\gu_warp.c">
+      <Filter>psp</Filter>
+    </ClCompile>
+    <ClCompile Include="psp\net_psp.c">
+      <Filter>psp</Filter>
+    </ClCompile>
+    <ClCompile Include="psp\snddma_psp.c">
+      <Filter>psp</Filter>
+    </ClCompile>
+    <ClCompile Include="psp\sys_psp.c">
+      <Filter>psp</Filter>
+    </ClCompile>
+    <ClCompile Include="psp\vid_menu_psp.c">
+      <Filter>psp</Filter>
+    </ClCompile>
+    <ClCompile Include="psp\vid_psp.c">
+      <Filter>psp</Filter>
+    </ClCompile>
+    <ClCompile Include="qcommon\cmd.c">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="qcommon\cmodel.c">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="qcommon\common.c">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="qcommon\crc.c">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="qcommon\cvar.c">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="qcommon\files.c">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="qcommon\md4.c">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="qcommon\mem.c">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="qcommon\net_chan.c">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="qcommon\pmove.c">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="qcommon\profiler.c">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="null\cd_null.c">
+      <Filter>null</Filter>
+    </ClCompile>
+    <ClCompile Include="psp-sim\pspaudiolib.c">
+      <Filter>psp-sim</Filter>
+    </ClCompile>
+    <ClCompile Include="psp-sim\pspctrl.c">
+      <Filter>psp-sim</Filter>
+    </ClCompile>
+    <ClCompile Include="psp-sim\pspdisplay.c">
+      <Filter>psp-sim</Filter>
+    </ClCompile>
+    <ClCompile Include="psp-sim\pspge.c">
+      <Filter>psp-sim</Filter>
+    </ClCompile>
+    <ClCompile Include="psp-sim\pspgu.c">
+      <Filter>psp-sim</Filter>
+    </ClCompile>
+    <ClCompile Include="psp-sim\pspgum.c">
+      <Filter>psp-sim</Filter>
+    </ClCompile>
+    <ClCompile Include="psp-sim\pspkernel.c">
+      <Filter>psp-sim</Filter>
+    </ClCompile>
+    <ClCompile Include="psp-sim\psprtc.c">
+      <Filter>psp-sim</Filter>
+    </ClCompile>
+    <ClCompile Include="psp-sim\psputils.c">
+      <Filter>psp-sim</Filter>
+    </ClCompile>
+    <ClCompile Include="null\in_null.c">
+      <Filter>null</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

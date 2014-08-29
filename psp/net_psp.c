@@ -96,6 +96,8 @@ qboolean	NET_CompareBaseAdr (netadr_t a, netadr_t b)
 			return true;
 		return false;
 	}
+
+	return true;
 }
 
 char	*NET_AdrToString (netadr_t a)

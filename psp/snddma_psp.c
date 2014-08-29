@@ -37,7 +37,7 @@ typedef struct sample_s
 static sample_t input_buffer[BUFFER_SIZE];
 static volatile int samples_read;
 
-static inline void CopySamples(const sample_t *first, const sample_t *last, sample_t *destination)
+static void CopySamples(const sample_t *first, const sample_t *last, sample_t *destination)
 {
 	const sample_t *source;
 

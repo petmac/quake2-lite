@@ -82,7 +82,6 @@ static int SetupCallbacks(void)
 void Sys_Error (char *error, ...)
 {
 	char buffer[256];
-	int i;
 
 	va_list		argptr;
 
@@ -247,9 +246,12 @@ int main (int argc, char **argv)
 			go = false;
 		}
 
-		Qcommon_Frame (curtime - oldtime);
+		if (curtime != oldtime)
+		{
+			Qcommon_Frame(curtime - oldtime);
 
-		oldtime = curtime;
+			oldtime = curtime;
+		}
 	}
 
 	sceKernelExitGame();
