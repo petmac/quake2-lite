@@ -2,53 +2,58 @@
 
 #include "psptypes.h"
 
+#include <SDL_opengl.h>
+
 #define GU_FALSE 0
 #define GU_TRUE 1
 
 // enable
 enum
 {
-	GU_BLEND,
-	GU_SCISSOR_TEST,
-	GU_CLIP_PLANES,
-	GU_DEPTH_TEST,
-	GU_CULL_FACE,
-	GU_TEXTURE_2D,
-	GU_LIGHTING
+	GU_BLEND = GL_BLEND,
+	GU_SCISSOR_TEST = GL_TEXTURE_2D,
+	GU_CLIP_PLANES = GL_TEXTURE_2D,
+	GU_DEPTH_TEST = GL_DEPTH_TEST,
+	GU_CULL_FACE = GL_CULL_FACE,
+	GU_TEXTURE_2D = GL_TEXTURE_2D,
+	GU_LIGHTING = GL_LIGHTING
 };
 
 // func
 enum
 {
-	GU_LEQUAL
+	GU_LEQUAL = GL_LEQUAL
 };
 
 // prim
 enum
 {
-	GU_TRIANGLE_FAN,
-	GU_POINTS,
-	GU_TRIANGLE_STRIP
+	GU_TRIANGLE_FAN = GL_TRIANGLE_FAN,
+	GU_POINTS = GL_POINTS,
+	GU_TRIANGLE_STRIP = GL_TRIANGLE_STRIP
 };
 
 // vertex type
 enum
 {
-	GU_TEXTURE_32BITF = 1,
-	GU_VERTEX_32BITF = 2,
-	GU_TRANSFORM_3D = 4,
-	GU_COLOR_8888 = 8,
-	GU_SPRITES = 16,
-	GU_TRANSFORM_2D = 32,
-	GU_TEXTURE_16BIT = 64,
-	GU_VERTEX_16BIT = 128
+	GU_TEXTURE_16BIT = 1,
+	GU_TEXTURE_32BITF = 2,
+
+	GU_VERTEX_16BIT = 4,
+	GU_VERTEX_32BITF = 8,
+
+	GU_COLOR_8888 = 16,
+
+	GU_TRANSFORM_3D = 32,
+	GU_TRANSFORM_2D = 64,
+	GU_SPRITES = 128
 };
 
 // clear
 enum
 {
-	GU_COLOR_BUFFER_BIT = 1,
-	GU_DEPTH_BUFFER_BIT = 2
+	GU_COLOR_BUFFER_BIT = GL_COLOR_BUFFER_BIT,
+	GU_DEPTH_BUFFER_BIT = GL_DEPTH_BUFFER_BIT
 };
 
 // blend
@@ -58,10 +63,10 @@ enum
 };
 enum
 {
-	GU_SRC_COLOR,
-	GU_DST_COLOR,
-	GU_SRC_ALPHA,
-	GU_ONE_MINUS_SRC_ALPHA,
+	GU_SRC_COLOR = GL_SRC_COLOR,
+	GU_DST_COLOR = GL_DST_COLOR,
+	GU_SRC_ALPHA = GL_SRC_ALPHA,
+	GU_ONE_MINUS_SRC_ALPHA = GL_ONE_MINUS_SRC_ALPHA,
 };
 
 // sync
@@ -78,40 +83,40 @@ enum
 // shade model
 enum
 {
-	GU_SMOOTH
+	GU_SMOOTH = GL_SMOOTH
 };
 
 // winding
 enum
 {
-	GU_CW,
-	GU_CCW
+	GU_CW = GL_CW,
+	GU_CCW = GL_CCW
 };
 
 // interp
 enum
 {
-	GU_LINEAR,
+	GU_LINEAR = GL_LINEAR,
 };
 
 // wrap
 enum
 {
-	GU_REPEAT
+	GU_REPEAT = GL_REPEAT
 };
 
 // tfx
 enum
 {
-	GU_TFX_REPLACE,
-	GU_TFX_MODULATE
+	GU_TFX_REPLACE = GL_REPLACE,
+	GU_TFX_MODULATE = GL_MODULATE
 };
 
 // tcc
 enum
 {
-	GU_TCC_RGB,
-	GU_TCC_RGBA
+	GU_TCC_RGB = GL_RGB,
+	GU_TCC_RGBA = GL_RGBA
 };
 
 // tex map mode
@@ -129,13 +134,13 @@ enum
 };
 
 // matrix mode
-enum
+typedef enum GU_MATRIX_MODE
 {
 	GU_PROJECTION,
 	GU_VIEW,
 	GU_TEXTURE,
 	GU_MODEL,
-};
+} GU_MATRIX_MODE;
 
 // display list mode?
 enum

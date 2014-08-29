@@ -2,7 +2,7 @@
 
 #include "pspgu.h"
 
-void sceGumMatrixMode(int mode);
+void sceGumMatrixMode(GU_MATRIX_MODE mode);
 void sceGumLoadIdentity(void);
 void sceGumPushMatrix(void);
 void sceGumPopMatrix(void);

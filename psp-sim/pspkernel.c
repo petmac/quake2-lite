@@ -18,7 +18,6 @@ int sceKernelCreateThread(const char *a, void *b, int c, int d, int e, int f)
 
 void sceKernelStartThread(int id, int a, int b)
 {
-
 }
 
 void sceKernelSleepThreadCB(void)
