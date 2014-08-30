@@ -48,9 +48,11 @@ static void upload_texture(void)
 
 void sceGuInit(void)
 {
+	const int scale = 2;
+
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
 
-	window = SDL_CreateWindow("PSP Sim", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 480, 272, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("PSP Sim", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 480 * scale, 272 * scale, SDL_WINDOW_OPENGL);
 	assert(window != NULL);
 
 	context = SDL_GL_CreateContext(window);
