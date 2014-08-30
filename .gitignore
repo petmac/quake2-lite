@@ -5,3 +5,7 @@
 *.sdf
 *.suo
 *.user
+*.o
+psp/EBOOT.PBP
+psp/PARAM.SFO
+psp/Quake2.elf

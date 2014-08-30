@@ -33,7 +33,7 @@ PSP_MODULE_INFO("Quake 2", 0, 1, 1);
 /* Define the main thread's attribute value (optional) */
 PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
 
-#define WRITE_LOG 1
+#define WRITE_LOG 0
 
 void *GetGameAPI (void *import);
 
