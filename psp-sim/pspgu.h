@@ -186,7 +186,7 @@ void sceGuClutMode(int psm, int a, int b, int c);
 void sceGuClutLoad(int blocks, const ScePspRGBA8888 *palette);
 
 void sceGuTexFlush(void);
-void sceGuTexImage(int a, int w, int h, int buf_w, const void *pixels);
+void sceGuTexImage(int mipmap, int w, int h, int buf_w, const void *pixels);
 void sceGuTexFilter(int a, int b);
 void sceGuTexFunc(int tfx, int tcc);
 void sceGuTexMode(int psm, int a, int b, int c);
@@ -199,3 +199,5 @@ void sceGuColor(ScePspRGBA8888 c);
 void sceGuShadeModel(int model);
 
 void sceGuFrontFace(int face);
+
+void sceGuDrawArray(int prim, int type, int numverts, const void *indices, const void *vertices);

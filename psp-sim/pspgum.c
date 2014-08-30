@@ -117,23 +117,5 @@ void sceGumPerspective(float fov, float aspect, float n, float f)
 
 void sceGumDrawArray(int prim, int type, int numverts, const void *indices, const void *vertices)
 {
-	const float *floats = (const float *)vertices;
-
-	switch (type)
-	{
-	case GU_TEXTURE_32BITF | GU_VERTEX_32BITF | GU_TRANSFORM_3D:
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, 20, floats);
-		glVertexPointer(3, GL_FLOAT, 20, &floats[2]);
-		break; 
-
-	default:
-		return;
-	}
-
-	glDisable(GL_TEXTURE_2D);
-
-	glColor4fv(floats);
-
-	glDrawArrays(prim, 0, numverts);
+	sceGuDrawArray(prim, type, numverts, indices, vertices);
 }
