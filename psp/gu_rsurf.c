@@ -567,8 +567,13 @@ static void R_BlendLightmaps (void)
 		/*
 		** draw remainder of dynamic lightmaps that haven't been uploaded yet
 		*/
-		if ( newdrawsurf )
-			LM_UploadBlock( true );
+		if (newdrawsurf)
+		{
+			LM_UploadBlock(true);
+
+			// Flush texture cache.
+			sceGuTexFlush();
+		}
 
 		for ( surf = newdrawsurf; surf != 0; surf = surf->lightmapchain )
 		{
