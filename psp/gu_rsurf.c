@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "gu_local.h"
 
+#include <pspkernel.h>
+
 static vec3_t	modelorg;		// relative to viewpoint
 
 msurface_t	*r_alpha_surfaces;
@@ -531,6 +533,7 @@ static void R_BlendLightmaps (void)
 				LM_UploadBlock( true );
 
 				// Flush texture cache.
+				sceKernelDcacheWritebackRange(&lightmap_textures[0], sizeof(lightmap_textures[0]));
 				sceGuTexFlush();
 
 				// draw all surfaces that use this lightmap
@@ -572,6 +575,7 @@ static void R_BlendLightmaps (void)
 			LM_UploadBlock(true);
 
 			// Flush texture cache.
+			sceKernelDcacheWritebackRange(&lightmap_textures[0], sizeof(lightmap_textures[0]));
 			sceGuTexFlush();
 		}
 
