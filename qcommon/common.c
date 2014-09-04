@@ -1575,7 +1575,7 @@ void Qcommon_Frame (int msec)
 	Prof_End();
 
 	frames_since_prof_print++;
-	if (frames_since_prof_print > 0)
+	if (frames_since_prof_print >= 60)
 	{
 		Prof_Print();
 		frames_since_prof_print = 0;
