@@ -44,18 +44,12 @@ QUAKE FILESYSTEM
 // in memory
 //
 
-typedef struct
-{
-	char	name[MAX_QPATH];
-	int		filepos, filelen;
-} packfile_t;
-
 typedef struct pack_s
 {
 	char	filename[MAX_OSPATH];
 	FILE	*handle;
 	int		numfiles;
-	packfile_t	*files;
+	dpackfile_t	*files;
 } pack_t;
 
 char	fs_gamedir[MAX_OSPATH];
@@ -418,7 +412,7 @@ pack_t *FS_LoadPackFile (char *packfile)
 {
 	dpackheader_t	header;
 	int				i;
-	packfile_t		*newfiles;
+	dpackfile_t		*newfiles;
 	int				numpackfiles;
 	pack_t			*pack;
 	FILE			*packhandle;
@@ -440,19 +434,16 @@ pack_t *FS_LoadPackFile (char *packfile)
 
 	numpackfiles = header.dirlen / sizeof(dpackfile_t);
 
-	newfiles = Z_Malloc (numpackfiles * sizeof(packfile_t));
+	newfiles = Z_Malloc (numpackfiles * sizeof(dpackfile_t));
 
 	fseek (packhandle, header.dirofs, SEEK_SET);
 
 // parse the directory
+	fread(newfiles, numpackfiles, sizeof(dpackfile_t), packhandle);
 	for (i=0 ; i<numpackfiles ; i++)
 	{
-		dpackfile_t info;
-		fread (&info, 1, sizeof(info), packhandle);
-
-		strcpy (newfiles[i].name, info.name);
-		newfiles[i].filepos = LittleLong(info.filepos);
-		newfiles[i].filelen = LittleLong(info.filelen);
+		newfiles[i].filepos = LittleLong(newfiles[i].filepos);
+		newfiles[i].filelen = LittleLong(newfiles[i].filelen);
 	}
 
 	pack = Z_Malloc (sizeof (pack_t));
