@@ -759,11 +759,16 @@ SV_Frame
 */
 void SV_Frame (int msec)
 {
+	Prof_Begin(__FUNCTION__);
+
 	time_before_game = time_after_game = 0;
 
 	// if server is not active, do nothing
 	if (!svs.initialized)
+	{
+		Prof_End();
 		return;
+	}
 
     svs.realtime += msec;
 
@@ -787,6 +792,7 @@ void SV_Frame (int msec)
 			svs.realtime = sv.time - 100;
 		}
 		NET_Sleep(sv.time - svs.realtime);
+		Prof_End();
 		return;
 	}
 
@@ -811,6 +817,7 @@ void SV_Frame (int msec)
 	// clear teleport flags, etc for next frame
 	SV_PrepWorldFrame ();
 
+	Prof_End();
 }
 
 //============================================================================
@@ -947,6 +954,8 @@ Only called at quake2.exe startup, not for each game
 */
 void SV_Init (void)
 {
+	Prof_Begin(__FUNCTION__);
+
 	SV_InitOperatorCommands	();
 
 	rcon_password = Cvar_Get ("rcon_password", "", 0);
@@ -981,6 +990,8 @@ void SV_Init (void)
 	sv_reconnect_limit = Cvar_Get ("sv_reconnect_limit", "3", CVAR_ARCHIVE);
 
 	SZ_Init (&net_message, net_message_buffer, sizeof(net_message_buffer));
+
+	Prof_End();
 }
 
 /*

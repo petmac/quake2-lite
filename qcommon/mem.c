@@ -216,6 +216,8 @@ static void Hunk_Init(hunk_t *hunk, const char *name, int capacity)
 
 void Mem_Init(void)
 {
+	Prof_Begin(__FUNCTION__);
+
 	Hunk_Init (&hunk_game, "Game", GAME_HUNK_CAPACITY);
 	Hunk_Init (&hunk_level, "Level", LEVEL_HUNK_CAPACITY);
 	Hunk_Init (&hunk_ref, "Refresh", REF_HUNK_CAPACITY);
@@ -224,6 +226,8 @@ void Mem_Init(void)
 	// Some hunks are always unlocked.
 	Hunk_Begin(&hunk_game);
 	Hunk_Begin(&hunk_level);
+
+	Prof_End();
 }
 
 void *Hunk_AllocEx(hunk_t *hunk, int size, const char *file, int line, const char *function)

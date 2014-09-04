@@ -198,6 +198,8 @@ void Cbuf_Execute (void)
 	char	line[1024];
 	int		quotes;
 
+	Prof_Begin(__FUNCTION__);
+
 	alias_count = 0;		// don't allow infinite alias loops
 
 	while (cmd_text.cursize)
@@ -244,6 +246,8 @@ void Cbuf_Execute (void)
 			break;
 		}
 	}
+
+	Prof_End();
 }
 
 
@@ -265,6 +269,8 @@ void Cbuf_AddEarlyCommands (qboolean clear)
 	int		i;
 	char	*s;
 
+	Prof_Begin(__FUNCTION__);
+
 	for (i=0 ; i<COM_Argc() ; i++)
 	{
 		s = COM_Argv(i);
@@ -279,6 +285,8 @@ void Cbuf_AddEarlyCommands (qboolean clear)
 		}
 		i+=2;
 	}
+
+	Prof_End();
 }
 
 /*

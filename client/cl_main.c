@@ -1685,17 +1685,28 @@ void CL_Frame (int msec)
 	static int	extratime;
 	static int  lasttimecalled;
 
+	Prof_Begin(__FUNCTION__);
+
 	if (dedicated->value)
+	{
+		Prof_End();
 		return;
+	}
 
 	extratime += msec;
 
 	if (!cl_timedemo->value)
 	{
 		if (cls.state == ca_connected && extratime < 100)
+		{
+			Prof_End();
 			return;			// don't flood packets out while connecting
-		if (extratime < 1000/cl_maxfps->value)
+		}
+		if (extratime < 1000 / cl_maxfps->value)
+		{
+			Prof_End();
 			return;			// framerate is too high
+		}
 	}
 
 	// let the mouse activate or deactivate
@@ -1773,6 +1784,8 @@ void CL_Frame (int msec)
 			}
 		}
 	}
+
+	Prof_End();
 }
 
 
@@ -1787,6 +1800,8 @@ void CL_Init (void)
 {
 	if (dedicated->value)
 		return;		// nothing running on the client
+
+	Prof_Begin(__FUNCTION__);
 
 	// all archived variables will now be loaded
 
@@ -1817,6 +1832,7 @@ void CL_Init (void)
 	FS_ExecAutoexec ();
 	Cbuf_Execute ();
 
+	Prof_End();
 }
 
 

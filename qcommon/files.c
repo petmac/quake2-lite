@@ -423,9 +423,14 @@ pack_t *FS_LoadPackFile (char *packfile)
 	pack_t			*pack;
 	FILE			*packhandle;
 
+	Prof_Begin(__FUNCTION__);
+
 	packhandle = fopen(packfile, "rb");
 	if (!packhandle)
+	{
+		Prof_End();
 		return NULL;
+	}
 
 	fread (&header, 1, sizeof(header), packhandle);
 	if (LittleLong(header.ident) != IDPAKHEADER)
@@ -457,6 +462,7 @@ pack_t *FS_LoadPackFile (char *packfile)
 	pack->files = newfiles;
 	
 	Com_Printf ("Added packfile %s (%i files)\n", packfile, numpackfiles);
+	Prof_End();
 	return pack;
 }
 
@@ -475,6 +481,8 @@ void FS_AddGameDirectory (char *dir)
 	searchpath_t	*search;
 	pack_t			*pak;
 	char			pakfile[MAX_OSPATH];
+
+	Prof_Begin(__FUNCTION__);
 
 	strcpy (fs_gamedir, dir);
 
@@ -501,7 +509,7 @@ void FS_AddGameDirectory (char *dir)
 		fs_searchpaths = search;		
 	}
 
-
+	Prof_End();
 }
 
 /*
@@ -551,10 +559,13 @@ void FS_SetGamedir (char *dir)
 {
 	searchpath_t	*next;
 
+	Prof_Begin(__FUNCTION__);
+
 	if (strstr(dir, "..") || strstr(dir, "/")
 		|| strstr(dir, "\\") || strstr(dir, ":") )
 	{
 		Com_Printf ("Gamedir should be a single filename, not a path\n");
+		Prof_End();
 		return;
 	}
 
@@ -594,6 +605,8 @@ void FS_SetGamedir (char *dir)
 			FS_AddGameDirectory (va("%s/%s", fs_cddir->string, dir) );
 		FS_AddGameDirectory (va("%s/%s", fs_basedir->string, dir) );
 	}
+
+	Prof_End();
 }
 
 
@@ -802,6 +815,8 @@ FS_InitFilesystem
 */
 void FS_InitFilesystem (void)
 {
+	Prof_Begin(__FUNCTION__);
+
 	Cmd_AddCommand ("path", FS_Path_f);
 	Cmd_AddCommand ("link", FS_Link_f);
 	Cmd_AddCommand ("dir", FS_Dir_f );
@@ -833,6 +848,8 @@ void FS_InitFilesystem (void)
 	fs_gamedirvar = Cvar_Get ("game", "", CVAR_LATCH|CVAR_SERVERINFO);
 	if (fs_gamedirvar->string[0])
 		FS_SetGamedir (fs_gamedirvar->string);
+
+	Prof_End();
 }
 
 
