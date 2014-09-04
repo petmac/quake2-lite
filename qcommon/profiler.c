@@ -52,6 +52,7 @@ typedef struct prof_block_s
 	unsigned int hash;
 	const char *name;
 	prof_tick_t exclusive;
+	int calls;
 } prof_block_t;
 
 #define MAX_PROF_STACK 1024
@@ -113,10 +114,12 @@ static prof_block_t *Prof_Find(const char *name)
 		block->hash = hash;
 		block->name = name;
 		block->exclusive = 0;
+		block->calls = 0;
 
 		++block_count;
 
 		qsort(blocks, block_count, sizeof(blocks[0]), &Prof_CompareName);
+		block = bsearch(&hash, blocks, block_count, sizeof(blocks[0]), &Prof_CompareName);
 
 		return block;
 	}
@@ -124,7 +127,7 @@ static prof_block_t *Prof_Find(const char *name)
 	return NULL;
 }
 
-static void Prof_Store(const char *name, int exclusive)
+static void Prof_Store(const char *name, prof_tick_t exclusive)
 {
 	prof_block_t *const block = Prof_Find(name);
 
@@ -134,6 +137,7 @@ static void Prof_Store(const char *name, int exclusive)
 	}
 
 	block->exclusive += exclusive;
+	++block->calls;
 }
 
 static int Prof_CompareExclusive(const void *a, const void *b)
@@ -210,7 +214,7 @@ void Prof_Print(void)
 
 		if (block->exclusive > 0)
 		{
-			Com_Printf("\t%-32s:%10u\n", block->name, (unsigned int)block->exclusive);
+			Com_Printf("\t%-32s:%10u (%d calls)\n", block->name, (unsigned int)block->exclusive, block->calls);
 		}
 	}
 
