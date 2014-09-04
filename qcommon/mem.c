@@ -209,7 +209,9 @@ static void Hunk_Init(hunk_t *hunk, const char *name, int capacity)
 	hunk->capacity = capacity;
 	hunk->membase = membase;
 	hunk->name = name;
+#if HUNK_STATS
 	hunk->tidemark = 0;
+#endif
 }
 
 void Mem_Init(void)
