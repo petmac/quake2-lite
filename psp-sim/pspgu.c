@@ -13,6 +13,7 @@ static SDL_Window *window;
 static SDL_GLContext context;
 static char *display_list_base;
 static int display_list_used;
+static SDL_bool texture_dirty = SDL_TRUE;
 
 typedef struct texture_state_s
 {
@@ -199,7 +200,7 @@ void sceGuClutLoad(int blocks, const ScePspRGBA8888 *palette)
 
 void sceGuTexFlush(void)
 {
-	upload_texture();
+	texture_dirty = SDL_TRUE;
 }
 
 void sceGuTexImage(int mipmap, int w, int h, int buf_w, const void *pixels)
@@ -270,6 +271,12 @@ void sceGuDrawArray(int prim, int type, int numverts, const void *indices, const
 
 	default:
 		return;
+	}
+
+	if (texture_dirty)
+	{
+		upload_texture();
+		texture_dirty = SDL_FALSE;
 	}
 
 	glDrawArrays(prim, 0, numverts);
