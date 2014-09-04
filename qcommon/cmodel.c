@@ -577,6 +577,8 @@ cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 	int i;
 	dheader_t header;
 
+	Prof_Begin(__FUNCTION__);
+
 	map_noareas = Cvar_Get ("map_noareas", "0", 0);
 
 	if (  !strcmp (map_name, name) && (clientload || !Cvar_VariableValue ("flushmap")) )
@@ -587,6 +589,9 @@ cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 			memset (portalopen, 0, sizeof(portalopen));
 			FloodAreaConnections ();
 		}
+
+		Prof_End();
+
 		return &map_cmodels[0];		// still have the right version
 	}
 
@@ -606,6 +611,9 @@ cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 		numclusters = 1;
 		numareas = 1;
 		*checksum = 0;
+
+		Prof_End();
+
 		return &map_cmodels[0];			// cinematic servers won't have anything at all
 	}
 
@@ -613,7 +621,10 @@ cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 	// load the file
 	//
 	if (FS_FOpenFile(name, &file) < 0)
-		Com_Error (ERR_DROP, "Couldn't load %s", name);
+	{
+		Prof_End();
+		Com_Error(ERR_DROP, "Couldn't load %s", name);
+	}
 
 	*checksum = 0;
 
@@ -624,8 +635,11 @@ cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 		((int *)&header)[i] = LittleLong ( ((int *)&header)[i]);
 
 	if (header.version != BSPVERSION)
-		Com_Error (ERR_DROP, "CMod_LoadBrushModel: %s has wrong version number (%i should be %i)"
-		, name, header.version, BSPVERSION);
+	{
+		Prof_End();
+		Com_Error(ERR_DROP, "CMod_LoadBrushModel: %s has wrong version number (%i should be %i)"
+			, name, header.version, BSPVERSION);
+	}
 
 	// load into heap
 	CMod_LoadSurfaces (&header.lumps[LUMP_TEXINFO], file, base);
@@ -650,6 +664,8 @@ cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 	FloodAreaConnections ();
 
 	strcpy (map_name, name);
+
+	Prof_End();
 
 	return &map_cmodels[0];
 }

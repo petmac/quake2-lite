@@ -256,6 +256,8 @@ void CL_PrepRefresh (void)
 	if (!cl.configstrings[CS_MODELS+1][0])
 		return;		// no map loaded
 
+	Prof_Begin(__FUNCTION__);
+
 	SCR_AddDirtyPoint (0, 0);
 	SCR_AddDirtyPoint (viddef.width-1, viddef.height-1);
 
@@ -353,6 +355,8 @@ void CL_PrepRefresh (void)
 
 	// start the cd track
 	CDAudio_Play (atoi(cl.configstrings[CS_CDTRACK]), true);
+
+	Prof_End();
 }
 
 /*

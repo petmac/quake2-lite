@@ -1384,6 +1384,7 @@ void Qcommon_Init (int argc, char **argv)
 		Sys_Error ("Error during initialization");
 
 	Prof_Init ();
+	Prof_Begin(__FUNCTION__);
 
 	z_chain.next = z_chain.prev = &z_chain;
 
@@ -1465,6 +1466,9 @@ void Qcommon_Init (int argc, char **argv)
 	}
 
 	Com_Printf ("====== Quake2 Initialized ======\n\n");	
+
+	Prof_End();
+	Prof_Print();
 }
 
 /*
@@ -1571,7 +1575,7 @@ void Qcommon_Frame (int msec)
 	Prof_End();
 
 	frames_since_prof_print++;
-	if (frames_since_prof_print > 60)
+	if (frames_since_prof_print > 0)
 	{
 		Prof_Print();
 		frames_since_prof_print = 0;
