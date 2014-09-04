@@ -534,4 +534,7 @@
       <Filter>null</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="D:\Steam Library\SteamApps\common\Quake 2\log.txt" />
+  </ItemGroup>
 </Project>

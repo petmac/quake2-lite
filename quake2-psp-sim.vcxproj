@@ -58,6 +58,9 @@
     </ClCompile>
     <Link />
     <Link />
+    <Link>
+      <IgnoreSpecificDefaultLibraries>msvcrt.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -245,6 +248,9 @@
     <ClCompile Include="server\sv_send.c" />
     <ClCompile Include="server\sv_user.c" />
     <ClCompile Include="server\sv_world.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="D:\Steam Library\SteamApps\common\Quake 2\log.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -487,17 +487,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="P:\PSP\GAME\Quake2\log.txt">
-      <Filter>psp</Filter>
-    </None>
     <None Include="Makefile">
       <Filter>psp</Filter>
     </None>
-    <None Include="sections.txt">
-      <Filter>psp</Filter>
-    </None>
-    <None Include="symbols.txt">
-      <Filter>psp</Filter>
-    </None>
+    <None Include="P:\PSP\GAME\Quake2\log.txt" />
+    <None Include="sections.txt" />
+    <None Include="symbols.txt" />
   </ItemGroup>
 </Project>
