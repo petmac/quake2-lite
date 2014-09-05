@@ -306,12 +306,12 @@ SV_ReadLevelFile
 void SV_ReadLevelFile (void)
 {
 	char	name[MAX_OSPATH];
-	FILE	*f;
+	file_t	*f;
 
 	Com_DPrintf("SV_ReadLevelFile()\n");
 
 	Com_sprintf (name, sizeof(name), "%s/save/current/%s.sv2", FS_Gamedir(), sv.name);
-	f = fopen(name, "rb");
+	f = Sys_OpenFileRead(name);
 	if (!f)
 	{
 		Com_Printf ("Failed to open %s\n", name);
@@ -319,7 +319,7 @@ void SV_ReadLevelFile (void)
 	}
 	FS_Read (sv.configstrings, sizeof(sv.configstrings), f);
 	CM_ReadPortalState (f);
-	fclose (f);
+	Sys_CloseFile (f);
 
 	Com_sprintf (name, sizeof(name), "%s/save/current/%s.sav", FS_Gamedir(), sv.name);
 	ge->ReadLevel (name);
@@ -406,7 +406,7 @@ SV_ReadServerFile
 */
 void SV_ReadServerFile (void)
 {
-	FILE	*f;
+	file_t	*f;
 	char	name[MAX_OSPATH], string[128];
 	char	comment[32];
 	char	mapcmd[MAX_TOKEN_CHARS];
@@ -414,7 +414,7 @@ void SV_ReadServerFile (void)
 	Com_DPrintf("SV_ReadServerFile()\n");
 
 	Com_sprintf (name, sizeof(name), "%s/save/current/server.ssv", FS_Gamedir());
-	f = fopen (name, "rb");
+	f = Sys_OpenFileRead (name);
 	if (!f)
 	{
 		Com_Printf ("Couldn't read %s\n", name);
@@ -430,14 +430,14 @@ void SV_ReadServerFile (void)
 	// these will be things like coop, skill, deathmatch, etc
 	while (1)
 	{
-		if (!fread (name, 1, sizeof(name), f))
+		if (!Sys_ReadFile (name, 1, sizeof(name), f))
 			break;
 		FS_Read (string, sizeof(string), f);
 		Com_DPrintf ("Set %s = %s\n", name, string);
 		Cvar_ForceSet (name, string);
 	}
 
-	fclose (f);
+	Sys_CloseFile (f);
 
 	// start a new game fresh with new cvars
 	SV_InitGame ();

@@ -1487,7 +1487,7 @@ void Qcommon_Frame (int msec)
 
 	if (setjmp (abortframe) )
 	{
-		Prof_End();
+		Prof_EndAll();
 		return;			// an ERR_DROP was thrown
 	}
 

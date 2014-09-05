@@ -193,6 +193,14 @@ void Prof_End(void)
 	}
 }
 
+void Prof_EndAll(void)
+{
+	while (stack_size > 0)
+	{
+		Prof_End();
+	}
+}
+
 void Prof_Print(void)
 {
 	int i;
@@ -201,6 +209,7 @@ void Prof_Print(void)
 	if (stack_size != 0)
 	{
 		Com_Error(ERR_FATAL, "Profiler stack not empty. (%d stack frames)", stack_size);
+		Prof_EndAll();
 	}
 
 	// Sort the blocks.

@@ -441,7 +441,7 @@ void SV_DemoCompleted (void)
 {
 	if (sv.demofile)
 	{
-		fclose (sv.demofile);
+		Sys_CloseFile (sv.demofile);
 		sv.demofile = NULL;
 	}
 	SV_Nextserver ();
@@ -505,7 +505,7 @@ void SV_SendClientMessages (void)
 		else
 		{
 			// get the next message
-			r = fread (&msglen, 4, 1, sv.demofile);
+			r = Sys_ReadFile (&msglen, 4, 1, sv.demofile);
 			if (r != 1)
 			{
 				SV_DemoCompleted ();
@@ -519,7 +519,7 @@ void SV_SendClientMessages (void)
 			}
 			if (msglen > MAX_MSGLEN)
 				Com_Error (ERR_DROP, "SV_SendClientMessages: msglen > MAX_MSGLEN");
-			r = fread (msgbuf, msglen, 1, sv.demofile);
+			r = Sys_ReadFile (msgbuf, msglen, 1, sv.demofile);
 			if (r != 1)
 			{
 				SV_DemoCompleted ();

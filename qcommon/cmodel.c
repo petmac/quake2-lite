@@ -132,13 +132,13 @@ int		c_traces, c_brush_traces;
 CMod_LoadSubmodels
 =================
 */
-void CMod_LoadSubmodels (lump_t *l, FILE *file, long base)
+void CMod_LoadSubmodels (lump_t *l, file_t *file, long base)
 {
 	dmodel_t	in;
 	cmodel_t	*out;
 	int			i, j, count;
 
-	fseek(file, l->fileofs + base, SEEK_SET);
+	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 
 	if (l->filelen % sizeof(in))
 		Com_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size");
@@ -173,13 +173,13 @@ void CMod_LoadSubmodels (lump_t *l, FILE *file, long base)
 CMod_LoadSurfaces
 =================
 */
-void CMod_LoadSurfaces (lump_t *l, FILE *file, long base)
+void CMod_LoadSurfaces (lump_t *l, file_t *file, long base)
 {
 	texinfo_t	in;
 	mapsurface_t	*out;
 	int			i, count;
 
-	fseek(file, l->fileofs + base, SEEK_SET);
+	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 
 	if (l->filelen % sizeof(in))
 		Com_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size");
@@ -210,14 +210,14 @@ CMod_LoadNodes
 
 =================
 */
-void CMod_LoadNodes (lump_t *l, FILE *file, long base)
+void CMod_LoadNodes (lump_t *l, file_t *file, long base)
 {
 	dnode_t		in;
 	int			child;
 	cnode_t		*out;
 	int			i, j, count;
 
-	fseek(file, l->fileofs + base, SEEK_SET);
+	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 	
 	if (l->filelen % sizeof(in))
 		Com_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size");
@@ -252,13 +252,13 @@ CMod_LoadBrushes
 
 =================
 */
-void CMod_LoadBrushes (lump_t *l, FILE *file, long base)
+void CMod_LoadBrushes (lump_t *l, file_t *file, long base)
 {
 	dbrush_t	in;
 	cbrush_t	*out;
 	int			i, count;
 
-	fseek(file, l->fileofs + base, SEEK_SET);
+	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 	
 	if (l->filelen % sizeof(in))
 		Com_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size");
@@ -287,14 +287,14 @@ void CMod_LoadBrushes (lump_t *l, FILE *file, long base)
 CMod_LoadLeafs
 =================
 */
-void CMod_LoadLeafs (lump_t *l, FILE *file, long base)
+void CMod_LoadLeafs (lump_t *l, file_t *file, long base)
 {
 	int			i;
 	cleaf_t		*out;
 	dleaf_t 	in;
 	int			count;
 
-	fseek(file, l->fileofs + base, SEEK_SET);
+	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 	
 	if (l->filelen % sizeof(in))
 		Com_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size");
@@ -345,14 +345,14 @@ void CMod_LoadLeafs (lump_t *l, FILE *file, long base)
 CMod_LoadPlanes
 =================
 */
-void CMod_LoadPlanes (lump_t *l, FILE *file, long base)
+void CMod_LoadPlanes (lump_t *l, file_t *file, long base)
 {
 	int			i, j;
 	cplane_t	*out;
 	dplane_t 	in;
 	int			count;
 
-	fseek(file, l->fileofs + base, SEEK_SET);
+	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 	
 	if (l->filelen % sizeof(in))
 		Com_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size");
@@ -385,13 +385,13 @@ void CMod_LoadPlanes (lump_t *l, FILE *file, long base)
 CMod_LoadLeafBrushes
 =================
 */
-void CMod_LoadLeafBrushes (lump_t *l, FILE *file, long base)
+void CMod_LoadLeafBrushes (lump_t *l, file_t *file, long base)
 {
 	int			i;
 	unsigned short	*out;
 	int			count;
 
-	fseek(file, l->fileofs + base, SEEK_SET);
+	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 	
 	if (l->filelen % sizeof(unsigned short))
 		Com_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size");
@@ -417,7 +417,7 @@ void CMod_LoadLeafBrushes (lump_t *l, FILE *file, long base)
 CMod_LoadBrushSides
 =================
 */
-void CMod_LoadBrushSides (lump_t *l, FILE *file, long base)
+void CMod_LoadBrushSides (lump_t *l, file_t *file, long base)
 {
 	int			i, j;
 	cbrushside_t	*out;
@@ -425,7 +425,7 @@ void CMod_LoadBrushSides (lump_t *l, FILE *file, long base)
 	int			count;
 	int			num;
 
-	fseek(file, l->fileofs + base, SEEK_SET);
+	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 
 	if (l->filelen % sizeof(in))
 		Com_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size");
@@ -456,14 +456,14 @@ void CMod_LoadBrushSides (lump_t *l, FILE *file, long base)
 CMod_LoadAreas
 =================
 */
-void CMod_LoadAreas (lump_t *l, FILE *file, long base)
+void CMod_LoadAreas (lump_t *l, file_t *file, long base)
 {
 	int			i;
 	carea_t		*out;
 	darea_t 	in;
 	int			count;
 
-	fseek(file, l->fileofs + base, SEEK_SET);
+	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 
 	if (l->filelen % sizeof(in))
 		Com_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size");
@@ -491,14 +491,14 @@ void CMod_LoadAreas (lump_t *l, FILE *file, long base)
 CMod_LoadAreaPortals
 =================
 */
-void CMod_LoadAreaPortals (lump_t *l, FILE *file, long base)
+void CMod_LoadAreaPortals (lump_t *l, file_t *file, long base)
 {
 	int			i;
 	dareaportal_t		*out;
 	dareaportal_t 	in;
 	int			count;
 
-	fseek(file, l->fileofs + base, SEEK_SET);
+	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 
 	if (l->filelen % sizeof(in))
 		Com_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size");
@@ -524,11 +524,11 @@ void CMod_LoadAreaPortals (lump_t *l, FILE *file, long base)
 CMod_LoadVisibility
 =================
 */
-void CMod_LoadVisibility (lump_t *l, FILE *file, long base)
+void CMod_LoadVisibility (lump_t *l, file_t *file, long base)
 {
 	int		i;
 
-	fseek(file, l->fileofs + base, SEEK_SET);
+	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 
 	numvisibility = l->filelen;
 	if (l->filelen > MAX_MAP_VISIBILITY)
@@ -550,9 +550,9 @@ void CMod_LoadVisibility (lump_t *l, FILE *file, long base)
 CMod_LoadEntityString
 =================
 */
-void CMod_LoadEntityString (lump_t *l, FILE *file, long base)
+void CMod_LoadEntityString (lump_t *l, file_t *file, long base)
 {
-	fseek(file, l->fileofs + base, SEEK_SET);
+	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 
 	numentitychars = l->filelen;
 	if (l->filelen > MAX_MAP_ENTSTRING)
@@ -572,7 +572,7 @@ Loads in the map and all submodels
 */
 cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 {
-	FILE *file = NULL;
+	file_t *file = NULL;
 	long base;
 	int i;
 	dheader_t header;
@@ -628,7 +628,7 @@ cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 
 	*checksum = 0;
 
-	base = ftell(file);
+	base = Sys_TellFile(file);
 
 	FS_Read(&header, sizeof(header), file);
 	for (i=0 ; i<sizeof(dheader_t)/4 ; i++)
@@ -655,7 +655,7 @@ cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 	CMod_LoadVisibility (&header.lumps[LUMP_VISIBILITY], file, base);
 	CMod_LoadEntityString (&header.lumps[LUMP_ENTITIES], file, base);
 
-	FS_FCloseFile(file);
+	Sys_CloseFile(file);
 	file = NULL;
 
 	CM_InitBoxHull ();
@@ -1743,7 +1743,7 @@ Reads the portal state from a savegame file
 and recalculates the area connections
 ===================
 */
-void	CM_ReadPortalState (FILE *f)
+void	CM_ReadPortalState (file_t *f)
 {
 	FS_Read (portalopen, sizeof(portalopen), f);
 	FloodAreaConnections ();

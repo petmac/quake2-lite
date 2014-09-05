@@ -208,9 +208,9 @@ typedef struct
 	int		(*FS_LoadFile) (char *name, void **buf);
 	void	(*FS_FreeFile) (void *buf);
 
-	int		(*FS_FOpenFile) (char *filename, FILE **file);
-	void	(*FS_FCloseFile) (FILE *f);
-	void	(*FS_Read) (void *buffer, int len, FILE *f);
+	int		(*FS_FOpenFile) (char *filename, file_t **file);
+	void	(*FS_FCloseFile) (file_t *f);
+	void	(*FS_Read) (void *buffer, int len, file_t *f);
 
 	// gamedir will be the current directory that generated
 	// files should be stored to, ie: "f:\quake\id1"

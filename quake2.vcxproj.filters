@@ -494,5 +494,8 @@
     <ClCompile Include="win32\net_wins.c">
       <Filter>win32</Filter>
     </ClCompile>
+    <ClCompile Include="sdl\sys_sdl_file.c">
+      <Filter>sdl</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

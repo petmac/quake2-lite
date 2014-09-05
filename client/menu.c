@@ -1972,13 +1972,13 @@ qboolean	m_savevalid[MAX_SAVEGAMES];
 void Create_Savestrings (void)
 {
 	int		i;
-	FILE	*f;
+	file_t	*f;
 	char	name[MAX_OSPATH];
 
 	for (i=0 ; i<MAX_SAVEGAMES ; i++)
 	{
 		Com_sprintf (name, sizeof(name), "%s/save/save%i/server.ssv", FS_Gamedir(), i);
-		f = fopen (name, "rb");
+		f = Sys_OpenFileRead (name);
 		if (!f)
 		{
 			strcpy (m_savestrings[i], "<EMPTY>");
@@ -1987,7 +1987,7 @@ void Create_Savestrings (void)
 		else
 		{
 			FS_Read (m_savestrings[i], sizeof(m_savestrings[i]), f);
-			fclose (f);
+			Sys_CloseFile (f);
 			m_savevalid[i] = true;
 		}
 	}
@@ -2455,28 +2455,25 @@ void StartServer_MenuInit( void )
 	char *s;
 	int length;
 	int i;
-	FILE *fp;
+	file_t *fp;
 
 	/*
 	** load the list of map names
 	*/
 	Com_sprintf( mapsname, sizeof( mapsname ), "%s/maps.lst", FS_Gamedir() );
-	if ( ( fp = fopen( mapsname, "rb" ) ) == 0 )
+	if ( ( fp = Sys_OpenFileRead( mapsname ) ) == 0 )
 	{
 		if ( ( length = FS_LoadFile( "maps.lst", ( void ** ) &buffer ) ) == -1 )
 			Com_Error( ERR_DROP, "couldn't find maps.lst\n" );
 	}
 	else
 	{
-#ifdef _WIN32
-		length = _filelength( _fileno( fp  ) );
-#else
-		fseek(fp, 0, SEEK_END);
-		length = ftell(fp);
-		fseek(fp, 0, SEEK_SET);
-#endif
+		Sys_SeekFile(fp, 0, SEEK_END);
+		length = Sys_TellFile(fp);
+		Sys_SeekFile(fp, 0, SEEK_SET);
+
 		buffer = Z_Malloc( length );
-		fread( buffer, length, 1, fp );
+		Sys_ReadFile( buffer, length, 1, fp );
 	}
 
 	s = buffer;
@@ -2518,6 +2515,7 @@ void StartServer_MenuInit( void )
 
 	if ( fp != 0 )
 	{
+		Sys_CloseFile(fp);
 		fp = 0;
 		Z_Free( buffer );
 	}

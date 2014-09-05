@@ -178,7 +178,7 @@ void SV_SpawnServer (char *server, char *spawnpoint, server_state_t serverstate,
 
 	Com_DPrintf ("SpawnServer: %s\n",server);
 	if (sv.demofile)
-		fclose (sv.demofile);
+		Sys_CloseFile (sv.demofile);
 
 	svs.spawncount++;		// any partially connected client will be
 							// restarted

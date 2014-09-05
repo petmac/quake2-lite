@@ -216,6 +216,7 @@
     <ClCompile Include="sdl\qgl_sdl.c" />
     <ClCompile Include="sdl\snddma_sdl.c" />
     <ClCompile Include="sdl\sys_sdl.c" />
+    <ClCompile Include="sdl\sys_sdl_file.c" />
     <ClCompile Include="sdl\vid_menu_sdl.c" />
     <ClCompile Include="sdl\vid_sdl.c" />
     <ClCompile Include="server\sv_ccmds.c" />

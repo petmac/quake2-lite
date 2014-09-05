@@ -47,7 +47,7 @@ QUAKE FILESYSTEM
 typedef struct pack_s
 {
 	char	filename[MAX_OSPATH];
-	FILE	*handle;
+	file_t	*handle;
 	int		numfiles;
 	dpackfile_t	*files;
 } pack_t;
@@ -95,15 +95,15 @@ The "game directory" is the first tree on the search path and directory that all
 FS_filelength
 ================
 */
-int FS_filelength (FILE *f)
+int FS_filelength (file_t *f)
 {
 	int		pos;
 	int		end;
 
-	pos = ftell (f);
-	fseek (f, 0, SEEK_END);
-	end = ftell (f);
-	fseek (f, pos, SEEK_SET);
+	pos = Sys_TellFile (f);
+	Sys_SeekFile (f, 0, SEEK_END);
+	end = Sys_TellFile (f);
+	Sys_SeekFile (f, pos, SEEK_SET);
 
 	return end;
 }
@@ -129,20 +129,6 @@ void	FS_CreatePath (char *path)
 			*ofs = '/';
 		}
 	}
-}
-
-
-/*
-==============
-FS_FCloseFile
-
-For some reason, other dll's can't just cal fclose()
-on files returned by FS_FOpenFile...
-==============
-*/
-void FS_FCloseFile (FILE *f)
-{
-	fclose (f);
 }
 
 
@@ -190,14 +176,14 @@ int	Developer_searchpath (int who)
 FS_FOpenFile
 
 Finds the file in the search path.
-returns filesize and an open FILE *
+returns filesize and an open file_t *
 Used for streaming data out of either a pak file or
 a seperate file.
 ===========
 */
 int file_from_pak = 0;
 #ifndef NO_ADDONS
-int FS_FOpenFile (char *filename, FILE **file)
+int FS_FOpenFile (char *filename, file_t **file)
 {
 	searchpath_t	*search;
 	char			netpath[MAX_OSPATH];
@@ -213,7 +199,7 @@ int FS_FOpenFile (char *filename, FILE **file)
 		if (!strncmp (filename, link->from, link->fromlength))
 		{
 			Com_sprintf (netpath, sizeof(netpath), "%s%s",link->to, filename+link->fromlength);
-			*file = fopen (netpath, "rb");
+			*file = Sys_OpenFileRead (netpath);
 			if (*file)
 			{		
 				Com_DPrintf ("link file: %s\n",netpath);
@@ -239,10 +225,10 @@ int FS_FOpenFile (char *filename, FILE **file)
 					file_from_pak = 1;
 					Com_DPrintf ("PackFile: %s : %s\n",pak->filename, filename);
 				// open a new file on the pakfile
-					*file = fopen (pak->filename, "rb");
+					*file = Sys_OpenFileRead(pak->filename);
 					if (!*file)
 						Com_Error (ERR_FATAL, "Couldn't reopen %s", pak->filename);	
-					fseek (*file, pak->files[i].filepos, SEEK_SET);
+					Sys_SeekFile (*file, pak->files[i].filepos, SEEK_SET);
 					return pak->files[i].filelen;
 				}
 		}
@@ -252,9 +238,9 @@ int FS_FOpenFile (char *filename, FILE **file)
 			
 			Com_sprintf (netpath, sizeof(netpath), "%s/%s",search->filename, filename);
 			
-			*file = fopen (netpath, "rb");
+			*file = Sys_OpenFileRead (netpath);
 			if (!*file)
-				continue;
+				continue; // TODO Close file? - PetMac
 			
 			Com_DPrintf ("FindFile: %s\n",netpath);
 
@@ -273,7 +259,7 @@ int FS_FOpenFile (char *filename, FILE **file)
 
 // this is just for demos to prevent add on hacking
 
-int FS_FOpenFile (char *filename, FILE **file)
+int FS_FOpenFile (char *filename, file_t **file)
 {
 	searchpath_t	*search;
 	char			netpath[MAX_OSPATH];
@@ -287,7 +273,7 @@ int FS_FOpenFile (char *filename, FILE **file)
 	{
 		Com_sprintf (netpath, sizeof(netpath), "%s/%s",FS_Gamedir(), filename);
 		
-		*file = fopen (netpath, "rb");
+		*file = Sys_OpenFileRead (netpath);
 		if (!*file)
 			return -1;
 		
@@ -312,10 +298,10 @@ int FS_FOpenFile (char *filename, FILE **file)
 			file_from_pak = 1;
 			Com_DPrintf ("PackFile: %s : %s\n",pak->filename, filename);
 		// open a new file on the pakfile
-			*file = fopen (pak->filename, "rb");
+			*file = Sys_OpenFileRead (pak->filename);
 			if (!*file)
 				Com_Error (ERR_FATAL, "Couldn't reopen %s", pak->filename);	
-			fseek (*file, pak->files[i].filepos, SEEK_SET);
+			Sys_SeekFile (*file, pak->files[i].filepos, SEEK_SET);
 			return pak->files[i].filelen;
 		}
 	
@@ -335,11 +321,11 @@ FS_ReadFile
 Properly handles partial reads
 =================
 */
-void FS_Read (void *buffer, int len, FILE *f)
+void FS_Read (void *buffer, int len, file_t *f)
 {
 	size_t	num;
 
-	num = fread(buffer, len, 1, f);
+	num = Sys_ReadFile(buffer, len, 1, f);
 	if (num != 1)
 	{
 		Com_Error(ERR_FATAL, "%s: fread failed.", __FUNCTION__);
@@ -356,7 +342,7 @@ a null buffer will just return the file length without loading
 */
 int FS_LoadFile (char *path, void **buffer)
 {
-	FILE	*h;
+	file_t	*h;
 	byte	*buf;
 	int		len;
 
@@ -373,7 +359,7 @@ int FS_LoadFile (char *path, void **buffer)
 	
 	if (!buffer)
 	{
-		fclose (h);
+		Sys_CloseFile (h);
 		return len;
 	}
 
@@ -382,7 +368,7 @@ int FS_LoadFile (char *path, void **buffer)
 
 	FS_Read (buf, len, h);
 
-	fclose (h);
+	Sys_CloseFile (h);
 
 	return len;
 }
@@ -415,18 +401,18 @@ pack_t *FS_LoadPackFile (char *packfile)
 	dpackfile_t		*newfiles;
 	int				numpackfiles;
 	pack_t			*pack;
-	FILE			*packhandle;
+	file_t			*packhandle;
 
 	Prof_Begin(__FUNCTION__);
 
-	packhandle = fopen(packfile, "rb");
+	packhandle = Sys_OpenFileRead(packfile);
 	if (!packhandle)
 	{
 		Prof_End();
 		return NULL;
 	}
 
-	fread (&header, 1, sizeof(header), packhandle);
+	Sys_ReadFile (&header, 1, sizeof(header), packhandle);
 	if (LittleLong(header.ident) != IDPAKHEADER)
 		Com_Error (ERR_FATAL, "%s is not a packfile", packfile);
 	header.dirofs = LittleLong (header.dirofs);
@@ -436,10 +422,10 @@ pack_t *FS_LoadPackFile (char *packfile)
 
 	newfiles = Z_Malloc (numpackfiles * sizeof(dpackfile_t));
 
-	fseek (packhandle, header.dirofs, SEEK_SET);
+	Sys_SeekFile (packhandle, header.dirofs, SEEK_SET);
 
 // parse the directory
-	fread(newfiles, numpackfiles, sizeof(dpackfile_t), packhandle);
+	Sys_ReadFile(newfiles, numpackfiles, sizeof(dpackfile_t), packhandle);
 	for (i=0 ; i<numpackfiles ; i++)
 	{
 		newfiles[i].filepos = LittleLong(newfiles[i].filepos);
@@ -567,7 +553,7 @@ void FS_SetGamedir (char *dir)
 	{
 		if (fs_searchpaths->pack)
 		{
-			fclose (fs_searchpaths->pack->handle);
+			Sys_CloseFile (fs_searchpaths->pack->handle);
 			Z_Free (fs_searchpaths->pack->files);
 			Z_Free (fs_searchpaths->pack);
 		}

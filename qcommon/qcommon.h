@@ -673,8 +673,10 @@ qboolean	CM_AreasConnected (int area1, int area2);
 int			CM_WriteAreaBits (byte *buffer, int area);
 qboolean	CM_HeadnodeVisible (int headnode, byte *visbits);
 
+typedef struct file_s file_t;
+
 void		CM_WritePortalState (FILE *f);
-void		CM_ReadPortalState (FILE *f);
+void		CM_ReadPortalState (file_t *f);
 
 /*
 ==============================================================
@@ -704,15 +706,13 @@ char	*FS_Gamedir (void);
 char	*FS_NextPath (char *prevpath);
 void	FS_ExecAutoexec (void);
 
-int		FS_FOpenFile (char *filename, FILE **file);
-void	FS_FCloseFile (FILE *f);
-// note: this can't be called from another DLL, due to MS libc issues
+int		FS_FOpenFile (char *filename, file_t **file);
 
 int		FS_LoadFile (char *path, void **buffer);
 // a null buffer will just return the file length without loading
 // a -1 length is not present
 
-void	FS_Read (void *buffer, int len, FILE *f);
+void	FS_Read (void *buffer, int len, file_t *f);
 // properly handles partial reads
 
 void	FS_FreeFile (void *buffer);
@@ -808,6 +808,12 @@ void	Sys_Quit (void);
 char	*Sys_GetClipboardData( void );
 void	Sys_CopyProtect (void);
 
+file_t *Sys_OpenFileRead(const char *path);
+void Sys_CloseFile(file_t *file);
+size_t Sys_ReadFile(void *buffer, size_t size, size_t count, file_t *file);
+int Sys_SeekFile(file_t *file, long offset, int whence);
+long Sys_TellFile(file_t *file);
+
 /*
 ==============================================================
 
@@ -868,11 +874,13 @@ PROFILER
 void Prof_Init(void);
 void Prof_Begin(const char *name);
 void Prof_End(void);
+void Prof_EndAll(void);
 void Prof_Print(void);
 
 #else
 #	define Prof_Init() do { } while (0)
 #	define Prof_Begin(name) do { } while (0)
 #	define Prof_End() do { } while (0)
+#	define Prof_EndAll() do { } while (0)
 #	define Prof_Print() do { } while (0)
 #endif
