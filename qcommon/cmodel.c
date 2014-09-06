@@ -138,6 +138,8 @@ void CMod_LoadSubmodels (lump_t *l, file_t *file, long base)
 	cmodel_t	*out;
 	int			i, j, count;
 
+	Prof_Begin(__FUNCTION__);
+
 	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 
 	if (l->filelen % sizeof(in))
@@ -165,6 +167,8 @@ void CMod_LoadSubmodels (lump_t *l, file_t *file, long base)
 		}
 		out->headnode = LittleLong (in.headnode);
 	}
+
+	Prof_End();
 }
 
 
@@ -178,6 +182,8 @@ void CMod_LoadSurfaces (lump_t *l, file_t *file, long base)
 	texinfo_t	in;
 	mapsurface_t	*out;
 	int			i, count;
+
+	Prof_Begin(__FUNCTION__);
 
 	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 
@@ -201,6 +207,8 @@ void CMod_LoadSurfaces (lump_t *l, file_t *file, long base)
 		out->c.flags = LittleLong (in.flags);
 		out->c.value = LittleLong (in.value);
 	}
+
+	Prof_End();
 }
 
 
@@ -216,6 +224,8 @@ void CMod_LoadNodes (lump_t *l, file_t *file, long base)
 	int			child;
 	cnode_t		*out;
 	int			i, j, count;
+
+	Prof_Begin(__FUNCTION__);
 
 	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 	
@@ -244,6 +254,7 @@ void CMod_LoadNodes (lump_t *l, file_t *file, long base)
 		}
 	}
 
+	Prof_End();
 }
 
 /*
@@ -257,6 +268,8 @@ void CMod_LoadBrushes (lump_t *l, file_t *file, long base)
 	dbrush_t	in;
 	cbrush_t	*out;
 	int			i, count;
+
+	Prof_Begin(__FUNCTION__);
 
 	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 	
@@ -280,6 +293,7 @@ void CMod_LoadBrushes (lump_t *l, file_t *file, long base)
 		out->contents = LittleLong(in.contents);
 	}
 
+	Prof_End();
 }
 
 /*
@@ -293,6 +307,8 @@ void CMod_LoadLeafs (lump_t *l, file_t *file, long base)
 	cleaf_t		*out;
 	dleaf_t 	in;
 	int			count;
+
+	Prof_Begin(__FUNCTION__);
 
 	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 	
@@ -338,6 +354,8 @@ void CMod_LoadLeafs (lump_t *l, file_t *file, long base)
 	}
 	if (emptyleaf == -1)
 		Com_Error (ERR_DROP, "Map does not have an empty leaf");
+
+	Prof_End();
 }
 
 /*
@@ -351,6 +369,8 @@ void CMod_LoadPlanes (lump_t *l, file_t *file, long base)
 	cplane_t	*out;
 	dplane_t 	in;
 	int			count;
+
+	Prof_Begin(__FUNCTION__);
 
 	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 	
@@ -378,6 +398,8 @@ void CMod_LoadPlanes (lump_t *l, file_t *file, long base)
 
 		out->dist = LittleFloat (in.dist);
 	}
+
+	Prof_End();
 }
 
 /*
@@ -390,6 +412,8 @@ void CMod_LoadLeafBrushes (lump_t *l, file_t *file, long base)
 	int			i;
 	unsigned short	*out;
 	int			count;
+
+	Prof_Begin(__FUNCTION__);
 
 	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 	
@@ -410,6 +434,8 @@ void CMod_LoadLeafBrushes (lump_t *l, file_t *file, long base)
 
 	for ( i=0 ; i<count ; i++, out++)
 		*out = LittleShort (*out);
+
+	Prof_End();
 }
 
 /*
@@ -424,6 +450,8 @@ void CMod_LoadBrushSides (lump_t *l, file_t *file, long base)
 	dbrushside_t 	in;
 	int			count;
 	int			num;
+
+	Prof_Begin(__FUNCTION__);
 
 	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 
@@ -449,6 +477,8 @@ void CMod_LoadBrushSides (lump_t *l, file_t *file, long base)
 			Com_Error (ERR_DROP, "Bad brushside texinfo");
 		out->surface = &map_surfaces[j];
 	}
+
+	Prof_End();
 }
 
 /*
@@ -462,6 +492,8 @@ void CMod_LoadAreas (lump_t *l, file_t *file, long base)
 	carea_t		*out;
 	darea_t 	in;
 	int			count;
+
+	Prof_Begin(__FUNCTION__);
 
 	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 
@@ -484,6 +516,8 @@ void CMod_LoadAreas (lump_t *l, file_t *file, long base)
 		out->floodvalid = 0;
 		out->floodnum = 0;
 	}
+
+	Prof_End();
 }
 
 /*
@@ -497,6 +531,8 @@ void CMod_LoadAreaPortals (lump_t *l, file_t *file, long base)
 	dareaportal_t		*out;
 	dareaportal_t 	in;
 	int			count;
+
+	Prof_Begin(__FUNCTION__);
 
 	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 
@@ -517,6 +553,8 @@ void CMod_LoadAreaPortals (lump_t *l, file_t *file, long base)
 		out->portalnum = LittleLong (in.portalnum);
 		out->otherarea = LittleLong (in.otherarea);
 	}
+
+	Prof_End();
 }
 
 /*
@@ -527,6 +565,8 @@ CMod_LoadVisibility
 void CMod_LoadVisibility (lump_t *l, file_t *file, long base)
 {
 	int		i;
+
+	Prof_Begin(__FUNCTION__);
 
 	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 
@@ -542,6 +582,8 @@ void CMod_LoadVisibility (lump_t *l, file_t *file, long base)
 		map_vis->bitofs[i][0] = LittleLong (map_vis->bitofs[i][0]);
 		map_vis->bitofs[i][1] = LittleLong (map_vis->bitofs[i][1]);
 	}
+
+	Prof_End();
 }
 
 
@@ -552,6 +594,8 @@ CMod_LoadEntityString
 */
 void CMod_LoadEntityString (lump_t *l, file_t *file, long base)
 {
+	Prof_Begin(__FUNCTION__);
+
 	Sys_SeekFile(file, l->fileofs + base, SEEK_SET);
 
 	numentitychars = l->filelen;
@@ -559,6 +603,8 @@ void CMod_LoadEntityString (lump_t *l, file_t *file, long base)
 		Com_Error (ERR_DROP, "Map has too large entity lump");
 
 	FS_Read(map_entitystring, l->filelen, file);
+
+	Prof_End();
 }
 
 
@@ -622,7 +668,6 @@ cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 	//
 	if (FS_FOpenFile(name, &file) < 0)
 	{
-		Prof_End();
 		Com_Error(ERR_DROP, "Couldn't load %s", name);
 	}
 
@@ -636,7 +681,6 @@ cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 
 	if (header.version != BSPVERSION)
 	{
-		Prof_End();
 		Com_Error(ERR_DROP, "CMod_LoadBrushModel: %s has wrong version number (%i should be %i)"
 			, name, header.version, BSPVERSION);
 	}
@@ -748,6 +792,8 @@ void CM_InitBoxHull (void)
 	cplane_t	*p;
 	cbrushside_t	*s;
 
+	Prof_Begin(__FUNCTION__);
+
 	box_headnode = numnodes;
 	box_planes = &map_planes[numplanes];
 	if (numnodes+6 > MAX_MAP_NODES
@@ -795,7 +841,9 @@ void CM_InitBoxHull (void)
 		p = &box_planes[i*2+1];
 		VectorClear (p->normal);
 		p->normal[i>>1] = -1;
-	}	
+	}
+
+	Prof_End();
 }
 
 
