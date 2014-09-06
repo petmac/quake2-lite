@@ -39,7 +39,7 @@ size_t Sys_ReadFile(void *buffer, size_t size, size_t count, file_t *file)
 	return SDL_RWread(f, buffer, size, count);
 }
 
-int Sys_SeekFile(file_t *file, long offset, int whence)
+long Sys_SeekFile(file_t *file, long offset, int whence)
 {
 	SDL_RWops *f = (SDL_RWops *)file;
 

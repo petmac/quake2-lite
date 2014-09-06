@@ -101,8 +101,7 @@ int FS_filelength (file_t *f)
 	int		end;
 
 	pos = Sys_TellFile (f);
-	Sys_SeekFile (f, 0, SEEK_END);
-	end = Sys_TellFile (f);
+	end = Sys_SeekFile (f, 0, SEEK_END);
 	Sys_SeekFile (f, pos, SEEK_SET);
 
 	return end;

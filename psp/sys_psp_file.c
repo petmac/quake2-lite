@@ -63,7 +63,7 @@ size_t Sys_ReadFile(void *buffer, size_t size, size_t count, file_t *file)
 	return sceIoRead(f, buffer, size * count) / size;
 }
 
-int Sys_SeekFile(file_t *file, long offset, int whence)
+long Sys_SeekFile(file_t *file, long offset, int whence)
 {
 	SceUID f = native_file(file);
 

@@ -811,7 +811,7 @@ void	Sys_CopyProtect (void);
 file_t *Sys_OpenFileRead(const char *path);
 void Sys_CloseFile(file_t *file);
 size_t Sys_ReadFile(void *buffer, size_t size, size_t count, file_t *file);
-int Sys_SeekFile(file_t *file, long offset, int whence);
+long Sys_SeekFile(file_t *file, long offset, int whence);
 long Sys_TellFile(file_t *file);
 
 /*

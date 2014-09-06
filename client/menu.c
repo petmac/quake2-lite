@@ -2468,8 +2468,7 @@ void StartServer_MenuInit( void )
 	}
 	else
 	{
-		Sys_SeekFile(fp, 0, SEEK_END);
-		length = Sys_TellFile(fp);
+		length = Sys_SeekFile(fp, 0, SEEK_END);
 		Sys_SeekFile(fp, 0, SEEK_SET);
 
 		buffer = Z_Malloc( length );
