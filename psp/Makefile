@@ -15,6 +15,7 @@ OBJS = \
 	net_psp.o \
 	snddma_psp.o \
 	sys_psp.o \
+	sys_psp_file.o \
 	vid_menu_psp.o \
 	vid_psp.o \
 	\

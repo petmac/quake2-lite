@@ -203,6 +203,7 @@
     <ClCompile Include="net_psp.c" />
     <ClCompile Include="snddma_psp.c" />
     <ClCompile Include="sys_psp.c" />
+    <ClCompile Include="sys_psp_file.c" />
     <ClCompile Include="vid_menu_psp.c" />
     <ClCompile Include="vid_psp.c" />
     <ClCompile Include="..\server\sv_ccmds.c" />

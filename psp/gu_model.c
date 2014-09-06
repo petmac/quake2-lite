@@ -24,9 +24,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 model_t	*loadmodel;
 int		modfilelen;
 
-void Mod_LoadSpriteModel (model_t *mod, FILE *file, long base);
-void Mod_LoadBrushModel (model_t *mod, FILE *file, long base);
-void Mod_LoadAliasModel (model_t *mod, FILE *file, long base);
+void Mod_LoadSpriteModel (model_t *mod, file_t *file, long base);
+void Mod_LoadBrushModel (model_t *mod, file_t *file, long base);
+void Mod_LoadAliasModel (model_t *mod, file_t *file, long base);
 model_t *Mod_LoadModel (model_t *mod, qboolean crash);
 
 byte	mod_novis[MAX_MAP_LEAFS/8];
@@ -176,7 +176,7 @@ model_t *Mod_ForName (char *name, qboolean crash)
 {
 	model_t	*mod;
 	int		i;
-	FILE *file;
+	file_t *file;
 	long base;
 	int type;
 	char *extradata;
@@ -252,12 +252,12 @@ model_t *Mod_ForName (char *name, qboolean crash)
 	// fill it in
 	//
 
-	base = ftell(file);
+	base = Sys_TellFile(file);
 
 	// call the apropriate loader
 	ri.FS_Read(&type, sizeof(type), file);
 
-	fseek(file, base, SEEK_SET);
+	Sys_SeekFile(file, base, SEEK_SET);
 
 	switch (LittleLong(type))
 	{
@@ -302,7 +302,7 @@ BRUSHMODEL LOADING
 Mod_LoadLighting
 =================
 */
-void Mod_LoadLighting (lump_t *l, FILE *file, long base)
+void Mod_LoadLighting (lump_t *l, file_t *file, long base)
 {
 	Com_DPrintf("%s...\n", __FUNCTION__);
 
@@ -313,7 +313,7 @@ void Mod_LoadLighting (lump_t *l, FILE *file, long base)
 		return;
 	}
 
-	fseek(file, base + l->fileofs, SEEK_SET);
+	Sys_SeekFile(file, base + l->fileofs, SEEK_SET);
 
 	loadmodel->lightdata = Hunk_Alloc (&hunk_ref, l->filelen);
 
@@ -328,11 +328,11 @@ void Mod_LoadLighting (lump_t *l, FILE *file, long base)
 Mod_LoadVisibility
 =================
 */
-void Mod_LoadVisibility (lump_t *l, FILE *file, long base)
+void Mod_LoadVisibility (lump_t *l, file_t *file, long base)
 {
 	int		i;
 
-	fseek(file, base + l->fileofs, SEEK_SET);
+	Sys_SeekFile(file, base + l->fileofs, SEEK_SET);
 
 	if (!l->filelen)
 	{
@@ -353,7 +353,7 @@ void Mod_LoadVisibility (lump_t *l, FILE *file, long base)
 Mod_LoadVertexes
 =================
 */
-void Mod_LoadVertexes (lump_t *l, FILE *file, long base)
+void Mod_LoadVertexes (lump_t *l, file_t *file, long base)
 {
 	dvertex_t	*in;
 	mvertex_t	*out;
@@ -361,7 +361,7 @@ void Mod_LoadVertexes (lump_t *l, FILE *file, long base)
 	
 	Com_DPrintf("%s\n", __FUNCTION__);
 
-	fseek(file, base + l->fileofs, SEEK_SET);
+	Sys_SeekFile(file, base + l->fileofs, SEEK_SET);
 
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
@@ -408,7 +408,7 @@ static float RadiusFromBounds (vec3_t mins, vec3_t maxs)
 Mod_LoadSubmodels
 =================
 */
-void Mod_LoadSubmodels (lump_t *l, FILE *file, long base)
+void Mod_LoadSubmodels (lump_t *l, file_t *file, long base)
 {
 	dmodel_t	in[MAX_MAP_MODELS];
 	mmodel_t	*out;
@@ -416,7 +416,7 @@ void Mod_LoadSubmodels (lump_t *l, FILE *file, long base)
 	
 	Com_DPrintf("%s\n", __FUNCTION__);
 
-	fseek(file, base + l->fileofs, SEEK_SET);
+	Sys_SeekFile(file, base + l->fileofs, SEEK_SET);
 
 	if (l->filelen % sizeof(dmodel_t))
 		ri.Sys_Error (ERR_DROP, "Mod_LoadSubmodels: funny lump size in %s",loadmodel->name);
@@ -452,14 +452,14 @@ void Mod_LoadSubmodels (lump_t *l, FILE *file, long base)
 Mod_LoadEdges
 =================
 */
-void Mod_LoadEdges (lump_t *l, FILE *file, long base)
+void Mod_LoadEdges (lump_t *l, file_t *file, long base)
 {
 	dedge_t *out;
 	int 	i, count;
 	
 	Com_DPrintf("%s\n", __FUNCTION__);
 
-	fseek(file, base + l->fileofs, SEEK_SET);
+	Sys_SeekFile(file, base + l->fileofs, SEEK_SET);
 
 	if (l->filelen % sizeof(dedge_t))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
@@ -479,7 +479,7 @@ void Mod_LoadEdges (lump_t *l, FILE *file, long base)
 Mod_LoadTexinfo
 =================
 */
-void Mod_LoadTexinfo (lump_t *l, FILE *file, long base)
+void Mod_LoadTexinfo (lump_t *l, file_t *file, long base)
 {
 	texinfo_t in[MAX_MAP_TEXINFO];
 	mtexinfo_t *out, *step;
@@ -489,7 +489,7 @@ void Mod_LoadTexinfo (lump_t *l, FILE *file, long base)
 	
 	Com_DPrintf("%s\n", __FUNCTION__);
 
-	fseek(file, base + l->fileofs, SEEK_SET);
+	Sys_SeekFile(file, base + l->fileofs, SEEK_SET);
 
 	if (l->filelen % sizeof(texinfo_t))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
@@ -600,7 +600,7 @@ void GL_BeginBuildingLightmaps (model_t *m);
 Mod_LoadFaces
 =================
 */
-void Mod_LoadFaces (lump_t *l, FILE *file, long base)
+void Mod_LoadFaces (lump_t *l, file_t *file, long base)
 {
 	dface_t		*in;
 	msurface_t 	*out;
@@ -610,7 +610,7 @@ void Mod_LoadFaces (lump_t *l, FILE *file, long base)
 	
 	Com_DPrintf("%s\n", __FUNCTION__);
 
-	fseek(file, base + l->fileofs, SEEK_SET);
+	Sys_SeekFile(file, base + l->fileofs, SEEK_SET);
 
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
@@ -707,7 +707,7 @@ static void Mod_SetParent (mnode_t *node, mnode_t *parent)
 Mod_LoadNodes
 =================
 */
-void Mod_LoadNodes (lump_t *l, FILE *file, long base)
+void Mod_LoadNodes (lump_t *l, file_t *file, long base)
 {
 	int			i, j, count, p;
 	dnode_t		in[MAX_MAP_NODES];
@@ -715,7 +715,7 @@ void Mod_LoadNodes (lump_t *l, FILE *file, long base)
 	
 	Com_DPrintf("%s\n", __FUNCTION__);
 
-	fseek(file, base + l->fileofs, SEEK_SET);
+	Sys_SeekFile(file, base + l->fileofs, SEEK_SET);
 
 	if (l->filelen % sizeof(dnode_t))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
@@ -766,7 +766,7 @@ void Mod_LoadNodes (lump_t *l, FILE *file, long base)
 Mod_LoadLeafs
 =================
 */
-void Mod_LoadLeafs (lump_t *l, FILE *file, long base)
+void Mod_LoadLeafs (lump_t *l, file_t *file, long base)
 {
 	dleaf_t 	in[MAX_MAP_LEAFS];
 	mleaf_t 	*out;
@@ -775,7 +775,7 @@ void Mod_LoadLeafs (lump_t *l, FILE *file, long base)
 	
 	Com_DPrintf("%s\n", __FUNCTION__);
 
-	fseek(file, base + l->fileofs, SEEK_SET);
+	Sys_SeekFile(file, base + l->fileofs, SEEK_SET);
 
 	if (l->filelen % sizeof(dleaf_t))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
@@ -831,7 +831,7 @@ void Mod_LoadLeafs (lump_t *l, FILE *file, long base)
 Mod_LoadMarksurfaces
 =================
 */
-void Mod_LoadMarksurfaces (lump_t *l, FILE *file, long base)
+void Mod_LoadMarksurfaces (lump_t *l, file_t *file, long base)
 {	
 	int		i, j, count;
 	short		*in;
@@ -839,7 +839,7 @@ void Mod_LoadMarksurfaces (lump_t *l, FILE *file, long base)
 	
 	Com_DPrintf("%s\n", __FUNCTION__);
 
-	fseek(file, base + l->fileofs, SEEK_SET);
+	Sys_SeekFile(file, base + l->fileofs, SEEK_SET);
 
 	if (l->filelen % sizeof(short))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
@@ -870,14 +870,14 @@ void Mod_LoadMarksurfaces (lump_t *l, FILE *file, long base)
 Mod_LoadSurfedges
 =================
 */
-void Mod_LoadSurfedges (lump_t *l, FILE *file, long base)
+void Mod_LoadSurfedges (lump_t *l, file_t *file, long base)
 {	
 	int		i, count;
 	int		*out;
 	
 	Com_DPrintf("%s\n", __FUNCTION__);
 
-	fseek(file, base + l->fileofs, SEEK_SET);
+	Sys_SeekFile(file, base + l->fileofs, SEEK_SET);
 
 	if (l->filelen % sizeof(int))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
@@ -901,7 +901,7 @@ Mod_LoadPlanes
 */
 #define MAX_MAP_PLANES_ON_STACK 4096
 
-void Mod_LoadPlanes (lump_t *l, FILE *file, long base)
+void Mod_LoadPlanes (lump_t *l, file_t *file, long base)
 {
 	int			i, j;
 	cplane_t	*out;
@@ -910,7 +910,7 @@ void Mod_LoadPlanes (lump_t *l, FILE *file, long base)
 	
 	Com_DPrintf("%s\n", __FUNCTION__);
 
-	fseek(file, base + l->fileofs, SEEK_SET);
+	Sys_SeekFile(file, base + l->fileofs, SEEK_SET);
 
 	if (l->filelen % sizeof(dplane_t))
 		ri.Sys_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
@@ -958,7 +958,7 @@ void Mod_LoadPlanes (lump_t *l, FILE *file, long base)
 Mod_LoadBrushModel
 =================
 */
-void Mod_LoadBrushModel (model_t *mod, FILE *file, long base)
+void Mod_LoadBrushModel (model_t *mod, file_t *file, long base)
 {
 	int			i;
 	dheader_t	header;
@@ -1050,7 +1050,7 @@ ALIAS MODELS
 Mod_LoadAliasModel
 =================
 */
-void Mod_LoadAliasModel (model_t *mod, FILE *file, long base)
+void Mod_LoadAliasModel (model_t *mod, file_t *file, long base)
 {
 	int				i, j;
 	dmdl_t			inmodel;
@@ -1092,7 +1092,7 @@ void Mod_LoadAliasModel (model_t *mod, FILE *file, long base)
 	//
 	pheader->frames = Hunk_Alloc(&hunk_ref, pheader->num_frames * pheader->framesize);
 
-	fseek(file, base + inmodel.ofs_frames, SEEK_SET);
+	Sys_SeekFile(file, base + inmodel.ofs_frames, SEEK_SET);
 	ri.FS_Read(pheader->frames, pheader->num_frames * pheader->framesize, file);
 
 	mod->type = mod_alias;
@@ -1103,7 +1103,7 @@ void Mod_LoadAliasModel (model_t *mod, FILE *file, long base)
 
 	pheader->glcmds = Hunk_Alloc(&hunk_ref, inmodel.num_glcmds * sizeof(int));
 
-	fseek(file, base + inmodel.ofs_glcmds, SEEK_SET);
+	Sys_SeekFile(file, base + inmodel.ofs_glcmds, SEEK_SET);
 	ri.FS_Read(pheader->glcmds, inmodel.num_glcmds * sizeof(int), file);
 
 	// Count the number of vertices.
@@ -1129,7 +1129,7 @@ void Mod_LoadAliasModel (model_t *mod, FILE *file, long base)
 	}
 
 	// register all skins
-	fseek(file, base + inmodel.ofs_skins, SEEK_SET);
+	Sys_SeekFile(file, base + inmodel.ofs_skins, SEEK_SET);
 	for (i=0 ; i<inmodel.num_skins ; i++)
 	{
 		char name[MAX_SKINNAME];
@@ -1166,7 +1166,7 @@ SPRITE MODELS
 Mod_LoadSpriteModel
 =================
 */
-void Mod_LoadSpriteModel (model_t *mod, FILE *file, long base)
+void Mod_LoadSpriteModel (model_t *mod, file_t *file, long base)
 {
 	dsprite_t	*sprout;
 	int			i;

@@ -485,6 +485,9 @@
     <ClCompile Include="..\null\in_null.c">
       <Filter>null</Filter>
     </ClCompile>
+    <ClCompile Include="sys_psp_file.c">
+      <Filter>psp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile">
