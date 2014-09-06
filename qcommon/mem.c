@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <malloc.h>
 
-#define HUNK_STATS 1
+#define HUNK_STATS 0
 
 struct hunk_s
 {
