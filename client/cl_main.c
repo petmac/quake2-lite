@@ -1127,15 +1127,20 @@ void CL_RequestNextDownload (void)
 	if (cls.state != ca_connected)
 		return;
 
+	Prof_Begin(__FUNCTION__);
+
 	if (!allow_download->value && precache_check < ENV_CNT)
 		precache_check = ENV_CNT;
 
 //ZOID
 	if (precache_check == CS_MODELS) { // confirm map
 		precache_check = CS_MODELS+2; // 0 isn't used
-		if (allow_download_maps->value)
-			if (!CL_CheckOrDownloadFile(cl.configstrings[CS_MODELS+1]))
+		if (allow_download_maps->value) {
+			if (!CL_CheckOrDownloadFile(cl.configstrings[CS_MODELS + 1])) {
+				Prof_End();
 				return; // started a download
+			}
+		}
 	}
 	if (precache_check >= CS_MODELS && precache_check < CS_MODELS+MAX_MODELS) {
 		if (allow_download_models->value) {
@@ -1149,6 +1154,7 @@ void CL_RequestNextDownload (void)
 				if (precache_model_skin == 0) {
 					if (!CL_CheckOrDownloadFile(cl.configstrings[precache_check])) {
 						precache_model_skin = 1;
+						Prof_End();
 						return; // started a download
 					}
 					precache_model_skin = 1;
@@ -1186,6 +1192,7 @@ void CL_RequestNextDownload (void)
 						LittleLong(pheader->ofs_skins) + 
 						(precache_model_skin - 1)*MAX_SKINNAME)) {
 						precache_model_skin++;
+						Prof_End();
 						return; // started a download
 					}
 					precache_model_skin++;
@@ -1211,8 +1218,10 @@ void CL_RequestNextDownload (void)
 					continue;
 				}
 				Com_sprintf(fn, sizeof(fn), "sound/%s", cl.configstrings[precache_check++]);
-				if (!CL_CheckOrDownloadFile(fn))
+				if (!CL_CheckOrDownloadFile(fn)) {
+					Prof_End();
 					return; // started a download
+				}
 			}
 		}
 		precache_check = CS_IMAGES;
@@ -1223,8 +1232,10 @@ void CL_RequestNextDownload (void)
 		while (precache_check < CS_IMAGES+MAX_IMAGES &&
 			cl.configstrings[precache_check][0]) {
 			Com_sprintf(fn, sizeof(fn), "pics/%s.pcx", cl.configstrings[precache_check++]);
-			if (!CL_CheckOrDownloadFile(fn))
+			if (!CL_CheckOrDownloadFile(fn)) {
+				Prof_End();
 				return; // started a download
+			}
 		}
 		precache_check = CS_PLAYERSKINS;
 	}
@@ -1264,6 +1275,7 @@ void CL_RequestNextDownload (void)
 					Com_sprintf(fn, sizeof(fn), "players/%s/tris.md2", model);
 					if (!CL_CheckOrDownloadFile(fn)) {
 						precache_check = CS_PLAYERSKINS + i * PLAYER_MULT + 1;
+						Prof_End();
 						return; // started a download
 					}
 					n++;
@@ -1273,6 +1285,7 @@ void CL_RequestNextDownload (void)
 					Com_sprintf(fn, sizeof(fn), "players/%s/weapon.md2", model);
 					if (!CL_CheckOrDownloadFile(fn)) {
 						precache_check = CS_PLAYERSKINS + i * PLAYER_MULT + 2;
+						Prof_End();
 						return; // started a download
 					}
 					n++;
@@ -1282,6 +1295,7 @@ void CL_RequestNextDownload (void)
 					Com_sprintf(fn, sizeof(fn), "players/%s/weapon.pcx", model);
 					if (!CL_CheckOrDownloadFile(fn)) {
 						precache_check = CS_PLAYERSKINS + i * PLAYER_MULT + 3;
+						Prof_End();
 						return; // started a download
 					}
 					n++;
@@ -1291,6 +1305,7 @@ void CL_RequestNextDownload (void)
 					Com_sprintf(fn, sizeof(fn), "players/%s/%s.pcx", model, skin);
 					if (!CL_CheckOrDownloadFile(fn)) {
 						precache_check = CS_PLAYERSKINS + i * PLAYER_MULT + 4;
+						Prof_End();
 						return; // started a download
 					}
 					n++;
@@ -1300,6 +1315,7 @@ void CL_RequestNextDownload (void)
 					Com_sprintf(fn, sizeof(fn), "players/%s/%s_i.pcx", model, skin);
 					if (!CL_CheckOrDownloadFile(fn)) {
 						precache_check = CS_PLAYERSKINS + i * PLAYER_MULT + 5;
+						Prof_End();
 						return; // started a download
 					}
 					// move on to next model
@@ -1320,6 +1336,7 @@ void CL_RequestNextDownload (void)
 		if (map_checksum != atoi(cl.configstrings[CS_MAPCHECKSUM])) {
 			Com_Error (ERR_DROP, "Local map version differs from server: %i != '%s'\n",
 				map_checksum, cl.configstrings[CS_MAPCHECKSUM]);
+			Prof_End();
 			return;
 		}
 #endif
@@ -1336,8 +1353,10 @@ void CL_RequestNextDownload (void)
 				else
 					Com_sprintf(fn, sizeof(fn), "env/%s%s.tga", 
 						cl.configstrings[CS_SKY], env_suf[n/2]);
-				if (!CL_CheckOrDownloadFile(fn))
+				if (!CL_CheckOrDownloadFile(fn)) {
+					Prof_End();
 					return; // started a download
+				}
 			}
 		}
 		precache_check = TEXTURE_CNT;
@@ -1359,8 +1378,10 @@ void CL_RequestNextDownload (void)
 				char fn[MAX_OSPATH];
 
 				sprintf(fn, "textures/%s.wal", map_surfaces[precache_tex++].rname);
-				if (!CL_CheckOrDownloadFile(fn))
+				if (!CL_CheckOrDownloadFile(fn)) {
+					Prof_End();
 					return; // started a download
+				}
 			}
 		}
 		precache_check = TEXTURE_CNT+999;
@@ -1372,6 +1393,8 @@ void CL_RequestNextDownload (void)
 
 	MSG_WriteByte (&cls.netchan.message, clc_stringcmd);
 	MSG_WriteString (&cls.netchan.message, va("begin %i\n", precache_spawncount) );
+
+	Prof_End();
 }
 
 /*

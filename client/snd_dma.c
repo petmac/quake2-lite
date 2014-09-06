@@ -330,6 +330,8 @@ void S_EndRegistration (void)
 	int		i;
 	sfx_t	*sfx;
 
+	Prof_Begin(__FUNCTION__);
+
 	// load everything in
 	for (i=0, sfx=known_sfx ; i < num_sfx ; i++,sfx++)
 	{
@@ -341,6 +343,8 @@ void S_EndRegistration (void)
 	Hunk_End(&hunk_snd);
 
 	s_registering = false;
+
+	Prof_End();
 }
 
 

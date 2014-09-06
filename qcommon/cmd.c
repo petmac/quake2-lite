@@ -837,7 +837,11 @@ void	Cmd_ExecuteString (char *text)
 				Cmd_ExecuteString (va("cmd %s", text));
 			}
 			else
+			{
+				Prof_Begin(cmd->name);
 				cmd->function ();
+				Prof_End();
+			}
 			return;
 		}
 	}

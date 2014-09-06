@@ -346,6 +346,8 @@ int FS_LoadFile (char *path, void **buffer)
 	byte	*buf;
 	int		len;
 
+	Prof_Begin(__FUNCTION__);
+
 	buf = NULL;	// quiet compiler warning
 
 // look for it in the filesystem or pack files
@@ -354,12 +356,14 @@ int FS_LoadFile (char *path, void **buffer)
 	{
 		if (buffer)
 			*buffer = NULL;
+		Prof_End();
 		return -1;
 	}
 	
 	if (!buffer)
 	{
 		Sys_CloseFile (h);
+		Prof_End();
 		return len;
 	}
 
@@ -369,6 +373,8 @@ int FS_LoadFile (char *path, void **buffer)
 	FS_Read (buf, len, h);
 
 	Sys_CloseFile (h);
+
+	Prof_End();
 
 	return len;
 }

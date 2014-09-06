@@ -71,14 +71,18 @@ qboolean	CL_CheckOrDownloadFile (char *filename)
 	FILE *fp;
 	char	name[MAX_OSPATH];
 
+	Prof_Begin(__FUNCTION__);
+
 	if (strstr (filename, ".."))
 	{
 		Com_Printf ("Refusing to download a path with ..\n");
+		Prof_End();
 		return true;
 	}
 
 	if (FS_LoadFile (filename, NULL) != -1)
 	{	// it exists, no need to download
+		Prof_End();
 		return true;
 	}
 
@@ -119,6 +123,7 @@ qboolean	CL_CheckOrDownloadFile (char *filename)
 
 	cls.downloadnumber++;
 
+	Prof_End();
 	return false;
 }
 
@@ -177,6 +182,8 @@ void CL_RegisterSounds (void)
 {
 	int		i;
 
+	Prof_Begin(__FUNCTION__);
+
 	S_BeginRegistration ();
 	CL_RegisterTEntSounds ();
 	for (i=1 ; i<MAX_SOUNDS ; i++)
@@ -187,6 +194,8 @@ void CL_RegisterSounds (void)
 		Sys_SendKeyEvents ();	// pump message loop
 	}
 	S_EndRegistration ();
+
+	Prof_End();
 }
 
 

@@ -39,6 +39,8 @@ static void ResampleSfx (sfx_t *sfx, const wavinfo_t *info, byte *data)
 	int dst_bytes;
 	sfxcache_t *sc;
 
+	Prof_Begin(__FUNCTION__);
+
 	// Calculate output format.
 	stepscale = (float)info->rate / dma.speed;	// this is usually 0.5, 1, or 2
 	dst_count = info->samples / stepscale;
@@ -49,6 +51,7 @@ static void ResampleSfx (sfx_t *sfx, const wavinfo_t *info, byte *data)
 	sc = sfx->cache = Hunk_Alloc (&hunk_snd, sizeof(sfxcache_t) + dst_bytes - 1);
 	if (!sc)
 	{
+		Prof_End();
 		return;
 	}
 
@@ -104,6 +107,8 @@ static void ResampleSfx (sfx_t *sfx, const wavinfo_t *info, byte *data)
 				((signed char *)sc->data)[i] = sample >> 8;
 		}
 	}
+
+	Prof_End();
 }
 
 //=============================================================================
@@ -121,12 +126,18 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 	int		size;
 	char	*name;
 
-	if (s->name[0] == '*')
+	Prof_Begin(__FUNCTION__);
+
+	if (s->name[0] == '*') {
+		Prof_End();
 		return NULL;
+	}
 
 // see if still in memory
-	if (s->cache)
+	if (s->cache) {
+		Prof_End();
 		return s->cache;
+	}
 
 //Com_Printf ("S_LoadSound: %x\n", (int)stackbuf);
 // load it in
@@ -147,6 +158,7 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 	if (!data)
 	{
 		Com_DPrintf ("Couldn't load %s\n", namebuffer);
+		Prof_End();
 		return NULL;
 	}
 
@@ -155,12 +167,15 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 	{
 		Com_Printf ("%s is a stereo sample\n",s->name);
 		FS_FreeFile (data);
+		Prof_End();
 		return NULL;
 	}
 
 	ResampleSfx (s, &info, data + info.dataofs);
 
 	FS_FreeFile (data);
+	
+	Prof_End();
 
 	return s->cache;
 }
@@ -266,10 +281,14 @@ wavinfo_t GetWavinfo (char *name, byte *wav, int wavlength)
 	int     format;
 	int		samples;
 
+	Prof_Begin(__FUNCTION__);
+
 	memset (&info, 0, sizeof(info));
 
-	if (!wav)
+	if (!wav) {
+		Prof_End();
 		return info;
+	}
 		
 	iff_data = wav;
 	iff_end = wav + wavlength;
@@ -279,6 +298,7 @@ wavinfo_t GetWavinfo (char *name, byte *wav, int wavlength)
 	if (!(data_p && !strncmp(data_p+8, "WAVE", 4)))
 	{
 		Com_Printf("Missing RIFF/WAVE chunks\n");
+		Prof_End();
 		return info;
 	}
 
@@ -290,6 +310,7 @@ wavinfo_t GetWavinfo (char *name, byte *wav, int wavlength)
 	if (!data_p)
 	{
 		Com_Printf("Missing fmt chunk\n");
+		Prof_End();
 		return info;
 	}
 	data_p += 8;
@@ -297,6 +318,7 @@ wavinfo_t GetWavinfo (char *name, byte *wav, int wavlength)
 	if (format != 1)
 	{
 		Com_Printf("Microsoft PCM format only\n");
+		Prof_End();
 		return info;
 	}
 
@@ -334,6 +356,7 @@ wavinfo_t GetWavinfo (char *name, byte *wav, int wavlength)
 	if (!data_p)
 	{
 		Com_Printf("Missing data chunk\n");
+		Prof_End();
 		return info;
 	}
 
@@ -350,6 +373,8 @@ wavinfo_t GetWavinfo (char *name, byte *wav, int wavlength)
 
 	info.dataofs = data_p - wav;
 	
+	Prof_End();
+
 	return info;
 }
 

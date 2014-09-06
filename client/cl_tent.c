@@ -127,6 +127,8 @@ void CL_RegisterTEntSounds (void)
 	int		i;
 	char	name[MAX_QPATH];
 
+	Prof_Begin(__FUNCTION__);
+
 	// PMM - version stuff
 //	Com_Printf ("%s\n", ROGUE_VERSION_STRING);
 	// PMM
@@ -162,6 +164,8 @@ void CL_RegisterTEntSounds (void)
 //	if (name[0] == 'w')
 //		name[0] = 'W';
 //PGM
+
+	Prof_End();
 }	
 
 /*
