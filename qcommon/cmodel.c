@@ -445,9 +445,9 @@ CMod_LoadBrushSides
 */
 void CMod_LoadBrushSides (lump_t *l, file_t *file, long base)
 {
-	int			i, j;
+	int			j;
 	cbrushside_t	*out;
-	dbrushside_t 	in;
+	dbrushside_t 	*in;
 	int			count;
 	int			num;
 
@@ -457,25 +457,30 @@ void CMod_LoadBrushSides (lump_t *l, file_t *file, long base)
 
 	if (l->filelen % sizeof(in))
 		Com_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size");
-	count = l->filelen / sizeof(in);
+	count = l->filelen / sizeof(*in);
 
 	// need to save space for box planes
 	if (count > MAX_MAP_BRUSHSIDES)
 		Com_Error (ERR_DROP, "Map has too many planes");
 
-	out = map_brushsides;	
 	numbrushsides = count;
 
-	for ( i=0 ; i<count ; i++, out++)
-	{
-		FS_Read(&in, sizeof(in), file);
+	FS_Read(map_brushsides, l->filelen, file);
 
-		num = LittleShort (in.planenum);
-		out->plane = &map_planes[num];
-		j = LittleShort (in.texinfo);
+	in = ((dbrushside_t *)map_brushsides) + count - 1;
+	out = map_brushsides + count - 1;
+
+	while (out >= map_brushsides)
+	{
+		num = LittleShort (in->planenum);
+		j = LittleShort(in->texinfo);
 		if (j >= numtexinfo)
-			Com_Error (ERR_DROP, "Bad brushside texinfo");
+			Com_Error(ERR_DROP, "Bad brushside texinfo");
+		out->plane = &map_planes[num];
 		out->surface = &map_surfaces[j];
+
+		--in;
+		--out;
 	}
 
 	Prof_End();
