@@ -190,6 +190,8 @@ int FS_FOpenFile (char *filename, file_t **file)
 	int				i;
 	filelink_t		*link;
 
+	Prof_Begin(__FUNCTION__);
+
 	file_from_pak = 0;
 
 	// check for links first
@@ -202,8 +204,10 @@ int FS_FOpenFile (char *filename, file_t **file)
 			if (*file)
 			{		
 				Com_DPrintf ("link file: %s\n",netpath);
+				Prof_End();
 				return FS_filelength (*file);
 			}
+			Prof_End();
 			return -1;
 		}
 	}
@@ -228,6 +232,7 @@ int FS_FOpenFile (char *filename, file_t **file)
 					if (!*file)
 						Com_Error (ERR_FATAL, "Couldn't reopen %s", pak->filename);	
 					Sys_SeekFile (*file, pak->files[i].filepos, SEEK_SET);
+					Prof_End();
 					return pak->files[i].filelen;
 				}
 		}
@@ -239,10 +244,11 @@ int FS_FOpenFile (char *filename, file_t **file)
 			
 			*file = Sys_OpenFileRead (netpath);
 			if (!*file)
-				continue; // TODO Close file? - PetMac
+				continue;
 			
 			Com_DPrintf ("FindFile: %s\n",netpath);
 
+			Prof_End();
 			return FS_filelength (*file);
 		}
 		
@@ -251,6 +257,7 @@ int FS_FOpenFile (char *filename, file_t **file)
 	Com_DPrintf ("FindFile: can't find %s\n", filename);
 	
 	*file = NULL;
+	Prof_End();
 	return -1;
 }
 

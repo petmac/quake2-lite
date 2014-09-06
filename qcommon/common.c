@@ -1116,6 +1116,8 @@ void Z_Free (void *ptr)
 {
 	zhead_t	*z;
 
+	Prof_Begin(__FUNCTION__);
+
 	z = ((zhead_t *)ptr) - 1;
 
 	if (z->magic != Z_MAGIC)
@@ -1127,6 +1129,8 @@ void Z_Free (void *ptr)
 	z_count--;
 	z_bytes -= z->size;
 	free (z);
+
+	Prof_End();
 }
 
 
@@ -1149,6 +1153,8 @@ void *Z_MallocEx (int size, const char *file, int line, const char *function)
 {
 	zhead_t	*z;
 	
+	Prof_Begin(__FUNCTION__);
+
 	// Com_Printf("Z_MallocEx: ALLOC size = %8d, count = %8d, total = %8d, called from %s\n", size, z_count, z_bytes, function);
 
 	if (size >= (80 * 1024))
@@ -1170,6 +1176,8 @@ void *Z_MallocEx (int size, const char *file, int line, const char *function)
 	z->prev = &z_chain;
 	z_chain.next->prev = z;
 	z_chain.next = z;
+
+	Prof_End();
 
 	return (void *)(z+1);
 }
