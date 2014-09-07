@@ -44,10 +44,13 @@ QUAKE FILESYSTEM
 // in memory
 //
 
+#define MAX_PACK_HANDLES 3
+
 typedef struct pack_s
 {
 	char	filename[MAX_OSPATH];
-	file_t	*handle;
+	file_t	*usedhandles[MAX_PACK_HANDLES];
+	file_t	*freehandles[MAX_PACK_HANDLES];
 	int		numfiles;
 	dpackfile_t	*files;
 } pack_t;
@@ -131,6 +134,64 @@ void	FS_CreatePath (char *path)
 }
 
 
+/*
+==============
+FS_FCloseFile
+
+For some reason, other dll's can't just cal fclose()
+on files returned by FS_FOpenFile...
+==============
+*/
+static qboolean FS_ClosePackHandle(pack_t *pak, file_t *f)
+{
+	int i;
+
+	for (i = 0; i < MAX_PACK_HANDLES; ++i)
+	{
+		if (f == pak->usedhandles[i])
+		{
+			int j;
+
+			pak->usedhandles[i] = NULL;
+
+			for (j = 0; j < MAX_PACK_HANDLES; ++j)
+			{
+				if (pak->freehandles[j] == NULL)
+				{
+					pak->freehandles[j] = f;
+					return true;
+				}
+			}
+
+			Com_DPrintf("Ran out of spaces to store free pack handles in.\n");
+			Sys_CloseFile(f);
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void FS_FCloseFile (file_t *f)
+{
+	searchpath_t *search;
+
+	for (search = fs_searchpaths; search; search = search->next)
+	{
+		pack_t *pak = search->pack;
+		if (pak)
+		{
+			if (FS_ClosePackHandle(pak, f)) {
+				return;
+			}
+		}
+	}
+
+	Sys_CloseFile(f);
+}
+
+
 // RAFAEL
 /*
 	Developer_searchpath
@@ -180,6 +241,42 @@ Used for streaming data out of either a pak file or
 a seperate file.
 ===========
 */
+static file_t *FS_OpenPackFile(pack_t *pak)
+{
+	file_t *f = NULL;
+	int i;
+
+	for (i = 0; i < MAX_PACK_HANDLES; ++i)
+	{
+		if (pak->freehandles[i] != NULL)
+		{
+			f = pak->freehandles[i];
+			pak->freehandles[i] = NULL;
+			break;
+		}
+	}
+
+	if (f == NULL)
+	{
+		f = Sys_OpenFileRead(pak->filename);
+		if (f == NULL)
+			Com_Error(ERR_FATAL, "Couldn't reopen %s", pak->filename);
+	}
+
+	for (i = 0; i < MAX_PACK_HANDLES; ++i)
+	{
+		if (pak->usedhandles[i] == NULL)
+		{
+			pak->usedhandles[i] = f;
+			return f;
+		}
+	}
+
+	Com_DPrintf("Ran out of spaces to store used pack handles in.\n");
+
+	return f;
+}
+
 int file_from_pak = 0;
 #ifndef NO_ADDONS
 int FS_FOpenFile (char *filename, file_t **file)
@@ -228,9 +325,7 @@ int FS_FOpenFile (char *filename, file_t **file)
 					file_from_pak = 1;
 					Com_DPrintf ("PackFile: %s : %s\n",pak->filename, filename);
 				// open a new file on the pakfile
-					*file = Sys_OpenFileRead(pak->filename);
-					if (!*file)
-						Com_Error (ERR_FATAL, "Couldn't reopen %s", pak->filename);	
+					*file = FS_OpenPackFile(pak);
 					Sys_SeekFile (*file, pak->files[i].filepos, SEEK_SET);
 					Prof_End();
 					return pak->files[i].filelen;
@@ -368,7 +463,7 @@ int FS_LoadFile (char *path, void **buffer)
 	
 	if (!buffer)
 	{
-		Sys_CloseFile (h);
+		FS_FCloseFile (h);
 		Prof_End();
 		return len;
 	}
@@ -378,7 +473,7 @@ int FS_LoadFile (char *path, void **buffer)
 
 	FS_Read (buf, len, h);
 
-	Sys_CloseFile (h);
+	FS_FCloseFile (h);
 
 	Prof_End();
 
@@ -446,7 +541,12 @@ pack_t *FS_LoadPackFile (char *packfile)
 
 	pack = Z_Malloc (sizeof (pack_t));
 	strcpy (pack->filename, packfile);
-	pack->handle = packhandle;
+	for (i = 0; i < MAX_PACK_HANDLES; ++i)
+	{
+		pack->usedhandles[i] = NULL;
+		pack->freehandles[i] = NULL;
+	}
+	pack->freehandles[0] = packhandle;
 	pack->numfiles = numpackfiles;
 	pack->files = newfiles;
 	
@@ -563,11 +663,25 @@ void FS_SetGamedir (char *dir)
 	//
 	while (fs_searchpaths != fs_base_searchpaths)
 	{
-		if (fs_searchpaths->pack)
+		pack_t *pak = fs_searchpaths->pack;
+
+		if (pak)
 		{
-			Sys_CloseFile (fs_searchpaths->pack->handle);
-			Z_Free (fs_searchpaths->pack->files);
-			Z_Free (fs_searchpaths->pack);
+			int i;
+
+			for (i = 0; i < MAX_PACK_HANDLES; ++i)
+			{
+				if (pak->usedhandles[i] != NULL)
+				{
+					Sys_CloseFile(pak->usedhandles[i]);
+				}
+				if (pak->freehandles[i] != NULL)
+				{
+					Sys_CloseFile(pak->freehandles[i]);
+				}
+			}
+			Z_Free (pak->files);
+			Z_Free (pak);
 		}
 		next = fs_searchpaths->next;
 		Z_Free (fs_searchpaths);

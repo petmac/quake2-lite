@@ -607,7 +607,7 @@ struct sfx_s *S_RegisterSexedSound (entity_state_t *ent, char *base)
 		if (f)
 		{
 			// yes, close the file and register it
-			Sys_CloseFile (f);
+			FS_FCloseFile (f);
 			sfx = S_RegisterSound (sexedFilename);
 		}
 		else

@@ -704,7 +704,7 @@ cmodel_t *CM_LoadMap (char *name, qboolean clientload, unsigned *checksum)
 	CMod_LoadVisibility (&header.lumps[LUMP_VISIBILITY], file, base);
 	CMod_LoadEntityString (&header.lumps[LUMP_ENTITIES], file, base);
 
-	Sys_CloseFile(file);
+	FS_FCloseFile(file);
 	file = NULL;
 
 	CM_InitBoxHull ();

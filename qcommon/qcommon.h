@@ -707,6 +707,7 @@ char	*FS_NextPath (char *prevpath);
 void	FS_ExecAutoexec (void);
 
 int		FS_FOpenFile (char *filename, file_t **file);
+void	FS_FCloseFile (file_t *f);
 
 int		FS_LoadFile (char *path, void **buffer);
 // a null buffer will just return the file length without loading
