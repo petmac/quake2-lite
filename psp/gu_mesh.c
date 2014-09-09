@@ -205,6 +205,7 @@ void GL_DrawAliasFrameLerp (mmdl_t *paliashdr, float backlerp)
 			do
 			{
 				const float *xyz;
+				vec3_t rgb;
 
 				vertex->s = *(float *)order++;
 				vertex->t = *(float *)order++;
@@ -215,7 +216,21 @@ void GL_DrawAliasFrameLerp (mmdl_t *paliashdr, float backlerp)
 				// normals and vertexes come from the frame list
 				l = shadedots[verts[index_xyz].lightnormalindex];
 
-				vertex->colour = GU_COLOR(l * shadelight[0], l * shadelight[1], l * shadelight[2], alpha);
+				VectorScale(shadelight, l * 2, rgb);
+				if (rgb[0] > 1)
+				{
+					rgb[0] = 1;
+				}
+				if (rgb[1] > 1)
+				{
+					rgb[1] = 1;
+				}
+				if (rgb[2] > 1)
+				{
+					rgb[2] = 1;
+				}
+
+				vertex->colour = GU_COLOR(rgb[0], rgb[1], rgb[2], alpha);
 				vertex->x = xyz[0];
 				vertex->y = xyz[1];
 				vertex->z = xyz[2];
