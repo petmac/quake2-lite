@@ -195,6 +195,9 @@
     <ClInclude Include="psp-sim\psptypes.h">
       <Filter>psp-sim</Filter>
     </ClInclude>
+    <ClInclude Include="psp-sim\pspiofilemgr.h">
+      <Filter>psp-sim</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="client\cl_cin.c">
@@ -532,6 +535,12 @@
     </ClCompile>
     <ClCompile Include="null\in_null.c">
       <Filter>null</Filter>
+    </ClCompile>
+    <ClCompile Include="psp\sys_psp_file.c">
+      <Filter>psp</Filter>
+    </ClCompile>
+    <ClCompile Include="psp-sim\pspiofilemgr.c">
+      <Filter>psp-sim</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

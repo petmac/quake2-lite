@@ -124,6 +124,7 @@
     <ClInclude Include="psp-sim\pspge.h" />
     <ClInclude Include="psp-sim\pspgu.h" />
     <ClInclude Include="psp-sim\pspgum.h" />
+    <ClInclude Include="psp-sim\pspiofilemgr.h" />
     <ClInclude Include="psp-sim\pspkernel.h" />
     <ClInclude Include="psp-sim\psprtc.h" />
     <ClInclude Include="psp-sim\psptypes.h" />
@@ -211,6 +212,7 @@
     <ClCompile Include="psp-sim\pspge.c" />
     <ClCompile Include="psp-sim\pspgu.c" />
     <ClCompile Include="psp-sim\pspgum.c" />
+    <ClCompile Include="psp-sim\pspiofilemgr.c" />
     <ClCompile Include="psp-sim\pspkernel.c" />
     <ClCompile Include="psp-sim\psprtc.c" />
     <ClCompile Include="psp-sim\psputils.c" />
@@ -227,6 +229,7 @@
     <ClCompile Include="psp\net_psp.c" />
     <ClCompile Include="psp\snddma_psp.c" />
     <ClCompile Include="psp\sys_psp.c" />
+    <ClCompile Include="psp\sys_psp_file.c" />
     <ClCompile Include="psp\vid_menu_psp.c" />
     <ClCompile Include="psp\vid_psp.c" />
     <ClCompile Include="qcommon\cmd.c" />

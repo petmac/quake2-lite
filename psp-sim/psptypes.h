@@ -8,6 +8,7 @@ typedef uint32_t u32;
 typedef uint64_t u64;
 
 typedef u32 SceSize;
+typedef int SceUID;
 
 typedef u16 ScePspRGB565;
 typedef u32 ScePspRGBA8888;

@@ -87,5 +87,5 @@ long Sys_SeekFile(file_t *file, long offset, int whence)
 long Sys_TellFile(file_t *file)
 {
 	SceUID f = native_file(file);
-	return sceIoLseek(f, 0, PSP_SEEK_CUR);
+	return sceIoLseek32(f, 0, PSP_SEEK_CUR);
 }
