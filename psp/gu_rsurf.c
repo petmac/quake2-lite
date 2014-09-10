@@ -31,7 +31,7 @@ msurface_t	*r_alpha_surfaces;
 #define DYNAMIC_LIGHT_WIDTH  128
 #define DYNAMIC_LIGHT_HEIGHT 128
 
-#define LIGHTMAP_BYTES 4
+#define LIGHTMAP_BYTES 3
 
 #define	BLOCK_WIDTH		128
 #define	BLOCK_HEIGHT	128
@@ -51,7 +51,7 @@ typedef struct gllightmapstate_s
 
 	// the lightmap texture data needs to be kept in
 	// main memory so texsubimage can update properly
-	byte		lightmap_buffer[4*BLOCK_WIDTH*BLOCK_HEIGHT];
+	byte		lightmap_buffer[LIGHTMAP_BYTES*BLOCK_WIDTH*BLOCK_HEIGHT];
 } gllightmapstate_t;
 
 static byte __attribute__((aligned(16))) lightmap_textures[MAX_LIGHTMAPS][BLOCK_WIDTH * BLOCK_HEIGHT];
@@ -1261,7 +1261,7 @@ static void LM_ConvertToGUFormat(byte *dst, int height)
 		r = *src++;
 		g = *src++;
 		b = *src;
-		src += 2;
+		src += (LIGHTMAP_BYTES - 2);
 
 		// Calculate RGB.
 		rgb = (r >> 3) | ((g >> 2) << 5) | ((g >> 3) << 11);

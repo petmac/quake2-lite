@@ -461,7 +461,7 @@ Combine and scale multiple lightmaps into the floating format in blocklights
 void R_BuildLightMap (msurface_t *surf, byte *dest, int stride)
 {
 	int			smax, tmax;
-	int			r, g, b, a, max;
+	int			r, g, b, max;
 	int			i, j, size;
 	byte		*lightmap;
 	float		scale[4];
@@ -580,7 +580,7 @@ void R_BuildLightMap (msurface_t *surf, byte *dest, int stride)
 
 // put into texture format
 store:
-	stride -= (smax<<2);
+	stride -= (smax * 3);
 	bl = s_blocklights;
 
 	for (i=0 ; i<tmax ; i++, dest += stride)
@@ -611,13 +611,6 @@ store:
 				max = b;
 
 			/*
-			** alpha is ONLY used for the mono lightmap case.  For this reason
-			** we set it to the brightest of the color components so that 
-			** things don't get too dim.
-			*/
-			a = max;
-
-			/*
 			** rescale all the color components if the intensity of the greatest
 			** channel exceeds 1.0
 			*/
@@ -628,16 +621,14 @@ store:
 				r = r*t;
 				g = g*t;
 				b = b*t;
-				a = a*t;
 			}
 
 			dest[0] = r;
 			dest[1] = g;
 			dest[2] = b;
-			dest[3] = a;
 
 			bl += 3;
-			dest += 4;
+			dest += 3;
 		}
 	}
 }
