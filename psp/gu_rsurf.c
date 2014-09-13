@@ -1264,7 +1264,7 @@ static void LM_ConvertToGUFormat(byte *dst, int height)
 		src += (LIGHTMAP_BYTES - 2);
 
 		// Calculate RGB.
-		rgb = (r >> 3) | ((g >> 2) << 5) | ((g >> 3) << 11);
+		rgb = (r >> 3) | ((g >> 2) << 5) | ((b >> 3) << 11);
 
 		// Write index.
 		*dst++ = gl_state.d_16to8table[rgb];
