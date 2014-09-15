@@ -1,46 +1,46 @@
-There are 39 section headers, starting at offset 0x18c084:
+There are 39 section headers, starting at offset 0x18c2e4:
 
 Section Headers:
   [Nr] Name              Type            Addr     Off    Size   ES Flg Lk Inf Al
   [ 0]                   NULL            00000000 000000 000000 00      0   0  0
-  [ 1] .reginfo          MIPS_REGINFO    08900000 0d884c 000018 01      0   0  4
+  [ 1] .reginfo          MIPS_REGINFO    08900000 0d8aac 000018 01      0   0  4
   [ 2] .init             PROGBITS        08900018 001018 000024 00  AX  0   0  1
-  [ 3] .text             PROGBITS        0890003c 00103c 0aec8c 00  AX  0   0  4
-  [ 4] .fini             PROGBITS        089aecc8 0afcc8 00001c 00  AX  0   0  1
-  [ 5] .sceStub.text     PROGBITS        089aece4 0afce4 0001e0 00  AX  0   0  4
-  [ 6] .lib.ent.top      PROGBITS        089aeec4 0afec4 000004 00   A  0   0  4
-  [ 7] .lib.ent          PROGBITS        089aeec8 0afec8 000010 00   A  0   0  4
-  [ 8] .lib.ent.btm      PROGBITS        089aeed8 0afed8 000004 00   A  0   0  4
-  [ 9] .lib.stub.top     PROGBITS        089aeedc 0afedc 000004 00   A  0   0  4
-  [10] .lib.stub         PROGBITS        089aeee0 0afee0 0000f0 00   A  0   0  4
-  [11] .lib.stub.btm     PROGBITS        089aefd0 0affd0 000004 00   A  0   0  4
-  [12] .rodata.sceModule PROGBITS        089aefe0 0affe0 000040 00   A  0   0 16
-  [13] .rodata.sceReside PROGBITS        089af020 0b0020 0000f4 00   A  0   0  4
-  [14] .rodata.sceNid    PROGBITS        089af114 0b0114 0000f0 00   A  0   0  4
-  [15] .rodata           PROGBITS        089af208 0b0208 014098 00   A  0   0  8
-  [16] .eh_frame         PROGBITS        089c33a0 0c43a0 00003c 00  WA  0   0  4
-  [17] .ctors            PROGBITS        089c33dc 0c43dc 000008 00  WA  0   0  4
-  [18] .dtors            PROGBITS        089c33e4 0c43e4 000008 00  WA  0   0  4
-  [19] .jcr              PROGBITS        089c33ec 0c43ec 000004 00  WA  0   0  4
-  [20] .data             PROGBITS        089c33f0 0c43f0 014450 00  WA  0   0 16
-  [21] .sdata            PROGBITS        089d7840 0d8840 00000c 00 WAp  0   0  4
-  [22] .sbss             NOBITS          089d784c 0d8864 000000 00 WAp  0   0  1
-  [23] .bss              NOBITS          089d7850 0d884c 3fd460 00  WA  0   0 16
-  [24] .comment          PROGBITS        00000000 0d8864 001b36 00      0   0  1
-  [25] .debug_aranges    MIPS_DWARF      00000000 0da3a0 002220 00      0   0  8
-  [26] .debug_pubnames   MIPS_DWARF      00000000 0dc5c0 0031ab 00      0   0  1
-  [27] .debug_info       MIPS_DWARF      00000000 0df76b 05367e 00      0   0  1
-  [28] .debug_abbrev     MIPS_DWARF      00000000 132de9 0142a3 00      0   0  1
-  [29] .debug_line       MIPS_DWARF      00000000 14708c 013b4d 00      0   0  1
-  [30] .debug_frame      MIPS_DWARF      00000000 15abdc 003a50 00      0   0  4
-  [31] .debug_str        MIPS_DWARF      00000000 15e62c 0085fb 01  MS  0   0  1
-  [32] .debug_loc        MIPS_DWARF      00000000 166c27 0238ad 00      0   0  1
-  [33] .mdebug.eabi32    PROGBITS        00000000 18a4d4 000000 00      0   0  1
-  [34] .gcc_compiled_lon PROGBITS        00000000 18a4d4 000000 00      0   0  1
-  [35] .debug_ranges     MIPS_DWARF      00000000 18a4d4 001a10 00      0   0  1
-  [36] .shstrtab         STRTAB          00000000 18bee4 0001a0 00      0   0  1
-  [37] .symtab           SYMTAB          00000000 18c69c 012f50 10     38 1196  4
-  [38] .strtab           STRTAB          00000000 19f5ec 013431 00      0   0  1
+  [ 3] .text             PROGBITS        0890003c 00103c 0aeee0 00  AX  0   0  4
+  [ 4] .fini             PROGBITS        089aef1c 0aff1c 00001c 00  AX  0   0  1
+  [ 5] .sceStub.text     PROGBITS        089aef38 0aff38 0001e0 00  AX  0   0  4
+  [ 6] .lib.ent.top      PROGBITS        089af118 0b0118 000004 00   A  0   0  4
+  [ 7] .lib.ent          PROGBITS        089af11c 0b011c 000010 00   A  0   0  4
+  [ 8] .lib.ent.btm      PROGBITS        089af12c 0b012c 000004 00   A  0   0  4
+  [ 9] .lib.stub.top     PROGBITS        089af130 0b0130 000004 00   A  0   0  4
+  [10] .lib.stub         PROGBITS        089af134 0b0134 0000f0 00   A  0   0  4
+  [11] .lib.stub.btm     PROGBITS        089af224 0b0224 000004 00   A  0   0  4
+  [12] .rodata.sceModule PROGBITS        089af230 0b0230 000040 00   A  0   0 16
+  [13] .rodata.sceReside PROGBITS        089af270 0b0270 0000f4 00   A  0   0  4
+  [14] .rodata.sceNid    PROGBITS        089af364 0b0364 0000f0 00   A  0   0  4
+  [15] .rodata           PROGBITS        089af458 0b0458 014098 00   A  0   0  8
+  [16] .eh_frame         PROGBITS        089c35f0 0c45f0 00003c 00  WA  0   0  4
+  [17] .ctors            PROGBITS        089c362c 0c462c 000008 00  WA  0   0  4
+  [18] .dtors            PROGBITS        089c3634 0c4634 000008 00  WA  0   0  4
+  [19] .jcr              PROGBITS        089c363c 0c463c 000004 00  WA  0   0  4
+  [20] .data             PROGBITS        089c3640 0c4640 014460 00  WA  0   0 16
+  [21] .sdata            PROGBITS        089d7aa0 0d8aa0 00000c 00 WAp  0   0  4
+  [22] .sbss             NOBITS          089d7aac 0d8ac4 000000 00 WAp  0   0  1
+  [23] .bss              NOBITS          089d7ab0 0d8aac 3fd870 00  WA  0   0 16
+  [24] .comment          PROGBITS        00000000 0d8ac4 001b36 00      0   0  1
+  [25] .debug_aranges    MIPS_DWARF      00000000 0da600 002220 00      0   0  8
+  [26] .debug_pubnames   MIPS_DWARF      00000000 0dc820 0031ab 00      0   0  1
+  [27] .debug_info       MIPS_DWARF      00000000 0df9cb 05367e 00      0   0  1
+  [28] .debug_abbrev     MIPS_DWARF      00000000 133049 0142a3 00      0   0  1
+  [29] .debug_line       MIPS_DWARF      00000000 1472ec 013b4d 00      0   0  1
+  [30] .debug_frame      MIPS_DWARF      00000000 15ae3c 003a50 00      0   0  4
+  [31] .debug_str        MIPS_DWARF      00000000 15e88c 0085fb 01  MS  0   0  1
+  [32] .debug_loc        MIPS_DWARF      00000000 166e87 0238ad 00      0   0  1
+  [33] .mdebug.eabi32    PROGBITS        00000000 18a734 000000 00      0   0  1
+  [34] .gcc_compiled_lon PROGBITS        00000000 18a734 000000 00      0   0  1
+  [35] .debug_ranges     MIPS_DWARF      00000000 18a734 001a10 00      0   0  1
+  [36] .shstrtab         STRTAB          00000000 18c144 0001a0 00      0   0  1
+  [37] .symtab           SYMTAB          00000000 18c8fc 012fa0 10     38 1201  4
+  [38] .strtab           STRTAB          00000000 19f89c 013467 00      0   0  1
 Key to Flags:
   W (write), A (alloc), X (execute), M (merge), S (strings)
   I (info), L (link order), G (group), x (unknown)
