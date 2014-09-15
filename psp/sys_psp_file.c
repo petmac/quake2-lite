@@ -157,25 +157,56 @@ long Sys_SeekFile(file_t *file, long offset, int whence)
 
 	if (f == cache_file)
 	{
-		cache_file = -1;
-		sceIoLseek32(f, cache_file_pos, PSP_SEEK_SET);
-	}
+		const size_t buffer_file_pos_begin = cache_file_pos - cache_begin;
+		const size_t buffer_file_pos_end = buffer_file_pos_begin + cache_end;
 
-	int wh = 0;
-	switch (whence)
+		switch (whence)
+		{
+		case SEEK_SET:
+			if ((offset >= buffer_file_pos_begin) && (offset <= buffer_file_pos_end))
+			{
+				cache_file_pos = offset;
+				cache_begin = offset - buffer_file_pos_begin;
+			}
+			else
+			{
+				cache_file_pos = sceIoLseek32(f, offset, PSP_SEEK_SET);
+				cache_begin = 0;
+				cache_end = 0;
+			}
+			break;
+		case SEEK_CUR:
+			cache_file_pos = sceIoLseek32(f, cache_file_pos + offset, PSP_SEEK_SET);
+			cache_begin = 0;
+			cache_end = 0;
+			break;
+		case SEEK_END:
+			cache_file_pos = sceIoLseek32(f, offset, PSP_SEEK_END);
+			cache_begin = 0;
+			cache_end = 0;
+			break;
+		}
+
+		return cache_file_pos;
+	}
+	else
 	{
-	case SEEK_SET:
-		wh = PSP_SEEK_SET;
-		break;
-	case SEEK_CUR:
-		wh = PSP_SEEK_CUR;
-		break;
-	case SEEK_END:
-		wh = PSP_SEEK_END;
-		break;
-	}
+		int wh = 0;
+		switch (whence)
+		{
+		case SEEK_SET:
+			wh = PSP_SEEK_SET;
+			break;
+		case SEEK_CUR:
+			wh = PSP_SEEK_CUR;
+			break;
+		case SEEK_END:
+			wh = PSP_SEEK_END;
+			break;
+		}
 
-	return sceIoLseek32(f, offset, wh);
+		return sceIoLseek32(f, offset, wh);
+	}
 }
 
 long Sys_TellFile(file_t *file)
