@@ -121,7 +121,7 @@ size_t Sys_ReadFile(void *buffer, size_t size, size_t count, file_t *file)
 	}
 	else
 	{
-		if (cache_file >= 0)
+		if ((cache_file >= 0) && (cache_begin != cache_end))
 		{
 			sceIoLseek32(cache_file, cache_file_pos, PSP_SEEK_SET);
 		}
