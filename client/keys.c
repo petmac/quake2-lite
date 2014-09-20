@@ -38,12 +38,12 @@ int		edit_line=0;
 int		history_line=0;
 
 int		key_waiting;
-char	*keybindings[256];
-qboolean	consolekeys[256];	// if true, can't be rebound while in console
-qboolean	menubound[256];	// if true, can't be rebound while in menu
-int		keyshift[256];		// key to map to if shift held down in console
-int		key_repeats[256];	// if > 1, it is autorepeating
-qboolean	keydown[256];
+char	*keybindings[KEY_COUNT];
+qboolean	consolekeys[KEY_COUNT];	// if true, can't be rebound while in console
+qboolean	menubound[KEY_COUNT];	// if true, can't be rebound while in menu
+int		keyshift[KEY_COUNT];		// key to map to if shift held down in console
+int		key_repeats[KEY_COUNT];	// if > 1, it is autorepeating
+qboolean	keydown[KEY_COUNT];
 
 typedef struct
 {
@@ -555,7 +555,7 @@ void Key_Unbindall_f (void)
 {
 	int		i;
 	
-	for (i=0 ; i<256 ; i++)
+	for (i=0 ; i<KEY_COUNT ; i++)
 		if (keybindings[i])
 			Key_SetBinding (i, "");
 }
@@ -617,7 +617,7 @@ void Key_WriteBindings (FILE *f)
 {
 	int		i;
 
-	for (i=0 ; i<256 ; i++)
+	for (i=0 ; i<KEY_COUNT ; i++)
 		if (keybindings[i] && keybindings[i][0])
 			fprintf (f, "bind %s \"%s\"\n", Key_KeynumToString(i), keybindings[i]);
 }
@@ -633,7 +633,7 @@ void Key_Bindlist_f (void)
 {
 	int		i;
 
-	for (i=0 ; i<256 ; i++)
+	for (i=0 ; i<KEY_COUNT ; i++)
 		if (keybindings[i] && keybindings[i][0])
 			Com_Printf ("%s \"%s\"\n", Key_KeynumToString(i), keybindings[i]);
 }
@@ -692,7 +692,7 @@ void Key_Init (void)
 	consolekeys['`'] = false;
 	consolekeys['~'] = false;
 
-	for (i=0 ; i<256 ; i++)
+	for (i=0 ; i<KEY_COUNT ; i++)
 		keyshift[i] = i;
 	for (i='a' ; i<='z' ; i++)
 		keyshift[i] = i - 'a' + 'A';
@@ -919,7 +919,7 @@ void Key_ClearStates (void)
 
 	anykeydown = false;
 
-	for (i=0 ; i<256 ; i++)
+	for (i=0 ; i<KEY_COUNT ; i++)
 	{
 		if ( keydown[i] || key_repeats[i] )
 			Key_Event( i, false, 0 );

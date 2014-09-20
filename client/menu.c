@@ -645,7 +645,7 @@ static void M_UnbindCommand (char *command)
 
 	l = strlen(command);
 
-	for (j=0 ; j<256 ; j++)
+	for (j=0 ; j<KEY_COUNT ; j++)
 	{
 		b = keybindings[j];
 		if (!b)
@@ -666,7 +666,7 @@ static void M_FindKeysForCommand (char *command, int *twokeys)
 	l = strlen(command);
 	count = 0;
 
-	for (j=0 ; j<256 ; j++)
+	for (j=0 ; j<KEY_COUNT ; j++)
 	{
 		b = keybindings[j];
 		if (!b)
