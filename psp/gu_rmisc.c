@@ -45,15 +45,12 @@ GL_ScreenShot_f
 */  
 void GL_ScreenShot_f (void) 
 {
-	byte		*buffer;
+	const gu_pixel_t *const front_buffer = (gu_back_buffer == vram->fb.fb1) ? vram->fb.fb2 : vram->fb.fb1;
+	char		header[18];
 	char		picname[80]; 
 	char		checkname[MAX_OSPATH];
-	int			i, c, temp;
+	int			i;
 	FILE		*f;
-
-	// create the scrnshots directory if it doesn't exist
-	Com_sprintf (checkname, sizeof(checkname), "%s/scrnshot", ri.FS_Gamedir());
-	Sys_Mkdir (checkname);
 
 // 
 // find a file name to save it to 
@@ -64,7 +61,11 @@ void GL_ScreenShot_f (void)
 	{ 
 		picname[5] = i/10 + '0'; 
 		picname[6] = i%10 + '0'; 
-		Com_sprintf (checkname, sizeof(checkname), "%s/scrnshot/%s", ri.FS_Gamedir(), picname);
+#ifdef _WIN32
+		Com_sprintf(checkname, sizeof(checkname), "%s", picname);
+#else
+		Com_sprintf (checkname, sizeof(checkname), "ms0:/PICTURE/%s", picname);
+#endif
 		f = fopen (checkname, "rb");
 		if (!f)
 			break;	// file doesn't exist
@@ -74,36 +75,48 @@ void GL_ScreenShot_f (void)
 	{
 		ri.Con_Printf (PRINT_ALL, "SCR_ScreenShot_f: Couldn't create a file\n"); 
 		return;
- 	}
-
-
-	buffer = Z_Malloc(GU_SCR_WIDTH*GU_SCR_HEIGHT*3 + 18);
-	memset (buffer, 0, 18);
-	buffer[2] = 2;		// uncompressed type
-	buffer[12] = GU_SCR_WIDTH&255;
-	buffer[13] = GU_SCR_WIDTH>>8;
-	buffer[14] = GU_SCR_HEIGHT&255;
-	buffer[15] = GU_SCR_HEIGHT>>8;
-	buffer[16] = 24;	// pixel size
-
-#ifndef PSP
-	qglReadPixels (0, 0, GU_SCR_WIDTH, GU_SCR_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, buffer+18 ); 
-#endif
-
-	// swap rgb to bgr
-	c = 18+GU_SCR_WIDTH*GU_SCR_HEIGHT*3;
-	for (i=18 ; i<c ; i+=3)
-	{
-		temp = buffer[i];
-		buffer[i] = buffer[i+2];
-		buffer[i+2] = temp;
 	}
 
-	f = fopen (checkname, "wb");
-	fwrite (buffer, 1, c, f);
-	fclose (f);
+	f = fopen(checkname, "wb");
+	if (f == NULL)
+	{
+		ri.Con_Printf(PRINT_ALL, "SCR_ScreenShot_f: Couldn't open file %s\n", checkname);
+		return;
+	}
 
-	Z_Free (buffer);
+	memset(&header, 0, sizeof(header));
+	header[2] = 2;		// uncompressed type
+	header[12] = GU_SCR_WIDTH&255;
+	header[13] = GU_SCR_WIDTH>>8;
+	header[14] = GU_SCR_HEIGHT&255;
+	header[15] = GU_SCR_HEIGHT>>8;
+	header[16] = 24;	// pixel size
+
+	fwrite(&header, 1, sizeof(header), f);
+
+	for (i = 0; i < GU_SCR_HEIGHT; ++i)
+	{
+		const gu_pixel_t *const src_row = &front_buffer[(GU_SCR_HEIGHT - i - 1) * GU_SCR_BUF_WIDTH];
+		uint8_t dst_row[GU_SCR_WIDTH][3];
+		int x;
+
+		for (x = 0; x < GU_SCR_WIDTH; ++x)
+		{
+			const gu_pixel_t src_pixel = src_row[x];
+			const uint8_t r = ((src_pixel & 31) * 255) / 31;
+			const uint8_t g = (((src_pixel >> 5) & 63) * 255) / 63;
+			const uint8_t b = (((src_pixel >> 11) & 31) * 255) / 31;
+			uint8_t *const dst_pixel = &dst_row[x][0];
+
+			dst_pixel[0] = b;
+			dst_pixel[1] = g;
+			dst_pixel[2] = r;
+		}
+
+		fwrite(&dst_row[0][0], sizeof(dst_row), 1, f);
+	}
+
+	fclose (f);
 	ri.Con_Printf (PRINT_ALL, "Wrote %s\n", picname);
 }
 

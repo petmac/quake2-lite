@@ -54,6 +54,8 @@ static button_mapping_t button_mappings[] =
 void IN_Init(void)
 {
 	in_joystick = Cvar_Get("in_joystick", "1", 0);
+
+	Key_SetBinding(K_TRIANGLE, "screenshot");
 }
 
 void IN_Shutdown(void)
