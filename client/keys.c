@@ -53,15 +53,26 @@ typedef struct
 
 keyname_t keynames[] =
 {
+	{ "UPARROW", K_UPARROW },
+	{ "DOWNARROW", K_DOWNARROW },
+	{ "LEFTARROW", K_LEFTARROW },
+	{ "RIGHTARROW", K_RIGHTARROW },
+
+#ifdef PSP
+	{ "CROSS", K_CROSS },
+	{ "CIRCLE", K_CIRCLE },
+	{ "SQUARE", K_SQUARE },
+	{ "TRIANGLE", K_TRIANGLE },
+	{ "LTRIGGER", K_LTRIGGER },
+	{ "RTRIGGER", K_RTRIGGER },
+	{ "SELECT", K_SELECT },
+	{ "START", K_START },
+#else
 	{"TAB", K_TAB},
 	{"ENTER", K_ENTER},
 	{"ESCAPE", K_ESCAPE},
 	{"SPACE", K_SPACE},
 	{"BACKSPACE", K_BACKSPACE},
-	{"UPARROW", K_UPARROW},
-	{"DOWNARROW", K_DOWNARROW},
-	{"LEFTARROW", K_LEFTARROW},
-	{"RIGHTARROW", K_RIGHTARROW},
 
 	{"ALT", K_ALT},
 	{"CTRL", K_CTRL},
@@ -151,6 +162,7 @@ keyname_t keynames[] =
 	{"PAUSE", K_PAUSE},
 
 	{"SEMICOLON", ';'},	// because a raw semicolon seperates commands
+#endif
 
 	{NULL,0}
 };
@@ -791,7 +803,7 @@ void Key_Event (int key, qboolean down, unsigned time)
 		key = K_ESCAPE;
 
 	// menu key is hardcoded, so the user can never unbind it
-	if (key == K_ESCAPE)
+	if ((key == K_ESCAPE) || (key == K_START))
 	{
 		if (!down)
 			return;

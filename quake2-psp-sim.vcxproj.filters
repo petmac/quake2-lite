@@ -533,14 +533,14 @@
     <ClCompile Include="psp-sim\psputils.c">
       <Filter>psp-sim</Filter>
     </ClCompile>
-    <ClCompile Include="null\in_null.c">
-      <Filter>null</Filter>
-    </ClCompile>
     <ClCompile Include="psp\sys_psp_file.c">
       <Filter>psp</Filter>
     </ClCompile>
     <ClCompile Include="psp-sim\pspiofilemgr.c">
       <Filter>psp-sim</Filter>
+    </ClCompile>
+    <ClCompile Include="psp\in_psp.c">
+      <Filter>psp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

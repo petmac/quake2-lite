@@ -12,6 +12,7 @@ OBJS = \
 	gu_rsurf.o \
 	gu_warp.o \
 	\
+	in_psp.o \
 	net_psp.o \
 	snddma_psp.o \
 	sys_psp.o \
@@ -89,7 +90,6 @@ OBJS = \
 	../game/q_shared.o \
 	\
 	../null/cd_null.o \
-	../null/in_null.o \
 	\
 	../qcommon/cmd.o \
 	../qcommon/cmodel.o \

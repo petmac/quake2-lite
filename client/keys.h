@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // these are the key numbers that should be passed to Key_Event
 //
-typedef enum key_e
+typedef enum qkey_e
 {
 	K_TAB = 9,
 	K_ENTER = 13,
@@ -131,8 +131,18 @@ typedef enum key_e
 	K_MWHEELDOWN,
 	K_MWHEELUP,
 
+	// PSP
+	K_CROSS,
+	K_CIRCLE,
+	K_SQUARE,
+	K_TRIANGLE,
+	K_LTRIGGER,
+	K_RTRIGGER,
+	K_SELECT,
+	K_START,
+
 	KEY_COUNT
-} key_t;
+} qkey_t;
 
 extern char		*keybindings[KEY_COUNT];
 extern	int		key_repeats[KEY_COUNT];

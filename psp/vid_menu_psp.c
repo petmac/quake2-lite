@@ -112,6 +112,7 @@ const char *VID_MenuKey( int key )
 	switch ( key )
 	{
 	case K_ESCAPE:
+	case K_CIRCLE:
 		M_PopMenu();
 		return NULL;
 	case K_UPARROW:
@@ -129,6 +130,7 @@ const char *VID_MenuKey( int key )
 		Menu_SlideItem( m, 1 );
 		break;
 	case K_ENTER:
+	case K_CROSS:
 		Menu_SelectItem( m );
 		break;
 	}

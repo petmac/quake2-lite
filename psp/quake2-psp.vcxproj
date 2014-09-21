@@ -200,6 +200,7 @@
     <ClCompile Include="gu_rmisc.c" />
     <ClCompile Include="gu_rsurf.c" />
     <ClCompile Include="gu_warp.c" />
+    <ClCompile Include="in_psp.c" />
     <ClCompile Include="net_psp.c" />
     <ClCompile Include="snddma_psp.c" />
     <ClCompile Include="sys_psp.c" />
@@ -215,7 +216,6 @@
     <ClCompile Include="..\server\sv_user.c" />
     <ClCompile Include="..\server\sv_world.c" />
     <ClCompile Include="..\null\cd_null.c" />
-    <ClCompile Include="..\null\in_null.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="P:\PSP\GAME\Quake2\log.txt" />

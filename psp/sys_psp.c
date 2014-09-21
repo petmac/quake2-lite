@@ -230,20 +230,12 @@ int main (int argc, char **argv)
 	// Run the main loop.
 	while (go)
 	{
-		SceCtrlData pad;
-
 		curtime = Sys_Milliseconds();
 		sys_frame_time = curtime;
 
 		if (curtime < oldtime)
 		{
 			Sys_Error("curtime (%d) < oldtime (%d)\n", curtime, oldtime);
-		}
-
-		sceCtrlPeekBufferPositive(&pad, 1);
-		if (pad.Buttons & PSP_CTRL_CROSS)
-		{
-			go = false;
 		}
 
 		if (curtime != oldtime)

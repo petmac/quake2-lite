@@ -205,7 +205,6 @@
     <ClCompile Include="game\p_weapon.c" />
     <ClCompile Include="game\q_shared.c" />
     <ClCompile Include="null\cd_null.c" />
-    <ClCompile Include="null\in_null.c" />
     <ClCompile Include="psp-sim\pspaudiolib.c" />
     <ClCompile Include="psp-sim\pspctrl.c" />
     <ClCompile Include="psp-sim\pspdisplay.c" />
@@ -226,6 +225,7 @@
     <ClCompile Include="psp\gu_rmisc.c" />
     <ClCompile Include="psp\gu_rsurf.c" />
     <ClCompile Include="psp\gu_warp.c" />
+    <ClCompile Include="psp\in_psp.c" />
     <ClCompile Include="psp\net_psp.c" />
     <ClCompile Include="psp\snddma_psp.c" />
     <ClCompile Include="psp\sys_psp.c" />

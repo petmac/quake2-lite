@@ -159,6 +159,7 @@ const char *Default_MenuKey( menuframework_s *m, int key )
 	switch ( key )
 	{
 	case K_ESCAPE:
+	case K_CIRCLE:
 		M_PopMenu();
 		return menu_out_sound;
 	case K_KP_UPARROW:
@@ -246,6 +247,7 @@ const char *Default_MenuKey( menuframework_s *m, int key )
 		
 	case K_KP_ENTER:
 	case K_ENTER:
+	case K_CROSS:
 		if ( m )
 			Menu_SelectItem( m );
 		sound = menu_move_sound;
@@ -438,6 +440,7 @@ const char *M_Main_Key (int key)
 	switch (key)
 	{
 	case K_ESCAPE:
+	case K_CIRCLE:
 		M_PopMenu ();
 		break;
 
@@ -455,6 +458,7 @@ const char *M_Main_Key (int key)
 
 	case K_KP_ENTER:
 	case K_ENTER:
+	case K_CROSS:
 		m_entersound = true;
 
 		switch (m_main_cursor)
@@ -986,6 +990,7 @@ static const char *Keys_MenuKey( int key )
 	{
 	case K_KP_ENTER:
 	case K_ENTER:
+	case K_CROSS:
 		KeyBindingFunc( item );
 		return menu_in_sound;
 	case K_BACKSPACE:		// delete bindings
@@ -1732,6 +1737,7 @@ const char *M_Credits_Key( int key )
 	switch (key)
 	{
 	case K_ESCAPE:
+	case K_CIRCLE:
 		if (creditsBuffer)
 			FS_FreeFile (creditsBuffer);
 		M_PopMenu ();
@@ -2039,12 +2045,18 @@ void LoadGame_MenuDraw( void )
 
 const char *LoadGame_MenuKey( int key )
 {
-	if ( key == K_ESCAPE || key == K_ENTER )
+	switch (key)
 	{
+	case K_ESCAPE:
+	case K_ENTER:
+	case K_CROSS:
+	case K_CIRCLE:
 		s_savegame_menu.cursor = s_loadgame_menu.cursor - 1;
 		if ( s_savegame_menu.cursor < 0 )
 			s_savegame_menu.cursor = 0;
+		break;
 	}
+
 	return Default_MenuKey( &s_loadgame_menu, key );
 }
 
@@ -2109,11 +2121,16 @@ void SaveGame_MenuInit( void )
 
 const char *SaveGame_MenuKey( int key )
 {
-	if ( key == K_ENTER || key == K_ESCAPE )
+	switch (key)
 	{
+	case K_ESCAPE:
+	case K_ENTER:
+	case K_CROSS:
+	case K_CIRCLE:
 		s_loadgame_menu.cursor = s_savegame_menu.cursor - 1;
 		if ( s_loadgame_menu.cursor < 0 )
 			s_loadgame_menu.cursor = 0;
+		break;
 	}
 	return Default_MenuKey( &s_savegame_menu, key );
 }
@@ -3824,11 +3841,13 @@ const char *M_Quit_Key (int key)
 	switch (key)
 	{
 	case K_ESCAPE:
+	case K_CIRCLE:
 	case 'n':
 	case 'N':
 		M_PopMenu ();
 		break;
 
+	case K_CROSS:
 	case 'Y':
 	case 'y':
 		cls.key_dest = key_console;

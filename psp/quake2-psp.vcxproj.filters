@@ -482,10 +482,10 @@
     <ClCompile Include="..\null\cd_null.c">
       <Filter>null</Filter>
     </ClCompile>
-    <ClCompile Include="..\null\in_null.c">
-      <Filter>null</Filter>
-    </ClCompile>
     <ClCompile Include="sys_psp_file.c">
+      <Filter>psp</Filter>
+    </ClCompile>
+    <ClCompile Include="in_psp.c">
       <Filter>psp</Filter>
     </ClCompile>
   </ItemGroup>
